@@ -1,5 +1,6 @@
 const jp = require('jsonpath');
 const fs = require('fs');
+const util = require('util');
 
 let wm = new WeakMap();
 
@@ -11,6 +12,11 @@ class Queryable {
   get(property = '*') {
       return property == '*' ? wm.get(this) : wm.get(this)[property];
   }
+
+  [util.inspect.custom](depth, options) {
+    return wm.get(this);
+  }
+
 
   * query(selector='') {
     const data = wm.get(this);
@@ -30,14 +36,31 @@ class SpriteCollection extends Sprite {
   }
 
   query(selector) {
+    let [type, ...selectors] = selector.split(" ");
+    const properties = selectors.filter(s => s.includes(":")).map(s => s.substring(1));
+
+    let unfilteredSprites;
     let sprites;
-    if (selector === 'stage') {
-      sprites = jp.query(wm.get(this), '$..[?(@.isStage==true)]').map(s => new Sprite(s));
-    } else if (selector === 'sprite') {
-      sprites = jp.query(wm.get(this), '$..[?(@.isStage==false)]').map(s => new Sprite(s));
+
+    if (type === 'stage') {
+      unfilteredSprites = jp.query(this.get('*'), '$..[?(@.isStage==true)]');
+    } else if (type === 'sprite') {
+      unfilteredSprites = jp.query(this.get('*'), '$..[?(@.isStage==false)]');
+    } else {
+      return this.get('*').map(s => new Sprite(s));
     }
 
-    return sprites;
+    //Filter the attributes
+    sprites = !Array.isArray(selectors) || !selectors.length ? unfilteredSprites : unfilteredSprites.map(s => {
+        let newObj = {}
+        properties.forEach(p => {
+          newObj[p] = s[p]
+        })
+        return newObj;
+      });
+
+
+    return sprites.map(s => new Sprite(s));
   }
 }
 
@@ -61,10 +84,16 @@ class ScratchProject extends SpriteCollection {
 const fileTargets = JSON.parse(fs.readFileSync('/Users/erikamiguelyeo/repos/evmiguel/sb3s/simple/project.json', 'utf-8')).targets;
 const sp = new ScratchProject(fileTargets);
 
-let sprites = sp.query('sprite');
-for (let s of sprites) {
-  console.log(s.get('*'))
+let sprites = sp.query('sprite :currentCostume');
+for( let s of sprites ){
+  console.log(s)
 }
+
+let stage = sp.query('stage');
+for( let s of sprites ){
+  console.log(s)
+}
+
 
 
 
