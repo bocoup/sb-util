@@ -8,6 +8,7 @@ class Queryable {
   constructor(targets) {
     wm.set(this, targets);
     this.validTypes = [ 'stage', 'sprite', 'block', 'asset']
+    this.index = 0;
   }
 
   get(property = '*') {
@@ -102,7 +103,6 @@ class Sprite extends Queryable {
 class SpriteCollection extends Sprite {
   constructor(target) {
     super(target);
-    this.index = 0;
   }
 }
 
@@ -115,18 +115,33 @@ class Block extends Queryable {
 class BlockCollection extends Block {
   constructor(target) {
     super(target);
-    this.index = 0;
+  }
+
+  parseQuery(selector) {
+    const { properties, node } = super.parseQuery(selector);
+    const blockTypes = selector.split(' ').filter(s => s.includes('.')).map(s => s.substring(1));
+
+    return { properties, node, blockTypes};
   }
 
 
   query(selector) {
     // Only interested in properties and node because the implicit type is 'block'
-    const { properties, node } = this.parseQuery(selector);
+    const { properties, node, blockTypes } = this.parseQuery(selector);
+    const collection = this.get('*');
 
-    const blocksObjs = this.get('*').map(b => b.toObject());
-    const blocks = jp.query(blocksObjs, `$..[?(@.opcode=="${node}")]`);
-
-    return this.filterProperties(blocks, properties).map(b => new Block(b));
+    let blocks;
+    if (blockTypes.length > 0) {
+      blocks = [];
+      for (let type of blockTypes) {
+        blocks = blocks.concat(collection.filter(c => c.get('opcode').includes(type)));
+      }      
+    } else {
+      const blocksObjs = collection.map(b => b.toObject());
+      blocks = jp.query(blocksObjs, `$..[?(@.opcode=="${node}")]`);
+    }
+    
+    return new BlockCollection(this.filterProperties(blocks, properties).map(b => new Block(b)));
   }
 }
 
@@ -187,4 +202,5 @@ console.log('\n\n\n');
 
 let blocks = sp.query('block');
 let controlIfElseBlock = blocks.query('control_if_else');
+console.log(blocks.query('.control .sensing'))
 
