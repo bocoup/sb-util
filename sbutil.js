@@ -126,7 +126,7 @@ class BlockCollection extends Block {
     const blocksObjs = this.get('*').map(b => b.toObject());
     const blocks = jp.query(blocksObjs, `$..[?(@.opcode=="${node}")]`);
 
-    return blocks.map(b => new Block(b));
+    return this.filterProperties(blocks, properties).map(b => new Block(b));
   }
 }
 
@@ -186,5 +186,5 @@ console.log(ifElseBlocks)
 console.log('\n\n\n');
 
 let blocks = sp.query('block');
-let controlIfElseBlock = blocks.query('control_if_else')
+let controlIfElseBlock = blocks.query('control_if_else');
 
