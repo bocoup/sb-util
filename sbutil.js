@@ -38,20 +38,27 @@ class SpriteCollection extends Sprite {
   query(selector) {
     let [type, ...selectors] = selector.split(" ");
     const properties = selectors.filter(s => s.includes(":")).map(s => s.substring(1));
+    const collection = this.get('*');
 
-    let unfilteredSprites;
-    let sprites;
+    let unfilteredTargets, unfilteredBlocks;
 
     if (type === 'stage') {
-      unfilteredSprites = jp.query(this.get('*'), '$..[?(@.isStage==true)]');
+      unfilteredTargets = jp.query(collection, '$..[?(@.isStage==true)]');
     } else if (type === 'sprite') {
-      unfilteredSprites = jp.query(this.get('*'), '$..[?(@.isStage==false)]');
+      unfilteredTargets = jp.query(collection, '$..[?(@.isStage==false)]');
+    } else if (type === 'blocks') {
+      unfilteredTargets = [];
+      unfilteredBlocks = jp.query(collection, '$..blocks');
+      unfilteredBlocks.map(u => {
+        Object.keys(u).map(k => unfilteredTargets.push(Object.assign({},{id: k}, u[k])));
+        return unfilteredTargets;
+      })
     } else {
       return this.get('*').map(s => new Sprite(s));
     }
 
     //Filter the attributes
-    sprites = !Array.isArray(selectors) || !selectors.length ? unfilteredSprites : unfilteredSprites.map(s => {
+    let sprites = !Array.isArray(selectors) || !selectors.length ? unfilteredTargets : unfilteredTargets.map(s => {
         let newObj = {}
         properties.forEach(p => {
           newObj[p] = s[p]
@@ -85,13 +92,24 @@ const fileTargets = JSON.parse(fs.readFileSync('/Users/erikamiguelyeo/repos/evmi
 const sp = new ScratchProject(fileTargets);
 
 let sprites = sp.query('sprite :currentCostume');
+console.log('Logging sprites:');
 for( let s of sprites ){
-  console.log(s)
+  console.log(s);
 }
+console.log('\n\n\n');
+
+let blocks = sp.query('blocks :id :opcode');
+console.log('Logging blocks:');
+for (let b of blocks){
+  console.log(b);
+}
+console.log('\n\n\n');
+
 
 let stage = sp.query('stage');
+console.log('Logging stage:');
 for( let s of sprites ){
-  console.log(s)
+  console.log(s);
 }
 
 
