@@ -25,9 +25,11 @@ class Queryable {
 
     const type = selectors.filter(s => this.validTypes.includes(s)).pop();
     const properties = selectors.filter(s => s.includes(":")).map(s => s.substring(1));
-    const node = selectors.filter(s => !s.includes(':') && !this.validTypes.includes(s)).pop();
+    const node = selectors.filter(s => !s.includes(':') && !s.includes('.') && !this.validTypes.includes(s)).pop();
+    const blockTypes = selector.split(' ').filter(s => s.includes('.')).map(s => s.substring(1));
 
-    return { type, properties, node };
+
+    return { type, properties, node, blockTypes };
   }
 
   filterProperties(targets, properties){
@@ -43,7 +45,7 @@ class Queryable {
 
 
   query(selector) {
-    const { type, properties, node } = this.parseQuery(selector);
+    const { type, properties, node, blockTypes } = this.parseQuery(selector);
     const collection = this.get('*');
 
     let unfilteredTargets, unfilteredBlocks;
@@ -62,6 +64,10 @@ class Queryable {
 
       if(node) {
         unfilteredTargets = jp.query(unfilteredTargets, `$..[?(@.opcode=="${node}")]`);
+      } else if (blockTypes.length > 1) {
+        for (let type of blockTypes) {
+          unfilteredTargets = unfilteredTargets.concat(collection.filter(c => c.get('opcode').includes(type)));
+        }  
       }
     } else {
       unfilteredTargets = this.get('*');
@@ -117,13 +123,6 @@ class BlockCollection extends Block {
     super(target);
   }
 
-  parseQuery(selector) {
-    const { properties, node } = super.parseQuery(selector);
-    const blockTypes = selector.split(' ').filter(s => s.includes('.')).map(s => s.substring(1));
-
-    return { properties, node, blockTypes};
-  }
-
 
   query(selector) {
     // Only interested in properties and node because the implicit type is 'block'
@@ -132,10 +131,7 @@ class BlockCollection extends Block {
 
     let blocks;
     if (blockTypes.length > 0) {
-      blocks = [];
-      for (let type of blockTypes) {
-        blocks = blocks.concat(collection.filter(c => c.get('opcode').includes(type)));
-      }      
+      blocks = super.query(`block ${selector}`);
     } else {
       const blocksObjs = collection.map(b => b.toObject());
       blocks = jp.query(blocksObjs, `$..[?(@.opcode=="${node}")]`);
@@ -202,5 +198,4 @@ console.log('\n\n\n');
 
 let blocks = sp.query('block');
 let controlIfElseBlock = blocks.query('control_if_else');
-console.log(blocks.query('.control .sensing'))
-
+let controlAndSendingBlocks = blocks.query('.control .sensing');
