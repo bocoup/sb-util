@@ -29,6 +29,17 @@ class Queryable {
     return { type, properties, node };
   }
 
+  filterProperties(targets, properties){
+    //Filter the attributes
+    return !Array.isArray(properties) || !properties.length ? targets : targets.map(s => {
+      let newObj = {};
+      properties.forEach(p => {
+        newObj[p] = s[p];
+      })
+      return newObj;
+    });
+  }
+
 
   query(selector) {
     const { type, properties, node } = this.parseQuery(selector);
@@ -49,23 +60,36 @@ class Queryable {
       })
 
       if(node) {
-          unfilteredTargets = jp.query(unfilteredTargets, `$..[?(@.opcode=="${node}")]`);
+        unfilteredTargets = jp.query(unfilteredTargets, `$..[?(@.opcode=="${node}")]`);
       }
     } else {
       unfilteredTargets = this.get('*');
     }
 
+    return this.filterProperties(unfilteredTargets, properties);
+  }
 
-    //Filter the attributes
-    let targets = !Array.isArray(properties) || !properties.length ? unfilteredTargets : unfilteredTargets.map(s => {
-        let newObj = {};
-        properties.forEach(p => {
-          newObj[p] = s[p];
-        })
-        return newObj;
-      });
+  toObject(){
+    let obj = {}
+    Object.entries(this.get('*')).forEach(([k, v]) => {
+      obj[k] = v;
+    })
 
-    return targets;
+    return obj;
+  }
+
+  [Symbol.iterator]() {
+    const collection = this.get('*');
+    return {
+      next: () => {
+        if (this.index < collection.length) {
+          return {value: collection[this.index++], done: false};
+        } else {
+          this.index = 0; //If we would like to iterate over this again without forcing manual update of the index
+          return {done: true};
+        }
+      }
+    };
   }
 }
 
@@ -78,26 +102,7 @@ class Sprite extends Queryable {
 class SpriteCollection extends Sprite {
   constructor(target) {
     super(target);
-
-    this.sprites = [];
-    if (Array.isArray(target)) {
-      this.sprites = target.map(t => new Sprite(t));
-    }
-
     this.index = 0;
-  }
-
-  [Symbol.iterator]() {
-    return {
-      next: () => {
-        if (this.index < this.sprites.length) {
-          return {value: this.sprites[this.index++], done: false};
-        } else {
-          this.index = 0; //If we would like to iterate over this again without forcing manual update of the index
-          return {done: true};
-        }
-      }
-    };
   }
 }
 
@@ -110,30 +115,18 @@ class Block extends Queryable {
 class BlockCollection extends Block {
   constructor(target) {
     super(target);
-
-    this.blocks = [];
-    if (Array.isArray(target)) {
-      this.blocks = target.map(t => new Block(t));
-    }
-
     this.index = 0;
   }
 
-  [Symbol.iterator]() {
-    return {
-      next: () => {
-        if (this.index < this.blocks.length) {
-          return {value: this.blocks[this.index++], done: false};
-        } else {
-          this.index = 0; //If we would like to iterate over this again without forcing manual update of the index
-          return {done: true};
-        }
-      }
-    };
-  }
 
   query(selector) {
+    // Only interested in properties and node because the implicit type is 'block'
+    const { properties, node } = this.parseQuery(selector);
 
+    const blocksObjs = this.get('*').map(b => b.toObject());
+    const blocks = jp.query(blocksObjs, `$..[?(@.opcode=="${node}")]`);
+
+    return blocks.map(b => new Block(b));
   }
 }
 
@@ -151,7 +144,7 @@ class ScratchProject extends Queryable {
     if ( type === 'stage' || type === 'sprite') {
       return new SpriteCollection(collection);
     } else if (type === 'block') {
-      return new BlockCollection(collection);
+      return new BlockCollection(collection.map(c => new Block(c)));
     } else {
       return new SpriteCollection(collection);
     }
@@ -164,6 +157,13 @@ class ScratchProject extends Queryable {
 
 const fileTargets = JSON.parse(fs.readFileSync('/Users/erikamiguelyeo/repos/evmiguel/sb3s/simple/project.json', 'utf-8')).targets;
 const sp = new ScratchProject(fileTargets);
+
+let stage = sp.query('stage');
+console.log('Logging stage:');
+for( let s of stage ){
+  console.log(s);
+}
+console.log('\n\n\n');
 
 let sprites = sp.query('sprite :name :currentCostume :layerOrder');
 console.log('Logging sprites:');
@@ -180,16 +180,11 @@ for (let b of blockIds){
 console.log('\n\n\n');
 
 
-let blocks = sp.query('block control_if_else');
+let ifElseBlocks = sp.query('block control_if_else');
 console.log('Logging control_if_else blocks:')
-console.log(blocks)
+console.log(ifElseBlocks)
 console.log('\n\n\n');
 
-
-let stage = sp.query('stage');
-console.log('Logging stage:');
-for( let s of stage ){
-  console.log(s);
-}
-
+let blocks = sp.query('block');
+let controlIfElseBlock = blocks.query('control_if_else')
 
