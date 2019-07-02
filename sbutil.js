@@ -18,13 +18,14 @@ class Queryable {
   }
 
   parseQuery(selector) {
+    if (selector.charAt(0) === ':') selector = "* "+selector;
     let [type, ...selectors] = selector.split(" ");
     const properties = selectors.filter(s => s.includes(":")).map(s => s.substring(1));
     return { type, properties };
   }
 
 
-  query(selector='') {
+  query(selector) {
     const { type, properties } = this.parseQuery(selector);
     const collection = this.get('*');
 
@@ -34,7 +35,7 @@ class Queryable {
       unfilteredTargets = jp.query(collection, '$..[?(@.isStage==true)]');
     } else if (type === 'sprite') {
       unfilteredTargets = jp.query(collection, '$..[?(@.isStage==false)]');
-    } else if (type === 'blocks') {
+    } else if (type === 'block') {
       unfilteredTargets = [];
       unfilteredBlocks = jp.query(collection, '$..blocks');
       unfilteredBlocks.map(u => {
@@ -42,7 +43,7 @@ class Queryable {
         return unfilteredTargets;
       })
     } else {
-      return this.get('*')
+      unfilteredTargets = this.get('*')
     }
 
 
@@ -91,7 +92,37 @@ class SpriteCollection extends Sprite {
   }
 }
 
-// TODO: make block class and BlockCollection class
+class Block extends Queryable {
+  constructor(target) {
+    super(target);
+  }
+}
+
+class BlockCollection extends Block {
+  constructor(target) {
+    super(target);
+
+    this.blocks = [];
+    if (Array.isArray(target)) {
+      this.blocks = target.map(t => new Block(t));
+    }
+
+    this.index = 0;
+  }
+
+  [Symbol.iterator]() {
+    return {
+      next: () => {
+        if (this.index < this.blocks.length) {
+          return {value: this.blocks[this.index++], done: false};
+        } else {
+          this.index = 0; //If we would like to iterate over this again without forcing manual update of the index
+          return {done: true};
+        }
+      }
+    };
+  }
+}
 
 /**
   The ScratchProject class will have functionality to read a project.json, an .sb* file, and a JSON input.
@@ -106,7 +137,11 @@ class ScratchProject extends Queryable {
     const collection = super.query(selector);
     if ( type === 'stage' || type === 'sprite') {
       return new SpriteCollection(collection);
-    } 
+    } else if (type === 'block') {
+      return new BlockCollection(collection);
+    } else {
+      return new SpriteCollection(collection);
+    }
   }
 }
 
@@ -117,19 +152,19 @@ class ScratchProject extends Queryable {
 const fileTargets = JSON.parse(fs.readFileSync('/Users/erikamiguelyeo/repos/evmiguel/sb3s/simple/project.json', 'utf-8')).targets;
 const sp = new ScratchProject(fileTargets);
 
-let sprites = sp.query('sprite :currentCostume');
+let sprites = sp.query('sprite :name :currentCostume :layerOrder');
 console.log('Logging sprites:');
 for( let s of sprites ){
   console.log(s);
 }
 console.log('\n\n\n');
 
-// let blocks = sp.query('blocks :id :opcode');
-// console.log('Logging blocks:');
-// for (let b of blocks){
-//   console.log(b);
-// }
-// console.log('\n\n\n');
+let blocks = sp.query('block :id :opcode');
+console.log('Logging blocks:');
+for (let b of blocks){
+  console.log(b);
+}
+console.log('\n\n\n');
 
 
 let stage = sp.query('stage');
