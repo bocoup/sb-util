@@ -17,27 +17,15 @@ class Queryable {
     return wm.get(this);
   }
 
-
-  * query(selector='') {
-    const data = wm.get(this);
-    yield* jp.query(data, selector).map(d => new Queryable(d));
-  }
-}
-
-class Sprite extends Queryable {
-  constructor(target) {
-    super(target);
-  }
-}
-
-class SpriteCollection extends Sprite {
-  constructor(targets) {
-    super(targets);
-  }
-
-  query(selector) {
+  parseQuery(selector) {
     let [type, ...selectors] = selector.split(" ");
     const properties = selectors.filter(s => s.includes(":")).map(s => s.substring(1));
+    return { type, properties };
+  }
+
+
+  query(selector='') {
+    const { type, properties } = this.parseQuery(selector);
     const collection = this.get('*');
 
     let unfilteredTargets, unfilteredBlocks;
@@ -54,11 +42,12 @@ class SpriteCollection extends Sprite {
         return unfilteredTargets;
       })
     } else {
-      return this.get('*').map(s => new Sprite(s));
+      return this.get('*')
     }
 
+
     //Filter the attributes
-    let sprites = !Array.isArray(selectors) || !selectors.length ? unfilteredTargets : unfilteredTargets.map(s => {
+    let targets = !Array.isArray(properties) || !properties.length ? unfilteredTargets : unfilteredTargets.map(s => {
         let newObj = {}
         properties.forEach(p => {
           newObj[p] = s[p]
@@ -66,21 +55,58 @@ class SpriteCollection extends Sprite {
         return newObj;
       });
 
-
-    return sprites.map(s => new Sprite(s));
+    return targets;
   }
 }
+
+class Sprite extends Queryable {
+  constructor(target) {
+    super(target);
+  }
+}
+
+class SpriteCollection extends Sprite {
+  constructor(target) {
+    super(target);
+
+    this.sprites = [];
+    if (Array.isArray(target)) {
+      this.sprites = target.map(t => new Sprite(t));
+    }
+
+    this.index = 0;
+  }
+
+  [Symbol.iterator]() {
+    return {
+      next: () => {
+        if (this.index < this.sprites.length) {
+          return {value: this.sprites[this.index++], done: false};
+        } else {
+          this.index = 0; //If we would like to iterate over this again without forcing manual update of the index
+          return {done: true};
+        }
+      }
+    };
+  }
+}
+
+// TODO: make block class and BlockCollection class
 
 /**
   The ScratchProject class will have functionality to read a project.json, an .sb* file, and a JSON input.
 */
-class ScratchProject extends SpriteCollection {
+class ScratchProject extends Queryable {
   constructor(targets) {
     super(targets);
   }
 
   query(selector) {
-    return super.query(selector)
+    const { type, properties } = this.parseQuery(selector);
+    const collection = super.query(selector);
+    if ( type === 'stage' || type === 'sprite') {
+      return new SpriteCollection(collection);
+    } 
   }
 }
 
@@ -98,20 +124,18 @@ for( let s of sprites ){
 }
 console.log('\n\n\n');
 
-let blocks = sp.query('blocks :id :opcode');
-console.log('Logging blocks:');
-for (let b of blocks){
-  console.log(b);
-}
-console.log('\n\n\n');
+// let blocks = sp.query('blocks :id :opcode');
+// console.log('Logging blocks:');
+// for (let b of blocks){
+//   console.log(b);
+// }
+// console.log('\n\n\n');
 
 
 let stage = sp.query('stage');
 console.log('Logging stage:');
-for( let s of sprites ){
+for( let s of stage ){
   console.log(s);
 }
-
-
 
 
