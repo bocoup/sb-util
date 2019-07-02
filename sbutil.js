@@ -7,6 +7,7 @@ let wm = new WeakMap();
 class Queryable {
   constructor(targets) {
     wm.set(this, targets);
+    this.validTypes = [ 'stage', 'sprite', 'block', 'asset']
   }
 
   get(property = '*') {
@@ -19,14 +20,18 @@ class Queryable {
 
   parseQuery(selector) {
     if (selector.charAt(0) === ':') selector = "* "+selector;
-    let [type, ...selectors] = selector.split(" ");
+    let selectors = selector.split(" ");
+
+    const type = selectors.filter(s => this.validTypes.includes(s)).pop();
     const properties = selectors.filter(s => s.includes(":")).map(s => s.substring(1));
-    return { type, properties };
+    const node = selectors.filter(s => !s.includes(':') && !this.validTypes.includes(s)).pop();
+
+    return { type, properties, node };
   }
 
 
   query(selector) {
-    const { type, properties } = this.parseQuery(selector);
+    const { type, properties, node } = this.parseQuery(selector);
     const collection = this.get('*');
 
     let unfilteredTargets, unfilteredBlocks;
@@ -42,16 +47,20 @@ class Queryable {
         Object.keys(u).map(k => unfilteredTargets.push(Object.assign({},{id: k}, u[k])));
         return unfilteredTargets;
       })
+
+      if(node) {
+          unfilteredTargets = jp.query(unfilteredTargets, `$..[?(@.opcode=="${node}")]`);
+      }
     } else {
-      unfilteredTargets = this.get('*')
+      unfilteredTargets = this.get('*');
     }
 
 
     //Filter the attributes
     let targets = !Array.isArray(properties) || !properties.length ? unfilteredTargets : unfilteredTargets.map(s => {
-        let newObj = {}
+        let newObj = {};
         properties.forEach(p => {
-          newObj[p] = s[p]
+          newObj[p] = s[p];
         })
         return newObj;
       });
@@ -122,6 +131,10 @@ class BlockCollection extends Block {
       }
     };
   }
+
+  query(selector) {
+
+  }
 }
 
 /**
@@ -159,11 +172,17 @@ for( let s of sprites ){
 }
 console.log('\n\n\n');
 
-let blocks = sp.query('block :id :opcode');
-console.log('Logging blocks:');
-for (let b of blocks){
+let blockIds = sp.query('block :id :opcode');
+console.log('Logging blocks with attributes:');
+for (let b of blockIds){
   console.log(b);
 }
+console.log('\n\n\n');
+
+
+let blocks = sp.query('block control_if_else');
+console.log('Logging control_if_else blocks:')
+console.log(blocks)
 console.log('\n\n\n');
 
 
