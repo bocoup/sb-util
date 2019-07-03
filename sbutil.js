@@ -139,6 +139,15 @@ class BlockCollection extends Block {
     
     return new BlockCollection(this.filterProperties(blocks, properties).map(b => new Block(b)));
   }
+
+  text(node = this.get('*')[0]) {
+    console.log(node.get('opcode'))
+    if (node.get('next') === null) {
+      return;
+    }
+    const next = this.get('*').filter(b => b.get('id') === node.get('next')).pop();
+    this.text(next);
+  }
 }
 
 /**
@@ -169,33 +178,36 @@ class ScratchProject extends Queryable {
 const fileTargets = JSON.parse(fs.readFileSync('/Users/erikamiguelyeo/repos/evmiguel/sb3s/simple/project.json', 'utf-8')).targets;
 const sp = new ScratchProject(fileTargets);
 
-let stage = sp.query('stage');
-console.log('Logging stage:');
-for( let s of stage ){
-  console.log(s);
-}
-console.log('\n\n\n');
+// let stage = sp.query('stage');
+// console.log('Logging stage:');
+// for( let s of stage ){
+//   console.log(s);
+// }
+// console.log('\n\n\n');
 
-let sprites = sp.query('sprite :name :currentCostume :layerOrder');
-console.log('Logging sprites:');
-for( let s of sprites ){
-  console.log(s);
-}
-console.log('\n\n\n');
+// let sprites = sp.query('sprite :name :currentCostume :layerOrder');
+// console.log('Logging sprites:');
+// for( let s of sprites ){
+//   console.log(s);
+// }
+// console.log('\n\n\n');
 
-let blockIds = sp.query('block :id :opcode');
-console.log('Logging blocks with attributes:');
-for (let b of blockIds){
-  console.log(b);
-}
-console.log('\n\n\n');
+// let blockIds = sp.query('block :id :opcode');
+// console.log('Logging blocks with attributes:');
+// for (let b of blockIds){
+//   console.log(b);
+// }
+// console.log('\n\n\n');
 
 
-let ifElseBlocks = sp.query('block control_if_else');
-console.log('Logging control_if_else blocks:')
-console.log(ifElseBlocks)
-console.log('\n\n\n');
+// let ifElseBlocks = sp.query('block control_if_else');
+// console.log('Logging control_if_else blocks:')
+// console.log(ifElseBlocks)
+// console.log('\n\n\n');
 
-let blocks = sp.query('block');
-let controlIfElseBlock = blocks.query('control_if_else');
-let controlAndSendingBlocks = blocks.query('.control .sensing');
+// let blocks = sp.query('block');
+// let controlIfElseBlock = blocks.query('control_if_else');
+// let controlAndSendingBlocks = blocks.query('.control .sensing');
+
+let spriteOfBlock = sp.query('sprite block');
+spriteOfBlock.text();
