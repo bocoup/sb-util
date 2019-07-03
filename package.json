@@ -1,6 +1,6 @@
 {
   "name": "sb-util",
-  "version": "0.0.0-prealpha",
+  "version": "0.0.1-prealpha",
   "description": "Scratch blocks utilities: open and query Scratch blocks formats",
   "repository": {
     "type": "git",
