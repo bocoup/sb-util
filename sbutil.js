@@ -142,11 +142,15 @@ class BlockCollection extends Block {
 
   text(node = this.get('*')[0]) {
     console.log(node.get('opcode'))
-    if (node.get('next') === null) {
+    const nextAttr = node.get('next')
+    const substacks = Object.entries(node.get('inputs'))
+                          .filter(([k,v]) => k.includes('SUBSTACK')).map(([k,v]) => [k.replace('SUBSTACK', ''), v]);
+    console.log(substacks)
+    if (nextAttr === null) {
       return;
     }
-    const next = this.get('*').filter(b => b.get('id') === node.get('next')).pop();
-    this.text(next);
+    const nextNode = this.get('*').filter(b => b.get('id') === nextAttr).pop();
+    this.text(nextNode);
   }
 }
 
