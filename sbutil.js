@@ -144,7 +144,9 @@ class BlockCollection extends Block {
     console.log(node.get('opcode'))
     const nextAttr = node.get('next')
     const substacks = Object.entries(node.get('inputs'))
-                          .filter(([k,v]) => k.includes('SUBSTACK')).map(([k,v]) => [k.replace('SUBSTACK', ''), v]);
+                          .filter(([k,v]) => k.includes('SUBSTACK')).map(([k,v]) => [k.replace('SUBSTACK', ''), v]).sort((a,b) => {
+                            return b[0] < a[0];
+                          }).map(([k,v]) => v);
     console.log(substacks)
     if (nextAttr === null) {
       return;
