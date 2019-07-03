@@ -146,11 +146,27 @@ class BlockCollection extends Block {
     const substacks = Object.entries(node.get('inputs'))
                           .filter(([k,v]) => k.includes('SUBSTACK')).map(([k,v]) => [k.replace('SUBSTACK', ''), v]).sort((a,b) => {
                             return b[0] < a[0];
-                          }).map(([k,v]) => v);
-    console.log(substacks)
+                          }).map(([k,v]) => v[1]);
+
+    // explore the substack if there
+    if (substacks) {
+      let index = 0;
+      substacks.forEach(s => {
+        if (index === 0) {
+          console.log('if');
+        } else {
+          console.log('else');
+        }
+        const nextNode = this.get('*').filter(b => b.get('id') === s).pop();
+        this.text(nextNode);
+        index++;
+      })
+    }
+
     if (nextAttr === null) {
       return;
     }
+
     const nextNode = this.get('*').filter(b => b.get('id') === nextAttr).pop();
     this.text(nextNode);
   }
