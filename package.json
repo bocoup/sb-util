@@ -1,14 +1,47 @@
 {
-  "name": "sbutil",
-  "version": "1.0.0",
-  "description": "",
+  "name": "sb-util",
+  "version": "0.0.0-prealpha",
+  "description": "Scratch blocks utilities: open and query Scratch blocks formats",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bocoup/sb-util"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "scratch",
+    "scratchblocks",
+    "blocks"
+  ],
+  "author": {
+    "name": "Bocoup, LLC - GAIA team",
+    "url": "https://bocoup.com"
+  },
+  "contributors": {
+    {
+     "name": "Erika Miguel-Yeo",
+     "email": "erika@bocoup.com"
+    },
+    {
+      "name": "Corey Frang",
+      "email": "corey@bocoup.com"
+    },
+    {
+      "name": "Z Goddard",
+      "email": "z@bocoup.com"
+    },
+    {
+      "name": "Katie Broida",
+      "email": "katie@bocoup.com"
+    },
+    {
+      "name": "Amal Hussein",
+      "email": "amal@bocoup.com"
+    }
+  ],
+  "license": "BSD-3-Clause",
   "dependencies": {
     "jsonpath": "^1.0.2"
   }
