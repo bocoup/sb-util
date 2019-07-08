@@ -189,7 +189,7 @@ class BlockCollection extends Block {
     return this.query(blockType);
   }
 
-  text(node = this.get('*')[0], space='') {
+  renderToText(node = this.get('*')[0], space='') {
     console.log(`${space}${node.get('opcode').trim()}`);
     //console.log(node)
     const nextAttr = node.get('next');
@@ -206,7 +206,7 @@ class BlockCollection extends Block {
     if ('CONDITION' in inputs) {
       const [shadow, conditionId] = inputs['CONDITION'];
       const nextNode = this.get('*').filter(b => b.get('id') === conditionId).pop();
-      this.text(nextNode, space+' ');
+      this.renderToText(nextNode, space+' ');
     }
 
     if ('X' in inputs) {
@@ -222,7 +222,7 @@ class BlockCollection extends Block {
     if ('KEY_OPTION' in inputs) {
       const [shadow, keyId] = inputs['KEY_OPTION'];
       const nextNode = this.get('*').filter(b => b.get('id') === keyId).pop();
-      this.text(nextNode, space+' ');
+      this.renderToText(nextNode, space+' ');
     }
 
     if ('KEY_OPTION' in fields) {
@@ -241,7 +241,7 @@ class BlockCollection extends Block {
       let index = 0;
       substacks.forEach(s => {
         const nextNode = this.get('*').filter(b => b.get('id') === s).pop();
-        this.text(nextNode, space+' ');
+        this.renderToText(nextNode, space+' ');
         index++;
       })
     }
@@ -251,7 +251,7 @@ class BlockCollection extends Block {
     }
 
     const nextNode = this.get('*').filter(b => b.get('id') === nextAttr).pop();
-    this.text(nextNode, space+' ');
+    this.renderToText(nextNode, space+' ');
   }
 }
 
@@ -378,4 +378,4 @@ console.log('\n\n\n');
 console.log('Logging text version of connected blocks:');
 console.log('----------------------------------------');
 
-sprite1Blocks.text();
+sprite1Blocks.renderToText();
