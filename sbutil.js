@@ -4,6 +4,8 @@ const util = require('util');
 
 let wm = new WeakMap();
 
+//--------------------------------------------------------------------------------------------------------------------------
+
 class Queryable {
   constructor(targets) {
     wm.set(this, targets);
@@ -12,6 +14,9 @@ class Queryable {
   }
 
   get(property = '*') {
+
+      // Hacky but this is throwaway code; In the implementation, we do not want to expose the inputs.  
+      Object.assign(this, wm.get(this));
       return property == '*' ? wm.get(this) : wm.get(this)[property];
   }
 
@@ -100,6 +105,8 @@ class Queryable {
   }
 }
 
+//--------------------------------------------------------------------------------------------------------------------------
+
 class Sprite extends Queryable {
   constructor(target) {
     super(target);
@@ -142,15 +149,19 @@ class SpriteCollection extends Sprite {
     for (const s of this){
       blocks = blocks.concat(s.query('block'));
     }
-    return blocks;
+    return new BlockCollection(blocks.map(b => new Block(b)));
   }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
 
 class Block extends Queryable {
   constructor(target) {
     super(target);
   }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
 
 class BlockCollection extends Block {
   constructor(target) {
@@ -178,25 +189,43 @@ class BlockCollection extends Block {
     return this.query(blockType);
   }
 
-  text(node = this.get('*')[0]) {
-    console.log(node.get('opcode'))
-    const nextAttr = node.get('next')
-    const substacks = Object.entries(node.get('inputs'))
+  text(node = this.get('*')[0], space='') {
+    console.log(`${space}${node.get('opcode').trim()}`);
+    const nextAttr = node.get('next');
+    const inputs = node.get('inputs');
+    const fields = node.get('fields');
+
+
+    const substacks = Object.entries(inputs)
                           .filter(([k,v]) => k.includes('SUBSTACK')).map(([k,v]) => [k.replace('SUBSTACK', ''), v]).sort((a,b) => {
                             return b[0] < a[0];
                           }).map(([k,v]) => v[1]);
+
+    
+    if ('CONDITION' in inputs) {
+      const [shadow, conditionId] = inputs['CONDITION'];
+      const nextNode = this.get('*').filter(b => b.get('id') === conditionId).pop();
+      this.text(nextNode, space+' ');
+    }
+
+    if ('KEY_OPTION' in inputs) {
+      const [shadow, keyId] = inputs['KEY_OPTION'];
+      const nextNode = this.get('*').filter(b => b.get('id') === keyId).pop();
+      this.text(nextNode, space+' ');
+    }
+
+    if ('KEY_OPTION' in fields) {
+      const [key, ...rest] = fields['KEY_OPTION'];
+      console.log(`${space} ${key}`)
+    }
+    
 
     // explore the substack if there
     if (substacks) {
       let index = 0;
       substacks.forEach(s => {
-        if (index === 0) {
-          console.log('if');
-        } else {
-          console.log('else');
-        }
         const nextNode = this.get('*').filter(b => b.get('id') === s).pop();
-        this.text(nextNode);
+        this.text(nextNode, space+' ');
         index++;
       })
     }
@@ -206,9 +235,11 @@ class BlockCollection extends Block {
     }
 
     const nextNode = this.get('*').filter(b => b.get('id') === nextAttr).pop();
-    this.text(nextNode);
+    this.text(nextNode, space+' ');
   }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
 
 /**
   The ScratchProject class will have functionality to read a project.json, an .sb* file, and a JSON input.
@@ -258,6 +289,8 @@ class ScratchProject extends Queryable {
     }
   }
 }
+
+//--------------------------------------------------------------------------------------------------------------------------
 
 //----------------------------------
 // MAIN
@@ -315,6 +348,18 @@ const sprite1Blocks = sp.sprites({name: 'Sprite1'}).blocks();
 console.log(sprite1Blocks);
 console.log('\n\n\n');
 
+console.log('Logging control and sensing blocks for Sprite1:')
+const controlAndSensing = sprite1Blocks.query('.control .sensing');
+console.log(controlAndSensing);
+console.log('\n\n\n');
 
-let spriteOfBlock = sp.query('sprite block');
-spriteOfBlock.text();
+
+console.log('Logging find of control if else for Sprite1:')
+console.log(controlAndSensing.query('control_if_else'));
+console.log('\n\n\n');
+
+
+console.log('Logging text version of connected blocks:');
+console.log('----------------------------------------');
+
+sprite1Blocks.text();
