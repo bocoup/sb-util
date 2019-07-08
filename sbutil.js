@@ -104,11 +104,29 @@ class Sprite extends Queryable {
   constructor(target) {
     super(target);
   }
+
+  currentCostume() {
+    return this.get('currentCostume')
+  }
 }
 
 class SpriteCollection extends Sprite {
   constructor(target) {
     super(target);
+  }
+
+  currentCostume() {
+    let costumes = [];
+    this.get('*').forEach(s => costumes.push(s.currentCostume()));
+    return costumes;
+  }
+
+  map(f) {
+    const mapped = [];
+    for (const s of this) {
+      mapped.push(f(s.toObject()))
+    }
+    return new SpriteCollection(mapped.map(s => new Sprite(s)))
   }
 }
 
@@ -180,46 +198,75 @@ class ScratchProject extends Queryable {
     super(targets);
   }
 
+  sprites() {
+    return this.query('sprite');
+  }
+
+  stage() {
+    return this.query('stage');
+  }
+
+  blocks() {
+    return this.query('block');
+  }
+
   query(selector) {
     const { type, properties } = this.parseQuery(selector);
     const collection = super.query(selector);
     if ( type === 'stage' || type === 'sprite') {
-      return new SpriteCollection(collection);
+      return new SpriteCollection(collection.map(c => new Sprite(c)));
     } else if (type === 'block') {
       return new BlockCollection(collection.map(c => new Block(c)));
     } else {
-      return new SpriteCollection(collection);
+      return new SpriteCollection(collection.map(c => new Sprite(c)));
     }
   }
 }
 
 //----------------------------------
-// Main
+// MAIN
 //----------------------------------
 
 const fileTargets = JSON.parse(fs.readFileSync('/Users/erikamiguelyeo/repos/evmiguel/sb3s/simple/project.json', 'utf-8')).targets;
 const sp = new ScratchProject(fileTargets);
 
-// let stage = sp.query('stage');
-// console.log('Logging stage:');
-// for( let s of stage ){
-//   console.log(s);
-// }
-// console.log('\n\n\n');
+//----------------------------------
+// STAGE EXAMPLE
+//----------------------------------
+let stage = sp.stage();
+console.log('Logging stage:');
+for( let s of stage ){
+  console.log(s);
+}
+console.log('\n\n\n');
 
-// let sprites = sp.query('sprite :name :currentCostume :layerOrder');
-// console.log('Logging sprites:');
-// for( let s of sprites ){
-//   console.log(s);
-// }
-// console.log('\n\n\n');
+//----------------------------------
+// SPRITES EXAMPLES
+//----------------------------------
+let sprites = sp.sprites();
+console.log('Logging sprites:');
+for( let s of sprites ){
+  console.log(s);
+}
+console.log('\n\n\n');
 
-// let blockIds = sp.query('block :id :opcode');
-// console.log('Logging blocks with attributes:');
-// for (let b of blockIds){
-//   console.log(b);
-// }
-// console.log('\n\n\n');
+console.log('Logging sprite costumes:');
+console.log(sprites.currentCostume());
+console.log('\n\n\n');
+
+console.log('Logging sprite mapping:');
+sprites.map(
+  ({name, currentCostume, layerOrder, rotationStyle}) => console.log(
+      {name, currentCostume, layerOrder, rotationStyle}))
+console.log('\n\n\n');
+
+
+let blocks = sp.blocks();
+console.log('Logging blocks:');
+for (let b of blocks){
+  console.log(b);
+}
+console.log('\n\n\n');
 
 
 // let ifElseBlocks = sp.query('block control_if_else');
@@ -231,5 +278,5 @@ const sp = new ScratchProject(fileTargets);
 // let controlIfElseBlock = blocks.query('control_if_else');
 // let controlAndSendingBlocks = blocks.query('.control .sensing');
 
-let spriteOfBlock = sp.query('sprite block');
-spriteOfBlock.text();
+// let spriteOfBlock = sp.query('sprite block');
+// spriteOfBlock.text();
