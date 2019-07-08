@@ -124,9 +124,25 @@ class SpriteCollection extends Sprite {
   map(f) {
     const mapped = [];
     for (const s of this) {
-      mapped.push(f(s.toObject()))
+      mapped.push(f(s.toObject()));
     }
-    return new SpriteCollection(mapped.map(s => new Sprite(s)))
+    return new SpriteCollection(mapped.map(s => new Sprite(s)));
+  }
+
+  find(f) {
+    const found = [];
+    for (const s of this) {
+      found.push(f(s));
+    }
+    return new SpriteCollection(found.map(s => new Sprite(s)));
+  }
+
+  blocks() {
+    let blocks = [];
+    for (const s of this){
+      blocks = blocks.concat(s.query('block'));
+    }
+    return blocks;
   }
 }
 
@@ -156,6 +172,10 @@ class BlockCollection extends Block {
     }
     
     return new BlockCollection(this.filterProperties(blocks, properties).map(b => new Block(b)));
+  }
+
+  filter(blockType) {
+    return this.query(blockType);
   }
 
   text(node = this.get('*')[0]) {
@@ -192,13 +212,29 @@ class BlockCollection extends Block {
 
 /**
   The ScratchProject class will have functionality to read a project.json, an .sb* file, and a JSON input.
+
+  To send raw queries to the Queryable interface, use the query syntax as follows:
+
+    Three main types: stage, sprite, block
+    Object properties: use the CSS pseudo-class syntax, such as :currentCostume, :opcode, :layerOrder, etc
+    Block type: will be filtered out from [stage, sprite, block], so do not add any punctuation. An example is
+                  super.query('block control_if_else')
 */
 class ScratchProject extends Queryable {
   constructor(targets) {
     super(targets);
   }
 
-  sprites() {
+  sprites(options) {
+    if (options) {
+      const sprites = this.query('sprite');
+      sprites.find(s => {
+        Object.entries(options).forEach(([k,v]) => {
+          if (s.get(k) === v) return s;
+        })
+      })
+      //this.query('sprite').filter(s => )
+    }
     return this.query('sprite');
   }
 
@@ -257,7 +293,7 @@ console.log('\n\n\n');
 console.log('Logging sprite mapping:');
 sprites.map(
   ({name, currentCostume, layerOrder, rotationStyle}) => console.log(
-      {name, currentCostume, layerOrder, rotationStyle}))
+      {name, currentCostume, layerOrder, rotationStyle}));
 console.log('\n\n\n');
 
 
@@ -269,14 +305,16 @@ for (let b of blocks){
 console.log('\n\n\n');
 
 
-// let ifElseBlocks = sp.query('block control_if_else');
-// console.log('Logging control_if_else blocks:')
-// console.log(ifElseBlocks)
-// console.log('\n\n\n');
+let ifElseBlocks = blocks.filter('control_if_else');
+console.log('Logging control_if_else blocks:');
+console.log(ifElseBlocks);
+console.log('\n\n\n');
 
-// let blocks = sp.query('block');
-// let controlIfElseBlock = blocks.query('control_if_else');
-// let controlAndSendingBlocks = blocks.query('.control .sensing');
+console.log('Logging blocks for Sprite1:')
+const sprite1Blocks = sp.sprites({name: 'Sprite1'}).blocks();
+console.log(sprite1Blocks);
+console.log('\n\n\n');
 
-// let spriteOfBlock = sp.query('sprite block');
-// spriteOfBlock.text();
+
+let spriteOfBlock = sp.query('sprite block');
+spriteOfBlock.text();
