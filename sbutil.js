@@ -191,6 +191,7 @@ class BlockCollection extends Block {
 
   text(node = this.get('*')[0], space='') {
     console.log(`${space}${node.get('opcode').trim()}`);
+    //console.log(node)
     const nextAttr = node.get('next');
     const inputs = node.get('inputs');
     const fields = node.get('fields');
@@ -208,6 +209,16 @@ class BlockCollection extends Block {
       this.text(nextNode, space+' ');
     }
 
+    if ('X' in inputs) {
+      const [xinput, [code, varName, id]] = inputs['X'];
+      console.log(` ${space}X: ${varName}`);
+    }
+
+    if ('Y' in inputs) {
+      const [yinput, [shadow, val]] = inputs['Y'];
+      console.log(` ${space}Y: ${val}`);
+    }
+
     if ('KEY_OPTION' in inputs) {
       const [shadow, keyId] = inputs['KEY_OPTION'];
       const nextNode = this.get('*').filter(b => b.get('id') === keyId).pop();
@@ -216,7 +227,12 @@ class BlockCollection extends Block {
 
     if ('KEY_OPTION' in fields) {
       const [key, ...rest] = fields['KEY_OPTION'];
-      console.log(`${space} ${key}`)
+      console.log(` ${space}${key}`)
+    }
+
+    if ('VARIABLE' in fields) {
+      const [variable, ...rest] = fields['VARIABLE'];
+      console.log(` ${space}${variable}`);
     }
     
 
