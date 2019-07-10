@@ -354,7 +354,7 @@ for (let b of blocks){
 console.log('\n\n\n');
 
 
-let ifElseBlocks = blocks.filter('control_if_else');
+let ifElseBlocks = blocks.query('control_if_else');
 console.log('Logging control_if_else blocks:');
 console.log(ifElseBlocks);
 console.log('\n\n\n');

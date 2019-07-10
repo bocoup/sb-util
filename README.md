@@ -1,7 +1,4 @@
-# Purpose
-This repo demonstrates a proof of concept for the .sb3 utility for Scratch. It is a naive Javascript implementation to illustrate the different ways a project.json can be queried to get insightful information about a Scratch project.
+# sb-util
+*sb-util* is a utility that allows developers to query a Scratch Project for collections of sprites, blocks, assets, and any other information within a *.sb3 file's project.json.
 
-## Running the script
-```
-node sbutil.js
-```
+This repo holds the TypeScript implementation of sb-util, which can be imported as a JavaScript library or used as a CLI.
