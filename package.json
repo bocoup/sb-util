@@ -8,6 +8,7 @@
   },
   "main": "index.js",
   "scripts": {
+    "start": "tsc && node dist/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -21,8 +22,8 @@
   },
   "contributors": [
     {
-     "name": "Erika Miguel-Yeo",
-     "email": "erika@bocoup.com"
+      "name": "Erika Miguel-Yeo",
+      "email": "erika@bocoup.com"
     },
     {
       "name": "Corey Frang",
@@ -44,5 +45,9 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "jsonpath": "^1.0.2"
+  },
+  "devDependencies": {
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
   }
 }
