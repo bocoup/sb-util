@@ -5,7 +5,7 @@ interface Queryable {
 interface ScratchProjectOptions {
 	file?: String,
 	uri?: String,
-	cloudId?: String
+	cloudId?: number
 }
 
 
