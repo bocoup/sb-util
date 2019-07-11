@@ -2,6 +2,14 @@ interface Queryable {
 	query(selector: String);
 }
 
+interface ScratchProjectOptions {
+	file?: String,
+	uri?: String,
+	cloudId?: String
+}
+
+
+
 export class ScratchProject implements Queryable {
 	query(selector?: String) {
 		return [];
@@ -15,9 +23,9 @@ export class ScratchProject implements Queryable {
 	necessary I/O or HTTP requests needed to populate
 	the ScratchProject
 */
-const initialize = function(options: Object): Promise<ScratchProject> {
+const initialize = function(options: ScratchProjectOptions): Promise<ScratchProject> {
 	if (!options || Object.keys(options).length === 0) { 
-		throw new InitOptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
+		throw new OptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
 	} else if (Object.keys(options).length > 1) {
 		throw new MultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
@@ -27,7 +35,7 @@ const initialize = function(options: Object): Promise<ScratchProject> {
 	});
 }
 
-class InitOptionsEmptyError extends Error {
+class OptionsEmptyError extends Error {
     constructor(message?: string) {
         super(message); // 'Error' breaks prototype chain here
     }
