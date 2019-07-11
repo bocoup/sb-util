@@ -7,6 +7,7 @@
     "url": "https://github.com/bocoup/sb-util"
   },
   "main": "index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "node tests/index.js"
