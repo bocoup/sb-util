@@ -1,1 +1,1 @@
-export { sb } from './sb-util';
+export { ScratchProject } from './sb-util';
