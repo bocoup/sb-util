@@ -8,13 +8,18 @@ export class ScratchProject implements Queryable {
 	}
 }
 
-let ScratchProjectInitializer = {
-	ready: function(options: Object): Promise<ScratchProject> {
-		return new Promise((res, rej) => {
-			res(new ScratchProject());
-		});
-	}
+/*
+	initialize() is a factory method that returns a
+	Promise to a ScratchProject while it does the
+	necessary I/O or HTTP requests needed to populate 
+	the ScratchProject
+*/
+const initialize = function(options: Object): Promise<ScratchProject> {
+	return new Promise<ScratchProject>((resolve, reject) => {
+		resolve(new ScratchProject);
+	});
 }
 
-export { ScratchProjectInitializer };
+
+export { initialize };
 
