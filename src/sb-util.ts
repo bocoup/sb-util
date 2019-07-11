@@ -7,3 +7,14 @@ export class ScratchProject implements Queryable {
 		return [];
 	}
 }
+
+let ScratchProjectInitializer = {
+	ready: function(options: Object): Promise<ScratchProject> {
+		return new Promise((res, rej) => {
+			res(new ScratchProject());
+		});
+	}
+}
+
+export { ScratchProjectInitializer };
+

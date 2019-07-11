@@ -1,5 +1,5 @@
-import { ScratchProject } from './sb-util';
+import { ScratchProjectInitializer } from './sb-util';
 
 it('creates a ScratchProject object', () => {
-	expect(new ScratchProject()).toBeInstanceOf(ScratchProject);
+	expect(ScratchProjectInitializer.ready({})).toBeInstanceOf(Promise);
 })
