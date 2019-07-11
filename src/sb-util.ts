@@ -1,12 +1,4 @@
-interface Queryable {
-	query(selector: String);
-}
-
-interface ScratchProjectOptions {
-	file?: String,
-	uri?: String,
-	cloudId?: number
-}
+import { Queryable, ScratchProjectOptions } from './abstracts'
 
 
 
@@ -15,7 +7,6 @@ export class ScratchProject implements Queryable {
 		return [];
 	}
 }
-
 
 /*
 	initialize() is a factory method that returns a
