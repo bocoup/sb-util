@@ -12,17 +12,6 @@ enum ProjectSource {
 	MIT_PROJECT_URI = 'https://projects.scratch.mit.edu'
 }
 
-
-export class ScratchProject implements Queryable {
-	constructor(projectJSON: Object, assetFetcher?: any) {
-
-	}
-
-	query(selector?: String) {
-		return [];
-	}
-}
-
 /*
   The AssetFetcher is responsible for handing different
   project sources and the asset files within or referred
@@ -54,13 +43,24 @@ const AssetFetcher = {
 	}
 }
 
+
+export class ScratchProject implements Queryable {
+	constructor(projectJSON: Object, assetFetcher?: any) {
+
+	}
+
+	query(selector?: String) {
+		return [];
+	}
+}
+
 /*
 	initialize() is a factory method that returns a
 	Promise to a ScratchProject while it does the
 	necessary I/O or HTTP requests needed to populate
 	the ScratchProject
 */
-const initialize = function(options: ScratchProjectOptions): Promise<ScratchProject> {
+export const initialize = function(options: ScratchProjectOptions): Promise<ScratchProject> {
 	// Check project options before initializing a ScratchProject
 	if (!options || Object.keys(options).length === 0) { 
 		throw new SpOptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
@@ -88,6 +88,4 @@ const initialize = function(options: ScratchProjectOptions): Promise<ScratchProj
 		resolve(new ScratchProject(projectJSON));
 	});
 }
-
-export { initialize };
 
