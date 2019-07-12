@@ -2,12 +2,14 @@ import { Queryable, ScratchProjectOptions } from './abstracts';
 import { SpOptionsEmptyError, SpMultipleSourceOptionsError } from './errors';
 import AdmZip from 'adm-zip';
 import fs from 'fs';
+import fetch from 'isomorphic-fetch';
 
 enum ProjectSource {
 	FILE = 'file',
 	URI = 'uri',
 	CLOUD_ID = 'cloudId',
-	PROJECT_JSON = 'project.json'
+	PROJECT_JSON = 'project.json',
+	MIT_PROJECT_URI = 'https://projects.scratch.mit.edu'
 }
 
 
@@ -21,6 +23,11 @@ export class ScratchProject implements Queryable {
 	}
 }
 
+/*
+  The AssetFetcher is responsible for handing different
+  project sources and the asset files within or referred
+  to in a project.
+*/
 const AssetFetcher = {
 	parseSb3: (sb3File: string) => {
 		return new Promise((resolve, reject) => {
@@ -35,6 +42,14 @@ const AssetFetcher = {
 			fs.readFile(jsonFile, (err, data) => {
 				resolve(JSON.parse(data.toString()));
 			})
+		})
+	},
+
+	parseFromCloudID: (cloudId: number) => {
+		return new Promise(async (resolve, reject) => {
+			const data = await fetch(`${ProjectSource.MIT_PROJECT_URI}/${cloudId}`);
+			const projectJSON = await data.json();
+			resolve(projectJSON);
 		})
 	}
 }
@@ -55,7 +70,7 @@ const initialize = function(options: ScratchProjectOptions): Promise<ScratchProj
 
 	let fileSource, parse;
 
-	if(ProjectSource.FILE in options) {
+	if (ProjectSource.FILE in options) {
 		fileSource = options[ProjectSource.FILE];
 		
 		if (fileSource.endsWith('.sb3')){
@@ -63,6 +78,9 @@ const initialize = function(options: ScratchProjectOptions): Promise<ScratchProj
 		} else if (fileSource.endsWith('.json')) {
 			parse = AssetFetcher.parseJSON;
 		}
+	} else if (ProjectSource.CLOUD_ID in options) {
+		fileSource = options[ProjectSource.CLOUD_ID];
+		parse = AssetFetcher.parseFromCloudID;
 	}
 
 	return new Promise<ScratchProject>(async (resolve, reject) => {

@@ -17,13 +17,17 @@ test('ScratchProject not initialized on invalid options', () => {
 	} catch (e) {
 		expect(e.message).toContain('Multiple options found.');
 	}
-})
+});
 
-test('ScratchProject intialized with a local file', async () => {
+test('ScratchProject intialized', async () => {
 	// Test init on sb3 file
 	await expect(initialize({ 'file': `${process.cwd()}/tests/data/test.sb3` })).resolves.toBeInstanceOf(ScratchProject);
 	
 	// Test init on project.json
 	await expect(initialize({ 'file': `${process.cwd()}/tests/data/project.json`})).resolves.toBeInstanceOf(ScratchProject);
-})
+
+	await expect(initialize({ 'cloudId': 319383115 })).resolves.toBeInstanceOf(ScratchProject);
+});
+
+
 
