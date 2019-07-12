@@ -1,5 +1,5 @@
 export interface Queryable {
-	query(selector: String);
+	query(selector: string);
 }
 
 export interface ScratchProjectOptions {

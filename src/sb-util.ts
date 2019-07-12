@@ -1,6 +1,7 @@
 import { Queryable, ScratchProjectOptions } from './abstracts';
 import { SpOptionsEmptyError, SpMultipleSourceOptionsError } from './errors';
 import AdmZip from 'adm-zip';
+import fs from 'fs';
 
 enum ProjectSource {
 	FILE = 'file',
@@ -20,6 +21,24 @@ export class ScratchProject implements Queryable {
 	}
 }
 
+const AssetFetcher = {
+	parseSb3: (sb3File: string) => {
+		return new Promise((resolve, reject) => {
+			const sb3 = new AdmZip(sb3File);
+			const projectJSONString = sb3.readAsText(ProjectSource.PROJECT_JSON);
+			resolve(JSON.parse(projectJSONString));
+		})
+	},
+
+	parseJSON: (jsonFile: string) => {
+		return new Promise((resolve, reject) => {
+			fs.readFile(jsonFile, (err, data) => {
+				resolve(JSON.parse(data.toString()));
+			})
+		})
+	}
+}
+
 /*
 	initialize() is a factory method that returns a
 	Promise to a ScratchProject while it does the
@@ -34,17 +53,20 @@ const initialize = function(options: ScratchProjectOptions): Promise<ScratchProj
 		throw new SpMultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
 
-	let projectJSON;
+	let fileSource, parse;
 
 	if(ProjectSource.FILE in options) {
-		if (options[ProjectSource.FILE].endsWith('.sb3')){
-			const sb3 = new AdmZip(options.file);
-			const projectJSONString = sb3.readAsText(ProjectSource.PROJECT_JSON);
-			projectJSON = JSON.parse(projectJSONString);
+		fileSource = options[ProjectSource.FILE];
+		
+		if (fileSource.endsWith('.sb3')){
+			parse = AssetFetcher.parseSb3; 
+		} else if (fileSource.endsWith('.json')) {
+			parse = AssetFetcher.parseJSON;
 		}
 	}
 
-	return new Promise<ScratchProject>((resolve, reject) => {
+	return new Promise<ScratchProject>(async (resolve, reject) => {
+		const projectJSON = await parse(fileSource);
 		resolve(new ScratchProject(projectJSON));
 	});
 }

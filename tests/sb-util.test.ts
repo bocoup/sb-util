@@ -20,6 +20,10 @@ test('ScratchProject not initialized on invalid options', () => {
 })
 
 test('ScratchProject intialized with a local file', async () => {
+	// Test init on sb3 file
 	await expect(initialize({ 'file': `${process.cwd()}/tests/data/test.sb3` })).resolves.toBeInstanceOf(ScratchProject);
+	
+	// Test init on project.json
+	await expect(initialize({ 'file': `${process.cwd()}/tests/data/project.json`})).resolves.toBeInstanceOf(ScratchProject);
 })
 
