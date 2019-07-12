@@ -3,7 +3,7 @@ export interface Queryable {
 }
 
 export interface ScratchProjectOptions {
-	file?: String,
-	uri?: String,
+	file?: string,
+	uri?: string,
 	cloudId?: number
 }

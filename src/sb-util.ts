@@ -1,9 +1,14 @@
 import { Queryable, ScratchProjectOptions } from './abstracts';
 import { SpOptionsEmptyError, SpMultipleSourceOptionsError } from './errors';
+import AdmZip from 'adm-zip';
 
 enum ProjectSource {
-	FILE = "file"
+	FILE = 'file',
+	URI = 'uri',
+	CLOUD_ID = 'cloudId',
+	PROJECT_JSON = 'project.json'
 }
+
 
 export class ScratchProject implements Queryable {
 	constructor(projectJSON: Object, assetFetcher?: any) {
@@ -29,8 +34,18 @@ const initialize = function(options: ScratchProjectOptions): Promise<ScratchProj
 		throw new SpMultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
 
+	let projectJSON;
+
+	if(ProjectSource.FILE in options) {
+		if (options[ProjectSource.FILE].endsWith('.sb3')){
+			const sb3 = new AdmZip(options.file);
+			const projectJSONString = sb3.readAsText(ProjectSource.PROJECT_JSON);
+			projectJSON = JSON.parse(projectJSONString);
+		}
+	}
+
 	return new Promise<ScratchProject>((resolve, reject) => {
-		resolve(new ScratchProject({}));
+		resolve(new ScratchProject(projectJSON));
 	});
 }
 

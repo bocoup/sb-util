@@ -45,6 +45,8 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
+    "@types/adm-zip": "^0.4.32",
+    "adm-zip": "^0.4.13",
     "jsonpath": "^1.0.2"
   },
   "devDependencies": {

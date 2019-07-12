@@ -1,4 +1,5 @@
-import { initialize } from './sb-util';
+import { initialize, ScratchProject } from '../src/sb-util';
+import process from 'process';
 
 test('ScratchProject not initialized on invalid options', () => {
 	expect.assertions(2);
@@ -18,7 +19,7 @@ test('ScratchProject not initialized on invalid options', () => {
 	}
 })
 
-test('ScratchProject intialized with a local file', () => {
-	expect(initialize({'file': 'foo.sb3'})).toBeInstanceOf(Promise);
+test('ScratchProject intialized with a local file', async () => {
+	await expect(initialize({ 'file': `${process.cwd()}/tests/data/test.sb3` })).resolves.toBeInstanceOf(ScratchProject);
 })
 
