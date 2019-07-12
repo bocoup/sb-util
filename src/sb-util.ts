@@ -1,8 +1,15 @@
-import { Queryable, ScratchProjectOptions } from './abstracts'
+import { Queryable, ScratchProjectOptions } from './abstracts';
+import { SpOptionsEmptyError, SpMultipleSourceOptionsError } from './errors';
 
-
+enum ProjectSource {
+	FILE = "file"
+}
 
 export class ScratchProject implements Queryable {
+	constructor(projectJSON: Object, assetFetcher?: any) {
+
+	}
+
 	query(selector?: String) {
 		return [];
 	}
@@ -15,29 +22,17 @@ export class ScratchProject implements Queryable {
 	the ScratchProject
 */
 const initialize = function(options: ScratchProjectOptions): Promise<ScratchProject> {
+	// Check project options before initializing a ScratchProject
 	if (!options || Object.keys(options).length === 0) { 
-		throw new OptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
-	} else if (Object.keys(options).length > 1) {
-		throw new MultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
+		throw new SpOptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
+	} if (Object.keys(options).length > 1) {
+		throw new SpMultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
 
 	return new Promise<ScratchProject>((resolve, reject) => {
-		resolve(new ScratchProject);
+		resolve(new ScratchProject({}));
 	});
 }
-
-class OptionsEmptyError extends Error {
-    constructor(message?: string) {
-        super(message); // 'Error' breaks prototype chain here
-    }
- }
-
- class MultipleSourceOptionsError extends Error {
-    constructor(message?: string) {
-        super(message); // 'Error' breaks prototype chain here
-    }
- }
-
 
 export { initialize };
 
