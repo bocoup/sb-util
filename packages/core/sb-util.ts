@@ -27,23 +27,10 @@ export const initialize = function(options: ScratchProjectOptions): Promise<Scra
 		throw new SpMultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
 
-	let fileSource, parse;
-
-	if (ProjectSource.FILE in options) {
-		fileSource = options[ProjectSource.FILE];
-		
-		if (fileSource.endsWith('.sb3')){
-			parse = AssetFetcher.parseSb3; 
-		} else if (fileSource.endsWith('.json')) {
-			parse = AssetFetcher.parseJSON;
-		}
-	} else if (ProjectSource.CLOUD_ID in options) {
-		fileSource = options[ProjectSource.CLOUD_ID];
-		parse = AssetFetcher.parseFromCloudID;
-	}
+	let fileSource = options[ProjectSource.FILE] || options[ProjectSource.CLOUD_ID];
 
 	return new Promise<ScratchProject>(async (resolve, reject) => {
-		const projectJSON = await parse(fileSource);
+		const projectJSON = await AssetFetcher.parse(fileSource);
 		resolve(new ScratchProject(projectJSON));
 	});
 }
