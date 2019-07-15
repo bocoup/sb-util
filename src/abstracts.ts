@@ -7,3 +7,7 @@ export interface ScratchProjectOptions {
 	uri?: string,
 	cloudId?: number
 }
+
+export interface AssetFetcher {
+	parse(source: any);
+}
