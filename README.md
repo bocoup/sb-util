@@ -6,16 +6,15 @@ This repo holds the TypeScript implementation of sb-util, which can be imported 
 # Development
 ## Install Dependencies
 ```
-yarn install
-lerna bootstrap
+npm install
 ```
 
 ## Build
 ```
-yarn build
+npm run build
 ```
 
 ## Run Tests
 ```
-yarn test
+npm test
 ```

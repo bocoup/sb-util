@@ -1,4 +1,4 @@
-import AdmZip from 'adm-zip';
+import JSZip from 'jszip';
 import { promises as fsp } from 'fs';
 import fetch from 'isomorphic-fetch';
 
@@ -19,8 +19,10 @@ export const AssetFetcher = {
     // TODO: Check the contents of the source to be parsed
     //     for better parsing
 	async parseSb3(sb3File: string) {
-		const data = new AdmZip(sb3File);
-		const projectJSONString = await data.readAsText('project.json');
+		const zip = new JSZip();
+		const sb3Content = await fsp.readFile(sb3File);
+		const data = await zip.loadAsync(sb3Content)
+		const projectJSONString = await data.files[ProjectSource.PROJECT_JSON].async('string');
 		return JSON.parse(projectJSONString);
 	},
 
