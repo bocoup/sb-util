@@ -1,4 +1,4 @@
-import { initialize, ScratchProject } from '../packages/core/sb-util';
+import { initialize, ScratchProject } from '../src/sb-util';
 import process from 'process';
 
 test('ScratchProject not initialized on empty options', () => {	
@@ -28,3 +28,5 @@ test('ScratchProject intialized', async () => {
 
 	await expect(initialize({ 'cloudId': 319383115 })).resolves.toBeInstanceOf(ScratchProject);
 });
+
+

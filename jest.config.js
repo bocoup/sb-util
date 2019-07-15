@@ -1,6 +1,6 @@
 module.exports = {
   "roots": [
-    "./packages",
+    "./src",
     "./tests"
   ],
   "transform": {

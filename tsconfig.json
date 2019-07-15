@@ -9,7 +9,7 @@
     "outDir": "dist"
   },
   "include": [
-        "./lib/**/*",
-        "index.ts"
+        "./src/**/*",
+        "./test/**/*"
     ]
 }

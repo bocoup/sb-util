@@ -37,12 +37,16 @@
     }
   ],
   "license": "BSD-3-Clause",
-  "dependencies": {},
+  "dependencies": {
+    "adm-zip": "^0.4.13",
+    "isomorphic-fetch": "^2.2.1"
+  },
   "devDependencies": {
-    "lerna": "^3.15.0",
-    "ts-jest": "^24.0.2",
+    "@types/adm-zip": "^0.4.32",
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
+    "lerna": "^3.15.0",
+    "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   },
