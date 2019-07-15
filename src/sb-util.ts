@@ -1,5 +1,4 @@
 import { Queryable, ScratchProjectOptions } from './abstracts';
-import { SpOptionsEmptyError, SpMultipleSourceOptionsError } from './errors';
 import { ProjectSource, AssetFetcher } from './asset-fetcher';
 
 export class ScratchProject implements Queryable {
@@ -22,9 +21,9 @@ export const initialize = function(options: ScratchProjectOptions): Promise<Scra
 	// Check project options before initializing a ScratchProject
 	const numProjectOptions = Object.keys(options).length;
 	if (!options ||  numProjectOptions === 0) { 
-		throw new SpOptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
+		throw Error('Please provide one of the following options: file, uri, or cloudId.'); 
 	} if (numProjectOptions > 1 && (ProjectSource.FILE in options || ProjectSource.CLOUD_ID in options)) {
-		throw new SpMultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
+		throw Error('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
 
 	let fileSource = options[ProjectSource.FILE] || options[ProjectSource.CLOUD_ID];
