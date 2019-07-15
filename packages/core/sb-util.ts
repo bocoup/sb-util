@@ -1,6 +1,6 @@
 import { Queryable, ScratchProjectOptions } from './abstracts';
 import { SpOptionsEmptyError, SpMultipleSourceOptionsError } from './errors';
-import { ProjectSource, AssetFetcher } from '../common';
+import { ProjectSource, AssetFetcher } from '../asset-manager';
 
 export class ScratchProject implements Queryable {
 	constructor(projectJSON: Object, assetFetcher?: any) {

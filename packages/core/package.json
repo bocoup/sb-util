@@ -1,11 +1,4 @@
 {
   "name": "core",
-  "version": "0.0.2-prealpha.0",
-  "main": "index.ts",
-  "license": "MIT",
-  "private": true,
-  "devDependencies": {
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.3"
-  }
+  "main": "index.ts"
 }

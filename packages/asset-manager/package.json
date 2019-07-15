@@ -1,6 +1,5 @@
 {
-  "name": "common",
-  "version": "0.0.2-prealpha.0",
+  "name": "asset-manager",
   "main": "index.ts",
   "private": true,
   "dependencies": {
