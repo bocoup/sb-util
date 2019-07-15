@@ -1,6 +1,6 @@
 {
   "name": "common",
-  "version": "0.0.1-prealpha",
+  "version": "0.0.2-prealpha.0",
   "main": "index.ts",
   "private": true,
   "dependencies": {

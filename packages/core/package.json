@@ -1,6 +1,6 @@
 {
   "name": "core",
-  "version": "1.0.0",
+  "version": "0.0.2-prealpha.0",
   "main": "index.ts",
   "license": "MIT",
   "private": true,
