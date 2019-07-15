@@ -1,16 +1,16 @@
 import { initialize, ScratchProject } from '../src/sb-util';
 import process from 'process';
 
-test('ScratchProject not initialized on invalid options', () => {
-	expect.assertions(2);
-	
+test('ScratchProject not initialized on empty options', () => {	
 	// Empty options object
 	try {
 		initialize({});
 	} catch (e) {
 		expect(e.message).toContain('Please provide one of the following options');
 	}
+});
 
+test('ScratchProject not initialized on multiple present options', () => {
 	// Multiple options object
 	try {
 		initialize({ 'file' : 'foo.sb3', 'cloudId': 12345 });
@@ -28,6 +28,3 @@ test('ScratchProject intialized', async () => {
 
 	await expect(initialize({ 'cloudId': 319383115 })).resolves.toBeInstanceOf(ScratchProject);
 });
-
-
-

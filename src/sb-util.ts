@@ -20,9 +20,10 @@ export class ScratchProject implements Queryable {
 */
 export const initialize = function(options: ScratchProjectOptions): Promise<ScratchProject> {
 	// Check project options before initializing a ScratchProject
-	if (!options || Object.keys(options).length === 0) { 
+	const numProjectOptions = Object.keys(options).length;
+	if (!options ||  numProjectOptions === 0) { 
 		throw new SpOptionsEmptyError('Please provide one of the following options: file, uri, or cloudId.'); 
-	} if (Object.keys(options).length > 1) {
+	} if (numProjectOptions > 1 && (ProjectSource.FILE in options || ProjectSource.CLOUD_ID in options)) {
 		throw new SpMultipleSourceOptionsError('Multiple options found. Please supply only one of the following: file, uri, or cloudId');
 	}
 
@@ -46,4 +47,3 @@ export const initialize = function(options: ScratchProjectOptions): Promise<Scra
 		resolve(new ScratchProject(projectJSON));
 	});
 }
-
