@@ -16,7 +16,7 @@ export enum ProjectSource {
   to in a project.
 */
 export const AssetFetcher = {
-	parseSb3: (sb3File: string) => {
+	parseSb3: function (sb3File: string) {
 		return new Promise((resolve, reject) => {
 			const sb3 = new AdmZip(sb3File);
 			const projectJSONString = sb3.readAsText(ProjectSource.PROJECT_JSON);
@@ -24,7 +24,7 @@ export const AssetFetcher = {
 		})
 	},
 
-	parseJSON: (jsonFile: string) => {
+	parseJSON: function(jsonFile: string) {
 		return new Promise((resolve, reject) => {
 			fs.readFile(jsonFile, (err, data) => {
 				resolve(JSON.parse(data.toString()));
@@ -32,11 +32,9 @@ export const AssetFetcher = {
 		})
 	},
 
-	parseFromCloudID: (cloudId: number) => {
-		return new Promise(async (resolve, reject) => {
-			const data = await fetch(`${ProjectSource.MIT_PROJECT_URI}/${cloudId}`);
-			const projectJSON = await data.json();
-			resolve(projectJSON);
-		})
+	parseFromCloudID: async function (cloudId: number) {
+		const data = await fetch(`${ProjectSource.MIT_PROJECT_URI}/${cloudId}`);
+		const projectJSON = await data.json();
+		return projectJSON;
 	}
 }
