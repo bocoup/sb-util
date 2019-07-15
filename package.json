@@ -2,25 +2,19 @@
   "name": "sb-util",
   "version": "0.0.1-prealpha",
   "description": "Scratch blocks utilities: open and query Scratch blocks formats",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bocoup/sb-util"
-  },
-  "main": "index.js",
+  "repository": "https://github.com/bocoup/sb-util",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest"
   },
+  "private": true,
   "keywords": [
     "scratch",
     "scratchblocks",
     "blocks"
   ],
-  "author": {
-    "name": "Bocoup, LLC - GAIA team",
-    "url": "https://bocoup.com"
-  },
+  "author": "Bocoup, LLC - GAIA team (https://bocoup.com)",
   "contributors": [
     {
       "name": "Erika Miguel-Yeo",
@@ -44,16 +38,15 @@
     }
   ],
   "license": "BSD-3-Clause",
-  "dependencies": {
-    "adm-zip": "^0.4.13",
-    "isomorphic-fetch": "^2.2.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "@types/adm-zip": "^0.4.32"
-  }
+    "typescript": "^3.5.3"
+  },
+  "workspaces": [
+    "common"
+  ]
 }

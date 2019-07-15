@@ -1,0 +1,13 @@
+{
+  "name": "common",
+  "version": "0.0.1-prealpha",
+  "main": "index.ts",
+  "private": true,
+  "dependencies": {
+    "adm-zip": "^0.4.13",
+    "isomorphic-fetch": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.4.32"
+  }
+}
