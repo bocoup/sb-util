@@ -4,6 +4,12 @@
 This repo holds the TypeScript implementation of sb-util, which can be imported as a JavaScript library or used as a CLI.
 
 # Development
+## Install Dependencies
+```
+yarn install
+lerna bootstrap
+```
+
 ## Build
 ```
 yarn build

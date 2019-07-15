@@ -1,4 +1,4 @@
-import { initialize, ScratchProject } from '../packages/core/index';
+import { initialize, ScratchProject } from '../packages/core/sb-util';
 import process from 'process';
 
 test('ScratchProject not initialized on empty options', () => {	

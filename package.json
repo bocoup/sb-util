@@ -1,6 +1,6 @@
 {
   "name": "sb-util",
-  "version": "0.0.1-prealpha",
+  "version": "0.0.1-prealpha.1",
   "description": "Scratch blocks utilities: open and query Scratch blocks formats",
   "repository": "https://github.com/bocoup/sb-util",
   "types": "dist/index.d.ts",
@@ -8,7 +8,6 @@
     "build": "tsc",
     "test": "jest"
   },
-  "private": true,
   "keywords": [
     "scratch",
     "scratchblocks",
@@ -39,10 +38,14 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {},
-  "devDependencies": {},
-  "workspaces": [
-    "packages/*"
-  ],
+  "devDependencies": {
+    "lerna": "^3.15.0",
+    "ts-jest": "^24.0.2",
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  },
   "files": [
     "dist"
   ]
