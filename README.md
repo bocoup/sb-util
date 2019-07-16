@@ -187,6 +187,67 @@ The selector syntax can be combined for more fine-grained filtering.
 const motionReporterBlocks = blocks.query('.motion :reporter');
 ```
 
+**renderToText()**  
+Return: a text representation of blocks that are connected. The output will be a consumable JSON format, which can be written to a file and also be converted to YAML
+
+```
+const sprite1Blocks = sp.sprites({name: 'Sprite1'}).blocks();
+const blockTextRepresentation = sprite1Blocks.renderToText()
+
+// Output
+{
+    "blockGroups" : [
+        // First group of blocks
+        {
+            "output": [
+                "event_whenflagclicked",
+                {
+                    "control_if_else" : {
+                        "if": {
+                            "condition" : {
+                                "sensing_keypressed": {
+                                    "sensing_keyoptions": "space"
+                                }
+                            }
+                        },
+                        "then": [
+                            {
+                                "data_changevariableby": {
+                                    "variable": "my variable",
+                                    "value": 10
+                                }
+                            },
+                            {
+                                "motion_gotoxy": {
+                                    "X": "my variable",
+                                    "Y": 10
+                                }
+                            }
+                        ],
+                        "else": [
+                            {
+                                "control_wait_until": {
+                                    "sensing_keypressed": {
+                                        "sensing_keyoptions": "space"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        // Second group of blocks
+        {
+            "output": { ... }
+        }
+    ]
+}
+```
+
+
+
+
 
 ---
 
