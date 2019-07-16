@@ -10,7 +10,7 @@ export class ScratchProject implements Queryable {
 	}
 }
 
-export const loadSB3 = function(source: string) {
+export const loadSb3 = function(source: string) {
 	return new Promise<ScratchProject>(async (resolve, reject) => {
 		const projectJSON = await new Sb3Fetcher().parse(source);
 		resolve(new ScratchProject(projectJSON))

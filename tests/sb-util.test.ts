@@ -1,9 +1,9 @@
-import { loadSB3, loadProjectJson, loadCloudId, ScratchProject } from '../src/sb-util';
+import { loadSb3, loadProjectJson, loadCloudId, ScratchProject } from '../src/sb-util';
 import process from 'process';
 
 test('ScratchProject intialized with sb3 file', async () => {
 	// Test init on sb3 file
-	await expect(loadSB3(`${process.cwd()}/tests/data/test.sb3`)).resolves.toBeInstanceOf(ScratchProject);
+	await expect(loadSb3(`${process.cwd()}/tests/data/test.sb3`)).resolves.toBeInstanceOf(ScratchProject);
 });
 
 test('ScratchProject intialized with project.json file', async () => {
