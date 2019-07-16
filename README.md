@@ -7,11 +7,11 @@ sb-util will accomplish this by consuming ***.sb3** files generate by Scratch. *
 
 The resulting tool should be usable in test suites, scripts, and applications.
 
-## Javascript API
+## Javascript API Proposal
 
 ### **Loading a Scratch Project**
-sb-util exposes loading functions to instantiate a **ScratchProject**
- object:
+sb-util exposes loading functions to asynchronously instantiate a **ScratchProject**
+ object. These loading functions handle file I/O and HTTP request handling, decoupling that process from the ScratchProject object itself.
 
  ---
 
@@ -58,6 +58,8 @@ const sp = new ScratchProject(projectJson);
 
 **Methods**
 
+---
+
 **assets()**  
 Return: *AssetCollection* representing all the assets of a project
 ```
@@ -90,7 +92,40 @@ Return: a list of *Variable* objects in the project
 ```
 let vars = sp.variables();
 ``` 
+---
 
+### SpriteCollection
+
+A *SpriteCollection* represents an iterable collection of Sprite objects. Array methods such as *map()*, *filter()*, and *pop()* are available.
+
+**Methods**
+
+---
+
+**query(selector)**
+Paramter: *selector* string in the CSS selector syntax style.
+Return: *SpriteCollection*
+
+```
+let stage = sp.sprites('[isStage=true]').pop();
+let sprite1 = sp.sprites('[name="Cat"]').pop();
+```
+
+Possible selector syntax:  
+| Sprite Attribute | Selector Syntax                                                  |
+| ---------------- |:----------------------------------------------------------------:|
+| isStage          | [isStage={true or false}]                                        |
+| layerOrder       | [layerOrder={a number}]                                          |
+| draggable        | [draggable={true or false}]                                      |
+| rotationStyle    | [rotationStyle={"all around" or "left-right" or "don't rotate"}] |
+
+---
+
+ ## CLI Proposal
+
+ *Coming soon*
+
+---
 
 # Development
 sb-util is implemented in TypeScript and will be available as a JavaScript library on [npm](https://www.npmjs.com/package/sb-util) and as a CLI tool.
