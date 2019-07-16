@@ -9,6 +9,14 @@ The resulting tool should be usable in test suites, scripts, and applications.
 
 ## Javascript API Proposal
 
+- [Loading a Scratch Project](https://github.com/bocoup/sb-util/tree/readme-api-proposal#javascript-api-proposal)
+- [ScratchProject](https://github.com/bocoup/sb-util/tree/readme-api-proposal#scratchproject)
+- [SpriteCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#spritecollection)
+- [Sprite](https://github.com/bocoup/sb-util/tree/readme-api-proposal#sprite)
+- [BlockCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#blockcollection)
+- [Block](https://github.com/bocoup/sb-util/tree/readme-api-proposal#block)
+
+
 ### **Loading a Scratch Project**
 sb-util exposes loading functions to asynchronously instantiate a **ScratchProject**
  object. These loading functions handle file I/O and HTTP request handling, decoupling that process from the ScratchProject object itself.
@@ -246,7 +254,7 @@ const blockTextRepresentation = sprite1Blocks.renderToText()
 ```
 ---
 
-**Block**
+### **Block**
 
 A *Block* is a singleton of *BlockCollection*. It has additional methods, specific to the data held by an individual block.
 
@@ -256,7 +264,7 @@ A *Block* is a singleton of *BlockCollection*. It has additional methods, specif
 This method is similar to *query*. *args* returns the inputs or fields (depending on the query string) of a block using one of the strings defined below. Certain query strings can return an input or a field.
 
 A sample of selector values for the *args* method is defined in this table: 
- 
+
 | Inputs                       | Fields                      | Both Input and Field   |
 |------------------------------|-----------------------------|------------------------|
 | X, Y, DURATION, MESSAGE, SECS CONDITION, SUBSTACK, OPERAND, TIMES, CHANGE, FROM, VALUE, BROADCAST_INPUT, BACKDROP, VOLUME, NUM1, NUM2 | EFFECT, BROADCAST_OPTION, VARIABLE, STOP_OPTION | COSTUME, TOUCHINGOBJECTMENU, TO, SOUND_MENU |
