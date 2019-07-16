@@ -8,21 +8,28 @@ sb-util will accomplish this by consuming ***.sb3** files generate by Scratch. *
 The resulting tool should be usable in test suites, scripts, and applications.
 
 ## Javascript API
-### Loading a Scratch Project
+### **Loading a Scratch Project**
 sb-util exposes loading functions to instantiate a **ScratchProject**
  object:
 
-**loadSb3(sb3File)**  
+ ---
+
+**loadSb3(sb3File)**
+
 Parameter(s): *sb3File*. String representing local file location of an *.sb3 file or a URI to an *.sb3 file   
 Return: *Promise*. This Promise object will resolve to a ScratchProject
 
-**loadProjectJson(projectJsonFile)**  
+**loadProjectJson(projectJsonFile)**
+
 Parameter(s): *projectJsonFile*. String representing local file location of an project.json file or a URI to an project.json file   
 Return: *Promise*. This Promise object will resolve to a ScratchProject
 
-**loadCloudId(cloudId)**  
+**loadCloudId(cloudId)**
+
 Parameter(s): *cloudId*. Number representing a Cloud ID in Scratch   
 Return: *Promise*. This Promise object will resolve to a ScratchProject  
+
+---
 
 ### ScratchProject
 A **ScratchProject** gets initialized by a JSON object, represented by the project.json.
