@@ -25,6 +25,8 @@ The resulting tool should be usable in test suites, scripts, and applications.
 - [Sprite](https://github.com/bocoup/sb-util/tree/readme-api-proposal#sprite)
 - [BlockCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#blockcollection)
 - [Block](https://github.com/bocoup/sb-util/tree/readme-api-proposal#block)
+- [AssetCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#assetcollection)
+- [Asset](https://github.com/bocoup/sb-util/tree/readme-api-proposal#asset)
 
 
 ### **Loading a Scratch Project**
