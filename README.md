@@ -329,6 +329,12 @@ Return: *Promise* to the file buffer of this Asset
 ## Development
 sb-util is implemented in TypeScript and will be available as a JavaScript library on [npm](https://www.npmjs.com/package/sb-util) and as a CLI tool.
 
+# Development
+## Install Dependencies
+```
+npm install
+```
+
 ## Build
 ```
 npm run build
