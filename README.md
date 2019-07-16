@@ -112,8 +112,9 @@ let sprite1 = sp.sprites('[name="Cat"]').pop();
 ```
 
 Possible selector syntax:  
+
 | Sprite Attribute | Selector Syntax                                                  |
-| ---------------- |:----------------------------------------------------------------:|
+| ---------------- |------------------------------------------------------------------|
 | isStage          | [isStage={true or false}]                                        |
 | layerOrder       | [layerOrder={a number}]                                          |
 | draggable        | [draggable={true or false}]                                      |
