@@ -125,7 +125,7 @@ let stage = sp.sprites('[isStage=true]');
 let sprite1 = sp.sprites('[name="Cat"]');
 ```
 
-Possible selector syntax:  
+Possible selector syntax, in attribute selector style:  
 
 | Sprite Attribute | Selector Syntax                                                  |
 | ---------------- |------------------------------------------------------------------|
@@ -264,7 +264,7 @@ const blockTextRepresentation = sprite1Blocks.renderToText()
 ```
 ---
 
-### **Block**
+### Block
 
 A *Block* is a singleton of *BlockCollection*. It has additional methods, specific to the data held by an individual block.
 
@@ -290,6 +290,33 @@ Returns the substacks for the block as an list of Objects representing a substac
 
 
 ---
+
+### AssetCollection  
+An *AssetCollection* represents an interable collection of objects that represent Assets, which are static files included in an *.sb3 file or somwhere the user designates, used for costumes and sounds.
+
+**Methods**
+
+**query(selector)**  
+Parameter(s): A string in the CSS selector style
+Return: *AssetCollection*
+
+Possible selector syntax:
+
+| Asset Attribute | Selector Syntax |
+|-----------------|-----------------|
+| name            | Attribute selector. `assets.query('name="83a9787d4cb6f3b7632b4ddfebf74367.wav")`|
+| dataFormat      | Type Selector. `assets.query('wav')`|
+
+---
+
+### Asset
+
+An *Asset* is a singleton of *AssetCollection*.
+
+**Methods**
+
+**toBuffer()**
+Return: *Promise* to the file buffer of this Asset
 
  ## CLI Proposal
 
