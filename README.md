@@ -258,7 +258,7 @@ This method is similar to *query*. *args* returns the inputs or fields (dependin
 A sample of selector values for the *args* method is defined in this table:  
 | Inputs                       | Fields                      | Both Input and Field   |
 |------------------------------|-----------------------------|------------------------|
-| X, Y, DURATION, MESSAGE, SECS CONDITION, SUBSTACK, OPERAND, TIMES, CHANGE, FROM, VALUE, BROADCAST_INPUT, BACKDROP, VOLUME, NUM1, NUM2 | EFFECT, BROADCAST_OPTION, VARIABLE, STOP_OPTION | COSTUME, TOUCHINGOBJECTMENU, TO, SOUND_MENU
+| X, Y, DURATION, MESSAGE, SECS CONDITION, SUBSTACK, OPERAND, TIMES, CHANGE, FROM, VALUE, BROADCAST_INPUT, BACKDROP, VOLUME, NUM1, NUM2 | EFFECT, BROADCAST_OPTION, VARIABLE, STOP_OPTION | COSTUME, TOUCHINGOBJECTMENU, TO, SOUND_MENU |
 
 ```
 const condition = block.args('CONDITION');
