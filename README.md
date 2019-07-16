@@ -58,8 +58,6 @@ const sp = new ScratchProject(projectJson);
 
 **Methods**
 
----
-
 **assets()**  
 Return: *AssetCollection* representing all the assets of a project
 ```
@@ -82,7 +80,7 @@ let sprite1 = sp.sprites('[name="Cat"]').pop();
 ```
 
 **stage()**
-Return: *SpriteCollection* singleton collection containing a Sprite object for stage
+Return: *Sprite* a stage
 ```
 let stage = sp.stage();
 ```
@@ -96,19 +94,17 @@ let vars = sp.variables();
 
 ### SpriteCollection
 
-A *SpriteCollection* represents an iterable collection of Sprite objects. Array methods such as *map()*, *filter()*, and *pop()* are available.
+A *SpriteCollection* represents an iterable collection of objects that represent Sprites. Array methods such as *map()*, *filter()*, and *pop()* are available.
 
 **Methods**
 
----
-
 **query(selector)**
-Paramter: *selector* string in the CSS selector syntax style.
+Parameter: *selector* string in the CSS selector syntax style.
 Return: *SpriteCollection*
 
 ```
-let stage = sp.sprites('[isStage=true]').pop();
-let sprite1 = sp.sprites('[name="Cat"]').pop();
+let stage = sp.sprites('[isStage=true]');
+let sprite1 = sp.sprites('[name="Cat"]');
 ```
 
 Possible selector syntax:  
@@ -119,6 +115,53 @@ Possible selector syntax:
 | layerOrder       | [layerOrder={a number}]                                          |
 | draggable        | [draggable={true or false}]                                      |
 | rotationStyle    | [rotationStyle={"all around" or "left-right" or "don't rotate"}] |
+
+---
+
+### Sprite
+
+A *Sprite* is a singleton of *SpriteCollection*, with additional methods that are specific to a single Sprite. A Sprite can be a stage or an individual sprite.
+
+** Methods **   
+
+**blocks()**  
+Return: *BlockCollection*
+```
+const sprite = sp.sprites('[name="Cat"]');
+const blocks = sprite.blocks();
+```
+
+**assets()**  
+Return: *AssetCollection*
+```
+const assets = sprite.assets();
+```
+
+**position()**  
+Return: the (X, Y) cooredinates of a Sprite in Object notation
+```
+const { x, y } = sprite.position();
+```
+
+**broadcasts()**  
+Return: a list of Objects representing a broadcast, which contains an id and a message
+```
+const broadcasts = sprite.broadcasts();
+
+// A mapping example
+broadcasts.map(({id: messageId, message}) => ({ messageId, message }));
+```
+
+**lists()**  
+Return: a list of Objects representing a list, which contains an id, name, and an  Array of values
+
+```
+const lists = sprite.lists();
+
+lists.map(({id: listId, name: listName, values}) => ({listId, listName, values}));
+```
+
+
 
 ---
 
