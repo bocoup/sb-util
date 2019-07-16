@@ -12,9 +12,17 @@ The resulting tool should be usable in test suites, scripts, and applications.
 sb-util exposes loading functions to instantiate a **ScratchProject**
  object:
 
- **loadSb3**
+**loadSb3(sb3File)**  
+Parameter(s): *sb3File*. String representing local file location of an *.sb3 file or a URI to an *.sb3 file   
+Return: *Promise*. This Promise object will resolve to a ScratchProject
 
+**loadProjectJson(projectJsonFile)**  
+Parameter(s): *projectJsonFile*. String representing local file location of an project.json file or a URI to an project.json file   
+Return: *Promise*. This Promise object will resolve to a ScratchProject
 
+**loadCloudId(cloudId)**  
+Parameter(s): *cloudId*. Number representing a Cloud ID in Scratch   
+Return: *Promise*. This Promise object will resolve to a ScratchProject  
 
 ### ScratchProject
 A **ScratchProject** gets initialized by a JSON object, represented by the project.json.
