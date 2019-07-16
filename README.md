@@ -164,7 +164,7 @@ lists.map(({id: listId, name: listName, values}) => ({listId, listName, values})
 ---
 ### BlockCollection
 
-A *BlockCollection* represents and iterable collection of objects that represent Blocks
+A *BlockCollection* represents and iterable collection of objects that represent Blocks. Array methods such as *map()*, *filter()*, and *pop()* are available.
 
 **Methods**
 
@@ -244,9 +244,30 @@ const blockTextRepresentation = sprite1Blocks.renderToText()
     ]
 }
 ```
+---
 
+**Block**
 
+A *Block* is a singleton of *BlockCollection*. It has additional methods, specific to the data held by an individual block.
 
+**Methods**
+
+**args(selector)**  
+This method is similar to *query*. *args* returns the inputs or fields (depending on the query string) of a block using one of the strings defined below. Certain query strings can return an input or a field.
+
+A sample of selector values for the *args* method is defined in this table:  
+| Inputs                       | Fields                      | Both Input and Field   |
+|------------------------------|-----------------------------|------------------------|
+| X, Y, DURATION, MESSAGE, SECS CONDITION, SUBSTACK, OPERAND, TIMES, CHANGE, FROM, VALUE, BROADCAST_INPUT, BACKDROP, VOLUME, NUM1, NUM2 | EFFECT, BROADCAST_OPTION, VARIABLE, STOP_OPTION | COSTUME, TOUCHINGOBJECTMENU, TO, SOUND_MENU
+
+```
+const condition = block.args('CONDITION');
+const variable = block.args('VARIABLE');
+const operand = block.args('OPERAND');
+```
+
+**substacks()**  
+Returns the substacks for the block as an list of Objects representing a substack. If a block is not capable of having a substack, the list will be empty.
 
 
 ---
