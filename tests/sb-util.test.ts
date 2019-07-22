@@ -1,24 +1,49 @@
 import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection } from '../src/sb-util';
 import process from 'process';
 
-test('ScratchProject intialized with sb3 file', async () => {
-	// Test init on sb3 file
-	await expect(loadSb3(`${process.cwd()}/tests/data/test.sb3`)).resolves.toBeInstanceOf(ScratchProject);
-});
+describe('ScratchProject', () => {
+	let sb3, projectJson, cloudJson;
 
-test('ScratchProject intialized with project.json file', async () => {
-	// Test init on project.json
-	await expect(loadProjectJson(`${process.cwd()}/tests/data/project.json`)).resolves.toBeInstanceOf(ScratchProject);
-});
+	beforeAll(async () => {
+		sb3 = await loadSb3(`${process.cwd()}/tests/data/test.sb3`);
+		projectJson = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+		cloudJson = await loadCloudId(319383115);
+	});
 
-test('ScratchProject intialized with cloud ID', async () => {
-	await expect(loadCloudId(319383115)).resolves.toBeInstanceOf(ScratchProject);
-});
+	test('is intialized with sb3 file', () => {
+		expect(sb3).toBeInstanceOf(ScratchProject);
+	});
 
-test('Get ScratchProject sprites', async () => {
-	const sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
-	const sprites = sp.sprites();
-	expect(sprites).toBeInstanceOf(SpriteCollection);
+	test('is intialized with project.json file', async () => {
+		expect(projectJson).toBeInstanceOf(ScratchProject);
+	});
+
+	test('is intialized with cloud ID', async () => {
+		expect(cloudJson).toBeInstanceOf(ScratchProject);
+	});
 })
 
+describe('Sprite(s)', () => {
+	let sp, sprites;
 
+	beforeAll(async () => {
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+	});
+
+	test('to be returned from a ScratchProject', async () => {
+		sprites = sp.sprites();
+		expect(sprites).toBeInstanceOf(SpriteCollection);
+	});
+
+	test('to fail with empty string query on ScratchProject sprites() API', () => {
+		expect(() => sp.sprites('')).toThrowError();
+	});
+
+	test('to fail with invalid query on ScratchProject sprites() API', () => {
+		expect(() => sp.sprites('[')).toThrowError();
+	});
+
+	test('to query stage with ScratchProject sprites() API', () => {
+		const stage = sp.sprites('[isStage=true]')
+	});
+})

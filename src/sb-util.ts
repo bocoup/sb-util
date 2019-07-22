@@ -11,6 +11,12 @@ enum ScratchProjectKeys {
 	TARGETS = 'targets'
 }
 
+enum SelectorSyntax {
+	OPEN_BRACKET = '[',
+	CLOSED_BRACKET = ']',
+	EQUALS = '='
+}
+
 /*
 sb-util CLASSES.
 
@@ -37,7 +43,11 @@ export class ScratchProject implements Queryable {
 	}
 
 	sprites(selector?: string){
-		return new SpriteCollection(this.query(CollectionTypes.SPRITES));
+		const sprites = this.query(CollectionTypes.SPRITES);
+
+		if (!selector && typeof selector !== 'string') return new SpriteCollection(sprites);
+
+		return new SpriteCollection(sprites).query(selector);
 	}
 }
 
@@ -46,8 +56,22 @@ export class SpriteCollection implements Queryable {
 		storage.set(this, sprites);
 	}
 
+	/*
+		Currently, the query selector syntax only supports
+		attribute selector style in the form of [attr] and
+		[attr=value]
+	*/
 	query(selector: string){
-		throw new Error('SpriteCollection query() is not implemented!');
+		if(selector.length < 2 || selector[0] !== SelectorSyntax.OPEN_BRACKET
+			&& selector.slice(-1) !== SelectorSyntax.CLOSED_BRACKET){
+			throw new Error('Invalid selector syntax for SpriteCollection. \
+				[attr] and [attr=value] format is accepted. Selector must not be empty');
+		}
+
+		// string between brackets
+		const selectorBody = selector.substring(1, selector.length-1);
+
+		throw new Error('query not finished implementing');
 	}
 
 	[Symbol.iterator]() {
@@ -71,7 +95,7 @@ export class Sprite extends SpriteCollection implements Queryable {
 	}
 
 	query(selector: string) {
-		throw new Error('Sprite query() not implemented yet!')
+		return super.query(selector);
 	}
 }
 
