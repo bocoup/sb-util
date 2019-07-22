@@ -1,12 +1,36 @@
 import { Queryable, AssetFetcher } from './abstracts';
 import { ProjectSource, Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 
+/*
+sb-util CLASSES.
+
+The classes below make up the sb-util API.
+*/
+
+// This is the global storage for project data
+const storage = new WeakMap();
+
 export class ScratchProject implements Queryable {
 	constructor(projectJSON: Object, assetFetcher?: AssetFetcher) {
+		storage.set(this, projectJSON);
 	}
 
-	query(selector?: String) {
-		return [];
+	get(property: string) {
+		return storage.get(this)[property];
+	}
+
+	query(selector: string) {
+		throw Error('ScratchProject query() is not implemented');
+	}
+
+	sprites(selector?: string){
+		throw Error('ScratchProject sprites() is not implemented')
+	}
+}
+
+export class SpriteCollection implements Queryable {
+	query(selector: string){
+		throw Error('SpriteCollection query() is not implemented!')
 	}
 }
 
