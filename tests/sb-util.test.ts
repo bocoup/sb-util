@@ -52,6 +52,14 @@ describe('ScratchProject sprites()', () => {
 		expect(stage).toBeInstanceOf(Sprite);
 	});
 
+	test('to get stage with stage() function', () => {
+		const stage = sp.stage();
+		expect(stage).toBeInstanceOf(Sprite);
+
+		const isStageProperty = stage.get('isStage');
+		expect(isStageProperty).toBeTruthy();
+	});
+
 	test('to query for sprites with an attribute that is numeric', () => {
 		const sprites = sp.sprites('[layerOrder=1]');
 		expect(sprites).toBeInstanceOf(SpriteCollection);

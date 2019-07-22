@@ -50,6 +50,10 @@ export class ScratchProject implements Queryable {
 
 		return new SpriteCollection(sprites).query(selector);
 	}
+
+	stage() {
+		return this.sprites('[isStage=true]');
+	}
 }
 
 export class SpriteCollection implements Queryable {
@@ -97,7 +101,7 @@ export class SpriteCollection implements Queryable {
 			sprites = allSprites.filter((s: SpriteProperties) => attr in s);
 		}
 
-		return sprites.length === 1 ? new Sprite(sprites) : new SpriteCollection(sprites);
+		return sprites.length === 1 ? new Sprite(sprites.pop()) : new SpriteCollection(sprites);
 	}
 
 	[Symbol.iterator]() {
@@ -118,6 +122,10 @@ export class Sprite extends SpriteCollection implements Queryable {
 	constructor(sprite: SpriteProperties) {
 		// Per documentation, Sprite is a singleton SpriteCollection
 		super([sprite]);
+	}
+
+	get(property){
+		return storage.get(this).pop()[property];
 	}
 
 	query(selector: string) {
