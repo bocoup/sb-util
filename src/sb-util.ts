@@ -1,5 +1,15 @@
-import { Queryable, AssetFetcher } from './abstracts';
+import { Queryable, AssetFetcher, SpriteProperties } from './abstracts';
 import { ProjectSource, Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
+
+enum CollectionTypes {
+	SPRITES = 'sprites',
+	BLOCKS = 'blocks',
+	ASSETS = 'assets'
+}
+
+enum ScratchProjectKeys {
+	TARGETS = 'targets'
+}
 
 /*
 sb-util CLASSES.
@@ -20,17 +30,48 @@ export class ScratchProject implements Queryable {
 	}
 
 	query(selector: string) {
-		throw Error('ScratchProject query() is not implemented');
+		if(selector === CollectionTypes.SPRITES) {
+			// The key for sprites in the project JSON is called 'targets'
+			return this.get(ScratchProjectKeys.TARGETS);
+		}
 	}
 
 	sprites(selector?: string){
-		throw Error('ScratchProject sprites() is not implemented')
+		return new SpriteCollection(this.query(CollectionTypes.SPRITES));
 	}
 }
 
 export class SpriteCollection implements Queryable {
+	constructor(sprites: Array<SpriteProperties>){
+		storage.set(this, sprites);
+	}
+
 	query(selector: string){
-		throw Error('SpriteCollection query() is not implemented!')
+		throw new Error('SpriteCollection query() is not implemented!');
+	}
+
+	[Symbol.iterator]() {
+		const sprites = storage.get(this);
+		return {
+			next(): IteratorResult<Sprite> {
+				let sprite = sprites.pop();
+				if(sprite){
+					return {value: new Sprite(sprite), done: false};
+				}
+				return {done: true, value: null};
+			}
+		}
+	}
+}
+
+export class Sprite extends SpriteCollection implements Queryable {
+	constructor(sprite: SpriteProperties) {
+		// Per documentation, Sprite is a singleton SpriteCollection
+		super([sprite]);
+	}
+
+	query(selector: string) {
+		throw new Error('Sprite query() not implemented yet!')
 	}
 }
 
