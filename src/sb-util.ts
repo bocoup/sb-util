@@ -1,5 +1,6 @@
 import { Queryable, AssetFetcher, SpriteProperties } from './abstracts';
 import { ProjectSource, Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
+import { type } from 'os';
 
 enum CollectionTypes {
 	SPRITES = 'sprites',
@@ -71,7 +72,32 @@ export class SpriteCollection implements Queryable {
 		// string between brackets
 		const selectorBody = selector.substring(1, selector.length-1);
 
-		throw new Error('query not finished implementing');
+		let sprites, allSprites = storage.get(this);
+
+		// case when selector string is in [attr=value] form
+		if(selectorBody.includes(SelectorSyntax.EQUALS)) {
+			const [attr, valueString] = selectorBody.split(SelectorSyntax.EQUALS);
+
+			this['value'] = valueString;
+
+			// handle case when booleans are strings
+			if (valueString === 'true' || valueString === 'false') {
+				this['value'] = Boolean(valueString);
+			}
+			// handle case when numbers are strings
+			else if (!isNaN(+valueString)) {
+				this['value'] = +valueString;
+			}
+
+			sprites = allSprites.filter((s: SpriteProperties) => s[attr] === this['value']);
+		}
+		// case when selector string is in [attr] form
+		else {
+			const attr = selectorBody;
+			sprites = allSprites.filter((s: SpriteProperties) => attr in s);
+		}
+
+		return sprites.length === 1 ? new Sprite(sprites) : new SpriteCollection(sprites);
 	}
 
 	[Symbol.iterator]() {

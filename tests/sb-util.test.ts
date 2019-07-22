@@ -1,4 +1,4 @@
-import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection } from '../src/sb-util';
+import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite } from '../src/sb-util';
 import process from 'process';
 
 describe('ScratchProject', () => {
@@ -23,7 +23,11 @@ describe('ScratchProject', () => {
 	});
 })
 
-describe('Sprite(s)', () => {
+/* The implementation of ScratchProject#sprites() method is tightly
+	 coupled to SpriteCollection#query() method. Testing the query()
+	 method can be done, but it is redundant.
+*/
+describe('ScratchProject sprites()', () => {
 	let sp, sprites;
 
 	beforeAll(async () => {
@@ -35,15 +39,26 @@ describe('Sprite(s)', () => {
 		expect(sprites).toBeInstanceOf(SpriteCollection);
 	});
 
-	test('to fail with empty string query on ScratchProject sprites() API', () => {
+	test('to fail with empty string query', () => {
 		expect(() => sp.sprites('')).toThrowError();
 	});
 
-	test('to fail with invalid query on ScratchProject sprites() API', () => {
+	test('to fail with invalid query', () => {
 		expect(() => sp.sprites('[')).toThrowError();
 	});
 
-	test('to query stage with ScratchProject sprites() API', () => {
-		const stage = sp.sprites('[isStage=true]')
+	test('to query stage with ScratchProject', () => {
+		const stage = sp.sprites('[isStage=true]');
+		expect(stage).toBeInstanceOf(Sprite);
 	});
+
+	test('to query for sprites with an attribute that is numeric', () => {
+		const sprites = sp.sprites('[layerOrder=1]');
+		expect(sprites).toBeInstanceOf(SpriteCollection);
+	})
+
+	test('to query for sprites with single attribute with ScratchProject', () => {
+		const sprites = sp.sprites('[x]');
+		expect(sprites).toBeInstanceOf(SpriteCollection);
+	})
 })
