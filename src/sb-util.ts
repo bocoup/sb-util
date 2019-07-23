@@ -1,6 +1,5 @@
-import { Queryable, AssetFetcher, SpriteProperties, SpritePosition } from './abstracts';
-import { ProjectSource, Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
-import { type } from 'os';
+import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
+import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 
 enum CollectionTypes {
 	SPRITES = 'sprites',
@@ -20,6 +19,16 @@ enum SelectorSyntax {
 	SINGLE_QUOTE = '\''
 }
 
+enum SpriteAttributes {
+	BLOCKS = 'blocks',
+	BROADCASTS = 'broadcasts',
+	LISTS = 'lists'
+}
+
+enum BlockAttributes {
+	ID = 'id'
+}
+
 /*
 sb-util CLASSES.
 
@@ -34,14 +43,14 @@ export class ScratchProject implements Queryable {
 		storage.set(this, projectJSON);
 	}
 
-	get(property: string) {
+	prop(property: string) {
 		return storage.get(this)[property];
 	}
 
 	query(selector: string) {
 		if(selector === CollectionTypes.SPRITES) {
 			// The key for sprites in the project JSON is called 'targets'
-			return this.get(ScratchProjectKeys.TARGETS);
+			return this.prop(ScratchProjectKeys.TARGETS);
 		}
 	}
 
@@ -56,9 +65,23 @@ export class ScratchProject implements Queryable {
 	stage() {
 		return this.sprites('[isStage=true]');
 	}
+
+	blocks() {
+		let blocks = [];
+		let sprites = this.sprites();
+		for (let s of sprites) {
+			const blocksObj = s.prop(SpriteAttributes.BLOCKS);
+			Object.entries(blocksObj).forEach(([key, val]) => {
+				let block = val;
+				block[BlockAttributes.ID] = key;
+				blocks.push(block);
+			})
+		}
+		return new BlockCollection(blocks);
+	}
 }
 
-export class SpriteCollection implements Queryable {
+export class SpriteCollection implements Queryable  {
 	constructor(sprites: Array<SpriteProperties>){
 		storage.set(this, sprites);
 	}
@@ -131,7 +154,7 @@ export class Sprite extends SpriteCollection implements Queryable {
 		super([sprite]);
 	}
 
-	get(property: string){
+	prop(property: string){
 		const sprite = storage.get(this).slice(-1).pop();
 		return sprite[property];
 	}
@@ -141,18 +164,29 @@ export class Sprite extends SpriteCollection implements Queryable {
 	}
 
 	position(): SpritePosition {
-		const x = this.get('x');
-		const y = this.get('y');
+		const x = this.prop('x');
+		const y = this.prop('y');
 		return { x, y };
 	}
 
 	broadcasts() {
-		return this.get('broadcasts');
+		return this.prop(SpriteAttributes.BROADCASTS);
 	}
 
 	lists() {
-		return this.get('lists');
+		return this.prop(SpriteAttributes.LISTS);
 	}
+}
+
+export class BlockCollection implements Queryable {
+	constructor(blocks: Array<BlockProperties>) {
+		storage.set(this, blocks);
+	}
+
+	query() {
+		throw new Error('BlockCollection queryable not implemented yet!')
+	}
+
 }
 
 /*

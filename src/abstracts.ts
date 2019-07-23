@@ -9,10 +9,10 @@ export interface AssetFetcher {
 export interface SpriteProperties {
 	isStage: boolean,
 	name: string,
-	variables: Object,
-	lists: Object,
-	blocks: Object,
-	comments: Object,
+	variables: object,
+	lists: object,
+	blocks: object,
+	comments: object,
 	currentCostume: number,
 	costumes: Array<Object>,
 	sounds: Array<Object>,
@@ -34,4 +34,15 @@ export interface SpriteProperties {
 export interface SpritePosition {
 	x: number,
 	y: number
+}
+
+export interface BlockProperties {
+	id: string,
+	opcode: string,
+	parent: string,
+	next: string,
+	inputs: object,
+	fields: object,
+	shadow: boolean,
+	topLevel: boolean
 }

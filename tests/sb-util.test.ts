@@ -1,4 +1,4 @@
-import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite } from '../src/sb-util';
+import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection } from '../src/sb-util';
 import process from 'process';
 
 describe('ScratchProject', () => {
@@ -56,7 +56,7 @@ describe('ScratchProject sprites()', () => {
 		const stage = sp.stage();
 		expect(stage).toBeInstanceOf(Sprite);
 
-		const isStageProperty = stage.get('isStage');
+		const isStageProperty = stage.prop('isStage');
 		expect(isStageProperty).toBeTruthy();
 	});
 
@@ -71,14 +71,24 @@ describe('ScratchProject sprites()', () => {
 	});
 });
 
+describe('SratchProject blocks()', () => {
+	let sp, blocks;
+
+	beforeAll(async () => {
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+	});
+
+	test('to be returned by a ScratchProject', () => {
+		const blocks = sp.blocks();
+		expect(blocks).toBeInstanceOf(BlockCollection);
+	});
+})
+
 describe('Sprite class', () => {
 	let sp, sprite;
 
 	beforeAll(async () => {
 		sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
-	});
-
-	beforeEach(() => {
 		sprite = sp.sprites('[name="Sprite1"]'); // know the sprite's name because of knowledge of project.json file
 	});
 

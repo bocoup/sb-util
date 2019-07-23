@@ -144,6 +144,14 @@ A *Sprite* is a singleton of *SpriteCollection*, with additional methods that ar
 
 **Methods**   
 
+**prop(attribute)**
+Return: *any* value for a given attribute
+```
+const currentCostume = sprite.prop('currentCostume');
+```
+
+Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
+
 **blocks()**  
 Return: *BlockCollection*
 ```
