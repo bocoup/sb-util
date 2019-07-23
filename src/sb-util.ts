@@ -86,6 +86,11 @@ export class SpriteCollection implements Queryable  {
 		storage.set(this, sprites);
 	}
 
+	prop(attribute: string) {
+		const first = storage.get(this).slice().shift();
+		return first[attribute];
+	}
+
 	/*
 		Currently, the query selector syntax only supports
 		attribute selector style in the form of [attr] and

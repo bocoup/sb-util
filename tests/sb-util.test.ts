@@ -1,90 +1,99 @@
 import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection } from '../src/sb-util';
 import process from 'process';
 
-describe('ScratchProject', () => {
-	let sb3, projectJson, cloudJson;
+describe('ScratchProject class --------------------', () => {
+	describe('loading functions', () => {
+		let sb3, projectJson, cloudJson;
 
-	beforeAll(async () => {
-		sb3 = await loadSb3(`${process.cwd()}/tests/data/test.sb3`);
-		projectJson = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
-		cloudJson = await loadCloudId(319383115);
+		beforeAll(async () => {
+			sb3 = await loadSb3(`${process.cwd()}/tests/data/test.sb3`);
+			projectJson = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+			cloudJson = await loadCloudId(319383115);
+		});
+
+		test('is intialized with sb3 file', () => {
+			expect(sb3).toBeInstanceOf(ScratchProject);
+		});
+
+		test('is intialized with project.json file', async () => {
+			expect(projectJson).toBeInstanceOf(ScratchProject);
+		});
+
+		test('is intialized with cloud ID', async () => {
+			expect(cloudJson).toBeInstanceOf(ScratchProject);
+		});
 	});
 
-	test('is intialized with sb3 file', () => {
-		expect(sb3).toBeInstanceOf(ScratchProject);
-	});
+	describe('class functions', () => {
+		let sp, sprites;
+		
+		beforeAll(async () => {
+			sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+		});
 
-	test('is intialized with project.json file', async () => {
-		expect(projectJson).toBeInstanceOf(ScratchProject);
-	});
+		test('props returns value for first sprite in SpriteCollection', () => {
+			expect(sp.sprites().prop('isStage')).toBeDefined();
+		});
 
-	test('is intialized with cloud ID', async () => {
-		expect(cloudJson).toBeInstanceOf(ScratchProject);
+		describe('sprites()', () => {
+			test('to be returned from a ScratchProject', async () => {
+				sprites = sp.sprites();
+				expect(sprites).toBeInstanceOf(SpriteCollection);
+			});
+		
+			test('to fail with empty string query', () => {
+				expect(() => sp.sprites('')).toThrowError();
+			});
+		
+			test('to fail with invalid query', () => {
+				expect(() => sp.sprites('[')).toThrowError();
+			});
+		
+			test('to query stage with ScratchProject', () => {
+				const stage = sp.sprites('[isStage=true]');
+				expect(stage).toBeInstanceOf(Sprite);
+			});
+		
+			test('to get stage with stage() function', () => {
+				const stage = sp.stage();
+				expect(stage).toBeInstanceOf(Sprite);
+		
+				const isStageProperty = stage.prop('isStage');
+				expect(isStageProperty).toBeTruthy();
+			});
+		
+			test('to query for sprites with an attribute that is numeric', () => {
+				const sprites = sp.sprites('[layerOrder=1]');
+				expect(sprites).toBeInstanceOf(SpriteCollection);
+			});
+		
+			test('to query for sprites with single attribute with ScratchProject', () => {
+				const sprites = sp.sprites('[x]');
+				expect(sprites).toBeInstanceOf(SpriteCollection);
+			});
+		});
+
+		describe('blocks()', () => {
+			let sp;
+		
+			beforeAll(async () => {
+				sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+			});
+		
+			test('to be returned by a ScratchProject', () => {
+				const blocks = sp.blocks();
+				expect(blocks).toBeInstanceOf(BlockCollection);
+			});
+		});
+
 	});
-})
+});
 
 /* The implementation of ScratchProject#sprites() method is tightly
 	 coupled to SpriteCollection#query() method. Testing the query()
 	 method can be done, but it is redundant.
 */
-describe('ScratchProject sprites()', () => {
-	let sp, sprites;
-
-	beforeAll(async () => {
-		sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
-	});
-
-	test('to be returned from a ScratchProject', async () => {
-		sprites = sp.sprites();
-		expect(sprites).toBeInstanceOf(SpriteCollection);
-	});
-
-	test('to fail with empty string query', () => {
-		expect(() => sp.sprites('')).toThrowError();
-	});
-
-	test('to fail with invalid query', () => {
-		expect(() => sp.sprites('[')).toThrowError();
-	});
-
-	test('to query stage with ScratchProject', () => {
-		const stage = sp.sprites('[isStage=true]');
-		expect(stage).toBeInstanceOf(Sprite);
-	});
-
-	test('to get stage with stage() function', () => {
-		const stage = sp.stage();
-		expect(stage).toBeInstanceOf(Sprite);
-
-		const isStageProperty = stage.prop('isStage');
-		expect(isStageProperty).toBeTruthy();
-	});
-
-	test('to query for sprites with an attribute that is numeric', () => {
-		const sprites = sp.sprites('[layerOrder=1]');
-		expect(sprites).toBeInstanceOf(SpriteCollection);
-	});
-
-	test('to query for sprites with single attribute with ScratchProject', () => {
-		const sprites = sp.sprites('[x]');
-		expect(sprites).toBeInstanceOf(SpriteCollection);
-	});
-});
-
-describe('SratchProject blocks()', () => {
-	let sp, blocks;
-
-	beforeAll(async () => {
-		sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
-	});
-
-	test('to be returned by a ScratchProject', () => {
-		const blocks = sp.blocks();
-		expect(blocks).toBeInstanceOf(BlockCollection);
-	});
-})
-
-describe('Sprite class', () => {
+describe('Sprite class -------------------------', () => {
 	let sp, sprite;
 
 	beforeAll(async () => {

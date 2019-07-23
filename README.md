@@ -118,6 +118,13 @@ A *SpriteCollection* represents an iterable collection of objects that represent
 
 **Methods**
 
+**prop(attribute)**
+Parameter: *attribute* string.
+Return: the value of the given attribute for the **first** element in the SpriteCollection
+
+Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
+
+
 **query(selector)**
 Parameter(s): *selector* string in the CSS selector syntax style.
 Return: *SpriteCollection*
@@ -145,6 +152,7 @@ A *Sprite* is a singleton of *SpriteCollection*, with additional methods that ar
 **Methods**   
 
 **prop(attribute)**
+Parameter: *attribute* string.
 Return: *any* value for a given attribute
 ```
 const currentCostume = sprite.prop('currentCostume');
