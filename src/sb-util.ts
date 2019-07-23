@@ -1,4 +1,4 @@
-import { Queryable, AssetFetcher, SpriteProperties } from './abstracts';
+import { Queryable, AssetFetcher, SpriteProperties, SpritePosition } from './abstracts';
 import { ProjectSource, Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 import { type } from 'os';
 
@@ -15,7 +15,9 @@ enum ScratchProjectKeys {
 enum SelectorSyntax {
 	OPEN_BRACKET = '[',
 	CLOSED_BRACKET = ']',
-	EQUALS = '='
+	EQUALS = '=',
+	DOUBLE_QUOTE = '\"',
+	SINGLE_QUOTE = '\''
 }
 
 /*
@@ -92,6 +94,11 @@ export class SpriteCollection implements Queryable {
 			else if (!isNaN(+valueString)) {
 				this['value'] = +valueString;
 			}
+			// handle case when strings have quotes
+			else if ((valueString[0] === SelectorSyntax.DOUBLE_QUOTE || valueString[0] === SelectorSyntax.SINGLE_QUOTE)
+					&& (valueString.slice(-1) === SelectorSyntax.DOUBLE_QUOTE || valueString.slice(-1) === SelectorSyntax.SINGLE_QUOTE)) {
+				this['value'] = valueString.replace(/^"(.*)"$/, '$1');
+			}
 
 			sprites = allSprites.filter((s: SpriteProperties) => s[attr] === this['value']);
 		}
@@ -130,6 +137,11 @@ export class Sprite extends SpriteCollection implements Queryable {
 
 	query(selector: string) {
 		return super.query(selector);
+	}
+
+	position(): SpritePosition {
+		const { x, y } = storage.get(this).pop();
+		return { x, y };
 	}
 }
 

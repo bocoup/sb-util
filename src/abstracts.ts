@@ -30,3 +30,8 @@ export interface SpriteProperties {
 	draggable?: boolean,
 	rotationStyle?: string
 }
+
+export interface SpritePosition {
+	x: number,
+	y: number
+}

@@ -63,10 +63,25 @@ describe('ScratchProject sprites()', () => {
 	test('to query for sprites with an attribute that is numeric', () => {
 		const sprites = sp.sprites('[layerOrder=1]');
 		expect(sprites).toBeInstanceOf(SpriteCollection);
-	})
+	});
 
 	test('to query for sprites with single attribute with ScratchProject', () => {
 		const sprites = sp.sprites('[x]');
 		expect(sprites).toBeInstanceOf(SpriteCollection);
-	})
-})
+	});
+});
+
+describe('Sprite class', () => {
+	let sp, sprite;
+
+	beforeAll(async () => {
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+		sprite = sp.sprites('[name="Sprite1"]'); // know the sprite's name because of knowledge of project.json file
+	});
+
+	test('can get sprite position', () => {
+		const position = sprite.position();
+		expect(position).toHaveProperty('x');
+		expect(position).toHaveProperty('y');
+	});
+});
