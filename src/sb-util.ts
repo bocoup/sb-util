@@ -149,6 +149,10 @@ export class Sprite extends SpriteCollection implements Queryable {
 	broadcasts() {
 		return this.get('broadcasts');
 	}
+
+	lists() {
+		return this.get('lists');
+	}
 }
 
 /*

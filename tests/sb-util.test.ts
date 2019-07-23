@@ -92,4 +92,9 @@ describe('Sprite class', () => {
 		const broadcasts = sprite.broadcasts();
 		expect(broadcasts).toBeInstanceOf(Object);
 	});
+
+	test('can get lists', () => {
+		const lists = sprite.lists();
+		expect(lists).toBeInstanceOf(Object);
+	})
 });

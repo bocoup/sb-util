@@ -178,7 +178,7 @@ Return: a list of Objects representing a list, which contains an id, name, and a
 ```
 const lists = sprite.lists();
 
-lists.map(({id: listId, name: listName, values}) => ({listId, listName, values}));
+Object.entries(lists).map(([key, value]) => ({key, value[0], value[1]}));
 ```
 
 ---
