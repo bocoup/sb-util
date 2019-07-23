@@ -76,6 +76,9 @@ describe('Sprite class', () => {
 
 	beforeAll(async () => {
 		sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+	});
+
+	beforeEach(() => {
 		sprite = sp.sprites('[name="Sprite1"]'); // know the sprite's name because of knowledge of project.json file
 	});
 
@@ -83,5 +86,10 @@ describe('Sprite class', () => {
 		const position = sprite.position();
 		expect(position).toHaveProperty('x');
 		expect(position).toHaveProperty('y');
+	});
+
+	test('can get broadcasts', () => {
+		const broadcasts = sprite.broadcasts();
+		expect(broadcasts).toBeInstanceOf(Object);
 	});
 });

@@ -131,8 +131,9 @@ export class Sprite extends SpriteCollection implements Queryable {
 		super([sprite]);
 	}
 
-	get(property){
-		return storage.get(this).pop()[property];
+	get(property: string){
+		const sprite = storage.get(this).slice(-1).pop();
+		return sprite[property];
 	}
 
 	query(selector: string) {
@@ -140,8 +141,13 @@ export class Sprite extends SpriteCollection implements Queryable {
 	}
 
 	position(): SpritePosition {
-		const { x, y } = storage.get(this).pop();
+		const x = this.get('x');
+		const y = this.get('y');
 		return { x, y };
+	}
+
+	broadcasts() {
+		return this.get('broadcasts');
 	}
 }
 

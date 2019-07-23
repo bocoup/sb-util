@@ -169,7 +169,7 @@ Return: a list of Objects representing a broadcast, which contains an id and a m
 const broadcasts = sprite.broadcasts();
 
 // A mapping example
-broadcasts.map(({id: messageId, message}) => ({ messageId, message }));
+Object.entries(broadcasts).map(([key, value]) => ({ messageId: key, message: value }));
 ```
 
 **lists()**  
