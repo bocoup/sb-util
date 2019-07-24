@@ -93,11 +93,6 @@ describe('ScratchProject class --------------------', () => {
 			beforeAll(async () => {
 				sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
 			});
-		
-			test('to be returned by a ScratchProject', () => {
-				const blocks = sp.blocks();
-				expect(blocks).toBeInstanceOf(BlockCollection);
-			});
 		});
 
 	});

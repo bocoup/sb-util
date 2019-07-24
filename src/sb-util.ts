@@ -54,17 +54,7 @@ export class ScratchProject {
 	}
 
 	blocks() {
-		let blocks = [];
-		let sprites = this.sprites();
-		for (let s of sprites) {
-			const blocksObj = s.prop(SpriteAttributes.BLOCKS);
-			Object.entries(blocksObj).forEach(([key, val]) => {
-				let block = val;
-				block[BlockAttributes.ID] = key;
-				blocks.push(block);
-			})
-		}
-		return new BlockCollection(blocks);
+		throw new Error('ScratchProject blocks() function not implemented yet!');
 	}
 }
 
@@ -144,10 +134,6 @@ export class Sprite extends SpriteCollection implements Queryable {
 		return sprite[property];
 	}
 
-	query(selector: string) {
-		return super.query(selector);
-	}
-
 	position(): SpritePosition {
 		const x = this.prop('x');
 		const y = this.prop('y');
@@ -164,7 +150,7 @@ export class Sprite extends SpriteCollection implements Queryable {
 }
 
 export class BlockCollection implements Queryable {
-	constructor(blocks: Array<BlockProperties>) {
+	constructor(blocks: Iterable<BlockProperties>) {
 		storage.set(this, blocks);
 	}
 
