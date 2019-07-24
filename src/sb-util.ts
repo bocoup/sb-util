@@ -1,6 +1,7 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 import { validateSpriteSelector, isSelectorAttrValue, getAttrValue, attrValueContainsQuotes } from './selector-parse';
+import { map, filter, makeIterable, first } from './generators';
 
 enum CollectionTypes {
 	SPRITES = 'sprites',
@@ -49,7 +50,7 @@ export class ScratchProject {
 	}
 
 	stage() {
-		return this.sprites('[isStage=true]');
+		return this.sprites('[isStage=true]').first();
 	}
 
 	blocks() {
@@ -72,6 +73,11 @@ export class SpriteCollection implements Queryable  {
 		storage.set(this, sprites);
 	}
 
+	first(): Sprite {
+		const props: SpriteProperties = first(storage.get(this));
+		return props ? new Sprite(props) : null;
+	}
+
 	prop(attribute: string) {
 		const first = storage.get(this).slice().shift();
 		return first[attribute];
@@ -88,7 +94,7 @@ export class SpriteCollection implements Queryable  {
 		// string between brackets
 		const selectorBody = selector.substring(1, selector.length-1);
 
-		let sprites, allSprites = storage.get(this);
+		let sprites, filterFunction, allSprites = storage.get(this);
 
 		// case when selector string is in [attr=value] form
 		if(isSelectorAttrValue(selectorBody)) {
@@ -109,28 +115,21 @@ export class SpriteCollection implements Queryable  {
 				this['value'] = valueString.replace(/^[",'](.*)[",']$/, '$1');
 			}
 
-			sprites = allSprites.filter((s: SpriteProperties) => s[attr] === this['value']);
+			filterFunction = (s: SpriteProperties) => s[attr] === this['value'];
 		}
 		// case when selector string is in [attr] form
 		else {
 			const attr = selectorBody;
-			sprites = allSprites.filter((s: SpriteProperties) => attr in s);
+			filterFunction = (s: SpriteProperties) => attr in s;
 		}
 
-		return sprites.length === 1 ? new Sprite(sprites.pop()) : new SpriteCollection(sprites);
+		sprites = makeIterable(allSprites, s => filter(s, filterFunction));
+		return new SpriteCollection(sprites);
 	}
 
 	[Symbol.iterator]() {
-		const sprites = storage.get(this);
-		return {
-			next(): IteratorResult<Sprite> {
-				let sprite = sprites.pop();
-				if(sprite){
-					return {value: new Sprite(sprite), done: false};
-				}
-				return {done: true, value: null};
-			}
-		}
+		const sprites: Iterable<SpriteProperties> = storage.get(this);
+		return map(sprites, props => new Sprite(props));
 	}
 }
 

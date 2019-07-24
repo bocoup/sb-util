@@ -55,7 +55,7 @@ describe('ScratchProject class --------------------', () => {
 		
 			test('to query stage with ScratchProject', () => {
 				const stage = sp.sprites('[isStage=true]');
-				expect(stage).toBeInstanceOf(Sprite);
+				expect(stage).toBeInstanceOf(SpriteCollection);
 			});
 		
 			test('to get stage with stage() function', () => {
@@ -112,7 +112,7 @@ describe('Sprite class -------------------------', () => {
 
 	beforeAll(async () => {
 		sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
-		sprite = sp.sprites('[name="Sprite1"]'); // know the sprite's name because of knowledge of project.json file
+		sprite = sp.sprites('[name="Sprite1"]').first(); // know the sprite's name because of knowledge of project.json file
 	});
 
 	test('can get sprite position', () => {
