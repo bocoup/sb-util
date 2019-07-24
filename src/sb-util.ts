@@ -113,7 +113,7 @@ export class SpriteCollection implements Queryable  {
 			}
 			// handle case when strings have quotes
 			else if (attrValueContainsQuotes(valueString)) {
-				this['value'] = valueString.replace(/^"(.*)"$/, '$1');
+				this['value'] = valueString.replace(/^[",'](.*)[",']$/, '$1');
 			}
 
 			sprites = allSprites.filter((s: SpriteProperties) => s[attr] === this['value']);

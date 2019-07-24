@@ -71,6 +71,16 @@ describe('ScratchProject class --------------------', () => {
 				const sprites = sp.sprites('[x]');
 				expect(sprites).toBeInstanceOf(SpriteCollection);
 			});
+
+			test('to query sprites where value is a string with double quotes', () => {
+				const sprite = sp.sprites('[name="Sprite1"]');;
+				expect(sprite).toBeInstanceOf(SpriteCollection);
+			});
+
+			test('to query sprites where value is a string with single quotes', () => {
+				const sprite = sp.sprites("[name='Sprite1']");;
+				expect(sprite).toBeInstanceOf(SpriteCollection);
+			});
 		});
 
 		describe('blocks()', () => {
