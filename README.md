@@ -194,7 +194,7 @@ Return: a list of Objects representing a list, which contains an id, name, and a
 ```
 const lists = sprite.lists();
 
-Object.entries(lists).map(([key, value]) => ({key, value[0], value[1]}));
+Object.entries(lists).map(([key, value]) => console.log({key, listName: value[0], values: value[1]}));
 ```
 
 ---
