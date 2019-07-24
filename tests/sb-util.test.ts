@@ -41,12 +41,16 @@ describe('ScratchProject class --------------------', () => {
 				expect(sprites).toBeInstanceOf(SpriteCollection);
 			});
 		
-			test('to fail with empty string query', () => {
+			test('to fail with empty string query string', () => {
 				expect(() => sp.sprites('')).toThrowError();
 			});
 		
-			test('to fail with invalid query', () => {
+			test('to fail with invalid query string', () => {
 				expect(() => sp.sprites('[')).toThrowError();
+			});
+
+			test('to fail with non-string query string', () => {
+				expect(() => sp.sprites(12345)).toThrowError();
 			});
 		
 			test('to query stage with ScratchProject', () => {

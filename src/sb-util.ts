@@ -41,6 +41,8 @@ export class ScratchProject {
 	}
 
 	sprites(selector?: string){
+		if (selector && typeof selector !== 'string') throw new Error('SpriteCollection selector should be a string!');
+
 		const sprites = this.prop(ScratchProjectKeys.TARGETS);
 		if (!selector && typeof selector !== 'string') return new SpriteCollection(sprites);
 		return new SpriteCollection(sprites).query(selector);
