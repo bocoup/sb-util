@@ -1,5 +1,6 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
+import { validateSpriteSelector, isSelectorAttrValue, getAttrValue, attrValueContainsQuotes } from './selector-parse';
 
 enum CollectionTypes {
 	SPRITES = 'sprites',
@@ -9,14 +10,6 @@ enum CollectionTypes {
 
 enum ScratchProjectKeys {
 	TARGETS = 'targets'
-}
-
-enum SelectorSyntax {
-	OPEN_BRACKET = '[',
-	CLOSED_BRACKET = ']',
-	EQUALS = '=',
-	DOUBLE_QUOTE = '\"',
-	SINGLE_QUOTE = '\''
 }
 
 enum SpriteAttributes {
@@ -82,7 +75,7 @@ export class ScratchProject implements Queryable {
 }
 
 export class SpriteCollection implements Queryable  {
-	constructor(sprites: Array<SpriteProperties>){
+	constructor(sprites: Iterable<SpriteProperties>){
 		storage.set(this, sprites);
 	}
 
@@ -97,11 +90,7 @@ export class SpriteCollection implements Queryable  {
 		[attr=value]
 	*/
 	query(selector: string){
-		if(selector.length < 2 || selector[0] !== SelectorSyntax.OPEN_BRACKET
-			&& selector.slice(-1) !== SelectorSyntax.CLOSED_BRACKET){
-			throw new Error('Invalid selector syntax for SpriteCollection. \
-				[attr] and [attr=value] format is accepted. Selector must not be empty');
-		}
+		validateSpriteSelector(selector);
 
 		// string between brackets
 		const selectorBody = selector.substring(1, selector.length-1);
@@ -109,8 +98,8 @@ export class SpriteCollection implements Queryable  {
 		let sprites, allSprites = storage.get(this);
 
 		// case when selector string is in [attr=value] form
-		if(selectorBody.includes(SelectorSyntax.EQUALS)) {
-			const [attr, valueString] = selectorBody.split(SelectorSyntax.EQUALS);
+		if(isSelectorAttrValue(selectorBody)) {
+			const [attr, valueString] = getAttrValue(selectorBody);
 
 			this['value'] = valueString;
 
@@ -123,8 +112,7 @@ export class SpriteCollection implements Queryable  {
 				this['value'] = +valueString;
 			}
 			// handle case when strings have quotes
-			else if ((valueString[0] === SelectorSyntax.DOUBLE_QUOTE || valueString[0] === SelectorSyntax.SINGLE_QUOTE)
-					&& (valueString.slice(-1) === SelectorSyntax.DOUBLE_QUOTE || valueString.slice(-1) === SelectorSyntax.SINGLE_QUOTE)) {
+			else if (attrValueContainsQuotes(valueString)) {
 				this['value'] = valueString.replace(/^"(.*)"$/, '$1');
 			}
 
