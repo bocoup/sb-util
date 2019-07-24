@@ -31,7 +31,7 @@ The classes below make up the sb-util API.
 // This is the global storage for project data
 const storage = new WeakMap();
 
-export class ScratchProject implements Queryable {
+export class ScratchProject {
 	constructor(projectJSON: Object, assetFetcher?: AssetFetcher) {
 		storage.set(this, projectJSON);
 	}
@@ -40,18 +40,9 @@ export class ScratchProject implements Queryable {
 		return storage.get(this)[property];
 	}
 
-	query(selector: string) {
-		if(selector === CollectionTypes.SPRITES) {
-			// The key for sprites in the project JSON is called 'targets'
-			return this.prop(ScratchProjectKeys.TARGETS);
-		}
-	}
-
 	sprites(selector?: string){
-		const sprites = this.query(CollectionTypes.SPRITES);
-
+		const sprites = this.prop(ScratchProjectKeys.TARGETS);
 		if (!selector && typeof selector !== 'string') return new SpriteCollection(sprites);
-
 		return new SpriteCollection(sprites).query(selector);
 	}
 
