@@ -2,10 +2,10 @@
 # sb-util
 
 ## Table of Contents
-- [sb-util Proposal (RFC)](https://github.com/bocoup/sb-util/tree/readme-api-proposal#sb-util-proposal-rfc)
-  - [JavaScript API Proposal](https://github.com/bocoup/sb-util/tree/readme-api-proposal#sb-util-proposal-rfc)
-  - [CLI Proposal](https://github.com/bocoup/sb-util/tree/readme-api-proposal#sb-util-proposal-rfc)
-- [Development](https://github.com/bocoup/sb-util/tree/readme-api-proposal#development)
+- [sb-util Proposal (RFC)](https://github.com/bocoup/sb-util/blob/master/README.md#sb-util-proposal-rfc)
+  - [JavaScript API Proposal](https://github.com/bocoup/sb-util/blob/master/README.md#javascript-api-proposal)
+  - [CLI Proposal](https://github.com/bocoup/sb-util/blob/master/README.md#cli-proposal)
+- [Development](https://github.com/bocoup/sb-util/blob/master/README.md#development)
 
 ---
 
@@ -19,14 +19,14 @@ The resulting tool should be usable in test suites, scripts, and applications.
 
 ## Javascript API Proposal
 
-- [Loading a Scratch Project](https://github.com/bocoup/sb-util/tree/readme-api-proposal#javascript-api-proposal)
-- [ScratchProject](https://github.com/bocoup/sb-util/tree/readme-api-proposal#scratchproject)
-- [SpriteCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#spritecollection)
-- [Sprite](https://github.com/bocoup/sb-util/tree/readme-api-proposal#sprite)
-- [BlockCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#blockcollection)
-- [Block](https://github.com/bocoup/sb-util/tree/readme-api-proposal#block)
-- [AssetCollection](https://github.com/bocoup/sb-util/tree/readme-api-proposal#assetcollection)
-- [Asset](https://github.com/bocoup/sb-util/tree/readme-api-proposal#asset)
+- [Loading a Scratch Project](https://github.com/bocoup/sb-util#javascript-api-proposal)
+- [ScratchProject](https://github.com/bocoup/sb-util#scratchproject)
+- [SpriteCollection](https://github.com/bocoup/sb-util#spritecollection)
+- [Sprite](https://github.com/bocoup/sb-util#sprite)
+- [BlockCollection](https://github.com/bocoup/sb-util#blockcollection)
+- [Block](https://github.com/bocoup/sb-util#block)
+- [AssetCollection](https://github.com/bocoup/sb-util#assetcollection)
+- [Asset](https://github.com/bocoup/sb-util#asset)
 
 
 ### **Loading a Scratch Project**
@@ -345,7 +345,6 @@ Return: *Promise* to the file buffer of this Asset
 ## Development
 sb-util is implemented in TypeScript and will be available as a JavaScript library on [npm](https://www.npmjs.com/package/sb-util) and as a CLI tool.
 
-# Development
 ## Install Dependencies
 ```
 npm install
