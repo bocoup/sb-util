@@ -120,7 +120,7 @@ A *SpriteCollection* represents an iterable collection of objects that represent
 
 **prop(attribute)**
 Parameter: *attribute* string.
-Return: the value of the given attribute for the **first** element in the SpriteCollection
+Return: the value of the given attribute for the **first** element in the SpriteCollection, undefined if the prop does not exist, null if the SpriteCollection is empty
 
 Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
 

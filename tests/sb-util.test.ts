@@ -65,6 +65,17 @@ describe('ScratchProject class --------------------', () => {
 				const isStageProperty = stage.prop('isStage');
 				expect(isStageProperty).toBeTruthy();
 			});
+
+			test('to get prop that does not exist', () => {
+				const stage = sp.stage();
+				expect(stage.prop('doesNotExist')).toBeUndefined();
+			});
+
+			test('to get prop when sprites are empty', () => {
+				const emptySprites = sp.sprites('[layerOrder=200]');
+				console.log(emptySprites, emptySprites.prop('isStage'))
+				expect(emptySprites.prop('isStage')).toBeNull();
+			});
 		
 			test('to query for sprites with an attribute that is numeric', () => {
 				const sprites = sp.sprites('[layerOrder=1]');

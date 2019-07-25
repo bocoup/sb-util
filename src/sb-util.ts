@@ -69,8 +69,9 @@ export class SpriteCollection implements Queryable  {
 	}
 
 	prop(attribute: string) {
-		const first = storage.get(this).slice().shift();
-		return first[attribute];
+		const first = this.first();
+		if (!first) return null;
+		return first.prop(attribute);
 	}
 
 	/*
@@ -138,6 +139,10 @@ export class Sprite extends SpriteCollection implements Queryable {
 		const x = this.prop('x');
 		const y = this.prop('y');
 		return { x, y };
+	}
+
+	blocks(selector: string) {
+		throw new Error('Sprite blocks() not implemented yet!');
 	}
 
 	broadcasts() {
