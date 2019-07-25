@@ -134,5 +134,10 @@ describe('Sprite class -------------------------', () => {
 	test('can get lists', () => {
 		const lists = sprite.lists();
 		expect(lists).toBeInstanceOf(Object);
-	})
+	});
+
+	test('can get all blocks', () => {
+		const blocks = sprite.blocks();
+		expect(blocks).toBeInstanceOf(BlockCollection);
+	});
 });

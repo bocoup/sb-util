@@ -127,7 +127,7 @@ export class SpriteCollection implements Queryable  {
 	}
 }
 
-export class Sprite extends SpriteCollection implements Queryable {
+export class Sprite extends SpriteCollection {
 	constructor(sprite: SpriteProperties) {
 		// Per documentation, Sprite is a singleton SpriteCollection
 		super([sprite]);
@@ -144,8 +144,10 @@ export class Sprite extends SpriteCollection implements Queryable {
 		return { x, y };
 	}
 
-	blocks(selector: string) {
-		throw new Error('Sprite blocks() not implemented yet!');
+	blocks(selector?: string) {
+		const blocksObj: Object = this.prop('blocks');
+		const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(([blockId, block]) => ({id: blockId, ...block}));
+		return new BlockCollection(allBlocks);
 	}
 
 	broadcasts() {
@@ -166,6 +168,12 @@ export class BlockCollection implements Queryable {
 		throw new Error('BlockCollection queryable not implemented yet!')
 	}
 
+}
+
+export class Block extends BlockCollection {
+	constructor(block: BlockProperties) {
+		super([block]);
+	}
 }
 
 /*

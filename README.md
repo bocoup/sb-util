@@ -118,6 +118,9 @@ A *SpriteCollection* represents an iterable collection of objects that represent
 
 **Methods**
 
+**first()**
+Return: the first element in the SpriteCollection, null if the collection is empty
+
 **prop(attribute)**
 Parameter: *attribute* string.
 Return: the value of the given attribute for the **first** element in the SpriteCollection, undefined if the prop does not exist, null if the SpriteCollection is empty
