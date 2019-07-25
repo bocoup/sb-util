@@ -294,6 +294,13 @@ A *Block* is a singleton of *BlockCollection*. It has additional methods, specif
 
 **Methods**
 
+**prop(attribute)**
+Parameter: *attribute* string.
+Return: *any* value for a given attribute
+
+Attributes available to pass: *opcode, next, parent, inputs, fields, shadow, topLevel*
+
+
 **args(selector)**  
 This method is similar to *query*. *args* returns the inputs or fields (depending on the query string) of a block using one of the strings defined below. Certain query strings can return an input or a field.
 
