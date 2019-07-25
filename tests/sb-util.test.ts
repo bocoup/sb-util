@@ -73,7 +73,6 @@ describe('ScratchProject class --------------------', () => {
 
 			test('to get prop when sprites are empty', () => {
 				const emptySprites = sp.sprites('[layerOrder=200]');
-				console.log(emptySprites, emptySprites.prop('isStage'))
 				expect(emptySprites.prop('isStage')).toBeNull();
 			});
 		

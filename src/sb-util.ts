@@ -85,28 +85,31 @@ export class SpriteCollection implements Queryable  {
 		// string between brackets
 		const selectorBody = selector.substring(1, selector.length-1);
 
-		let sprites, filterFunction, allSprites = storage.get(this);
+		let sprites: Iterable<SpriteProperties>, 
+			filterFunction: (s: SpriteProperties) => boolean,
+			attrValue: any, // the attribute being queried for might be string, number, or bool
+			allSprites = storage.get(this);
 
 		// case when selector string is in [attr=value] form
 		if(isSelectorAttrValue(selectorBody)) {
 			const [attr, valueString] = getAttrValue(selectorBody);
 
-			this['value'] = valueString;
+			attrValue = valueString;
 
 			// handle case when booleans are strings
 			if (valueString === 'true' || valueString === 'false') {
-				this['value'] = Boolean(valueString);
+				attrValue = Boolean(valueString);
 			}
 			// handle case when numbers are strings
 			else if (!isNaN(+valueString)) {
-				this['value'] = +valueString;
+				attrValue = +valueString;
 			}
 			// handle case when strings have quotes
 			else if (attrValueContainsQuotes(valueString)) {
-				this['value'] = valueString.replace(/^[",'](.*)[",']$/, '$1');
+				attrValue = valueString.replace(/^[",'](.*)[",']$/, '$1');
 			}
 
-			filterFunction = (s: SpriteProperties) => s[attr] === this['value'];
+			filterFunction = (s: SpriteProperties) => s[attr] === attrValue;
 		}
 		// case when selector string is in [attr] form
 		else {
