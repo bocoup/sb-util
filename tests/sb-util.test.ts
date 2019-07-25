@@ -165,5 +165,7 @@ describe('BlockCollection class', () => {
 		const motionBlocks = blocks.query('.motion');
 		const first = motionBlocks.first();
 		expect(first).not.toBeNull();
+		expect(first).toBeInstanceOf(Block);
+		expect(first.prop('opcode')).toContain('motion');
 	});
 });

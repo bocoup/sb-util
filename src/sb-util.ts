@@ -179,7 +179,8 @@ export class BlockCollection implements Queryable {
 	}
 
 	first() {
-		return first(storage.get(this));
+		const props: BlockProperties = first(storage.get(this));
+		return props ? new Block(props) : null;
 	}
 
 	query(selector: string) {
@@ -203,6 +204,10 @@ export class BlockCollection implements Queryable {
 export class Block extends BlockCollection {
 	constructor(block: BlockProperties) {
 		super([block]);
+	}
+
+	prop(property: string) {
+		return storage.get(this).slice().pop()[property];
 	}
 }
 
