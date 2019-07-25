@@ -146,3 +146,18 @@ describe('Sprite class -------------------------', () => {
 		expect(blocks).toBeInstanceOf(BlockCollection);
 	});
 });
+
+describe('BlockCollection class', () => {
+	let sp, blocks;
+
+	beforeAll(async () => {
+		// Choosing this file because it has a lot of blocks
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+		blocks = sp.blocks();
+	});
+
+	test('query for opcode', () => {
+		const eventFlagBlocks = blocks.query('event_whenflagclicked');
+		expect(eventFlagBlocks).toBeInstanceOf(BlockCollection);
+	});
+});

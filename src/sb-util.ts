@@ -1,6 +1,6 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
-import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes } from './selector-parse';
+import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes, parseBlockQuerySelector } from './selector-parse';
 import { map, filter, makeIterable, first, chain } from './generators';
 
 enum CollectionTypes {
@@ -57,7 +57,14 @@ export class ScratchProject {
 		const sprites = this.sprites();
 		const iters = [];
 		for(const sprite of sprites) {
-			iters.push(sprite.blocks());
+			const spriteBlocks: BlockCollection = sprite.blocks();
+
+			// Iterating over a BlockCollection will return a Block as each element.
+			// Therefore, we should convert the Block to a raw BlockProperties object
+			//	which can be obtained by accessing the Block in storage and retrieving
+			//	the first element
+			const spriteBlocksProps = makeIterable(spriteBlocks, (s: Block) => map(s, s => storage.get(s).slice().pop()));
+			iters.push(spriteBlocksProps);
 		}
 
 		const chained: Iterable<BlockProperties> = chain(...iters);
@@ -172,7 +179,10 @@ export class BlockCollection implements Queryable {
 	}
 
 	query(selector: string) {
-		throw new Error('BlockCollection queryable not implemented yet!')
+		const allBlocks = storage.get(this);
+		const [attr, value] = parseBlockQuerySelector(selector)
+		const blocks: Iterable<BlockProperties> = makeIterable(allBlocks, b => filter(b, (b: BlockProperties) => b[attr] === value));
+		return new BlockCollection(blocks);
 	}
 
 	[Symbol.iterator]() {

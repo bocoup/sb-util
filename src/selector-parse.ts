@@ -3,7 +3,7 @@ enum SelectorSyntax {
 	CLOSED_BRACKET = ']',
 	EQUALS = '=',
 	DOUBLE_QUOTE = '\"',
-	SINGLE_QUOTE = '\''
+    SINGLE_QUOTE = '\''
 }
 
 export function validateSpriteSelector(selector: string){
@@ -25,4 +25,8 @@ export function getAttributeAndValueInSelector(selector: string) {
 export function attrValueContainsQuotes(value: string) {
     return (value[0] === SelectorSyntax.DOUBLE_QUOTE || value[0] === SelectorSyntax.SINGLE_QUOTE)
 					&& (value.slice(-1) === SelectorSyntax.DOUBLE_QUOTE || value.slice(-1) === SelectorSyntax.SINGLE_QUOTE);
+}
+
+export function parseBlockQuerySelector(selector: string) {
+    return ['opcode', selector];
 }
