@@ -18,7 +18,7 @@ export function isSelectorAttrValue(selector: string) {
     return selector.includes(SelectorSyntax.EQUALS);
 }
 
-export function getAttrValue(selector: string) {
+export function getAttributeAndValueInSelector(selector: string) {
     return selector.split(SelectorSyntax.EQUALS);
 }
 

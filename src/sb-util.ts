@@ -1,6 +1,6 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
-import { validateSpriteSelector, isSelectorAttrValue, getAttrValue, attrValueContainsQuotes } from './selector-parse';
+import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes } from './selector-parse';
 import { map, filter, makeIterable, first } from './generators';
 
 enum CollectionTypes {
@@ -83,7 +83,7 @@ export class SpriteCollection implements Queryable  {
 		validateSpriteSelector(selector);
 
 		// string between brackets
-		const selectorBody = selector.substring(1, selector.length-1);
+		const selectorBody = selector.slice(1, -1);
 
 		let sprites: Iterable<SpriteProperties>, 
 			filterFunction: (s: SpriteProperties) => boolean,
@@ -92,7 +92,7 @@ export class SpriteCollection implements Queryable  {
 
 		// case when selector string is in [attr=value] form
 		if(isSelectorAttrValue(selectorBody)) {
-			const [attr, valueString] = getAttrValue(selectorBody);
+			const [attr, valueString] = getAttributeAndValueInSelector(selectorBody);
 
 			attrValue = valueString;
 
