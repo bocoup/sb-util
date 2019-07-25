@@ -89,11 +89,13 @@ describe('ScratchProject class --------------------', () => {
 			test('to query sprites where value is a string with double quotes', () => {
 				const sprite = sp.sprites('[name="Sprite1"]');;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
+				expect(sprites.first()).toBeInstanceOf(Sprite);
 			});
 
 			test('to query sprites where value is a string with single quotes', () => {
 				const sprite = sp.sprites("[name='Sprite1']");;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
+				expect(sprites.first()).toBeInstanceOf(Sprite);
 			});
 		});
 
@@ -159,6 +161,12 @@ describe('BlockCollection class', () => {
 	test('query for opcode', () => {
 		const eventFlagBlocks = blocks.query('event_whenflagclicked');
 		expect(eventFlagBlocks).toBeInstanceOf(BlockCollection);
+		expect(eventFlagBlocks.first()).toBeInstanceOf(Block);
+	});
+
+	test('query for invalid opcode', () => {
+		const blocksNot = blocks.query('some_opcode');
+		expect(blocksNot.first()).toBeNull();
 	});
 
 	test('query for block type', () => {

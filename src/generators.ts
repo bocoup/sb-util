@@ -20,7 +20,7 @@ export function makeIterable<T>(iter: Iterable<T>, predicate: (item: Iterable<T>
     };
 }
 
-export function * chain<T>(...iterables: Iterable<T>[]): Iterable<T> {
+export function * chain<T>(...iterables: Iterable<T>[]): Iterator<T> {
     for (const it of iterables) {
         yield* it;
     }

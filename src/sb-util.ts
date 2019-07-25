@@ -23,6 +23,15 @@ enum BlockAttributes {
 	ID = 'id'
 }
 
+enum BlockShapes {
+	HAT = 'hat',
+	STACK = 'stack',
+	BOOLEAN = 'boolean',
+	REPORTER = 'reporter',
+	C = 'c',
+	CAP = 'cap'
+}
+
 /*
 sb-util CLASSES.
 
@@ -67,7 +76,7 @@ export class ScratchProject {
 			iters.push(spriteBlocksProps);
 		}
 
-		const chained: Iterable<BlockProperties> = chain(...iters);
+		const chained: Iterable<BlockProperties> = makeIterable(iters, iters => chain(...iters));
 		return new BlockCollection(chained)
 	}
 }
@@ -158,7 +167,7 @@ export class Sprite extends SpriteCollection {
 		return { x, y };
 	}
 
-	blocks(selector?: string) {
+	blocks() {
 		const blocksObj: Object = this.prop('blocks');
 		const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(([blockId, block]) => ({id: blockId, ...block}));
 		return new BlockCollection(allBlocks);
