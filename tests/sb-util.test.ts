@@ -1,4 +1,4 @@
-import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection } from '../src/sb-util';
+import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection, Block } from '../src/sb-util';
 import process from 'process';
 
 describe('ScratchProject class --------------------', () => {
@@ -102,6 +102,11 @@ describe('ScratchProject class --------------------', () => {
 		
 			beforeAll(async () => {
 				sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+			});
+
+			test('get all blocks in a project', () => {
+				const blocks = sp.blocks();
+				expect(blocks).toBeInstanceOf(BlockCollection);
 			});
 		});
 

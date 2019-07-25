@@ -1,7 +1,7 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes } from './selector-parse';
-import { map, filter, makeIterable, first } from './generators';
+import { map, filter, makeIterable, first, chain } from './generators';
 
 enum CollectionTypes {
 	SPRITES = 'sprites',
@@ -49,12 +49,19 @@ export class ScratchProject {
 		return new SpriteCollection(sprites).query(selector);
 	}
 
-	stage() {
+	stage(): Sprite {
 		return this.sprites('[isStage=true]').first();
 	}
 
 	blocks() {
-		throw new Error('ScratchProject blocks() function not implemented yet!');
+		const sprites = this.sprites();
+		const iters = [];
+		for(const sprite of sprites) {
+			iters.push(sprite.blocks());
+		}
+
+		const chained: Iterable<BlockProperties> = chain(...iters);
+		return new BlockCollection(chained)
 	}
 }
 
@@ -164,10 +171,14 @@ export class BlockCollection implements Queryable {
 		storage.set(this, blocks);
 	}
 
-	query() {
+	query(selector: string) {
 		throw new Error('BlockCollection queryable not implemented yet!')
 	}
 
+	[Symbol.iterator]() {
+		const blocks: Iterable<BlockProperties> = storage.get(this);
+		return map(blocks, props => new Block(props));
+	}
 }
 
 export class Block extends BlockCollection {
