@@ -207,6 +207,9 @@ A *BlockCollection* represents and iterable collection of objects that represent
 
 **Methods**
 
+**first()**
+Return: the first element in the BlockCollection, null if the collection is empty
+
 **query(selector)**
 Parameter(s): *selector*, a string with the convention similar to CSS selector syntax  
 Return: *BlockCollection*

@@ -160,4 +160,10 @@ describe('BlockCollection class', () => {
 		const eventFlagBlocks = blocks.query('event_whenflagclicked');
 		expect(eventFlagBlocks).toBeInstanceOf(BlockCollection);
 	});
+
+	test('query for block type', () => {
+		const motionBlocks = blocks.query('.motion');
+		const first = motionBlocks.first();
+		expect(first).not.toBeNull();
+	});
 });

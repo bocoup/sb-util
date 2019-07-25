@@ -1,4 +1,4 @@
-import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
+import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties, BlockQueryProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes, parseBlockQuerySelector } from './selector-parse';
 import { map, filter, makeIterable, first, chain } from './generators';
@@ -178,10 +178,19 @@ export class BlockCollection implements Queryable {
 		storage.set(this, blocks);
 	}
 
+	first() {
+		return first(storage.get(this));
+	}
+
 	query(selector: string) {
 		const allBlocks = storage.get(this);
-		const [attr, value] = parseBlockQuerySelector(selector)
-		const blocks: Iterable<BlockProperties> = makeIterable(allBlocks, b => filter(b, (b: BlockProperties) => b[attr] === value));
+		const { attr, value, isType }: BlockQueryProperties = parseBlockQuerySelector(selector)
+
+		let filterFunction = (b: BlockProperties) => b[attr] === value;
+		if (isType) filterFunction = (b: BlockProperties) => b[attr].includes(value);
+
+		const blocks: Iterable<BlockProperties> = makeIterable(allBlocks, b => filter(b, filterFunction));
+
 		return new BlockCollection(blocks);
 	}
 
