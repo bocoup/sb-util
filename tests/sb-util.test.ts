@@ -165,8 +165,8 @@ describe('BlockCollection class', () => {
 	});
 
 	test('query for invalid opcode', () => {
-		const blocksNot = blocks.query('some_opcode');
-		expect(blocksNot.first()).toBeNull();
+		const invalidOpcodeBlocks = blocks.query('some_opcode');
+		expect(invalidOpcodeBlocks.first()).toBeNull();
 	});
 
 	test('query for block type', () => {
@@ -175,5 +175,10 @@ describe('BlockCollection class', () => {
 		expect(first).not.toBeNull();
 		expect(first).toBeInstanceOf(Block);
 		expect(first.prop('opcode')).toContain('motion');
+	});
+
+	test('query for invalid block type', () => {
+		const invalidTypeBlocks = blocks.query(':invalid');
+		expect(invalidTypeBlocks.first()).toBeNull();
 	});
 });
