@@ -3,12 +3,6 @@ import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset
 import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes, parseBlockQuerySelector } from './selector-parse';
 import { map, filter, makeIterable, first, chain } from './generators';
 
-enum CollectionTypes {
-	SPRITES = 'sprites',
-	BLOCKS = 'blocks',
-	ASSETS = 'assets'
-}
-
 enum ScratchProjectKeys {
 	TARGETS = 'targets'
 }
@@ -17,19 +11,6 @@ enum SpriteAttributes {
 	BLOCKS = 'blocks',
 	BROADCASTS = 'broadcasts',
 	LISTS = 'lists'
-}
-
-enum BlockAttributes {
-	ID = 'id'
-}
-
-enum BlockShapes {
-	HAT = 'hat',
-	STACK = 'stack',
-	BOOLEAN = 'boolean',
-	REPORTER = 'reporter',
-	C = 'c',
-	CAP = 'cap'
 }
 
 /*
