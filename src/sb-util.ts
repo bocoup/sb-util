@@ -168,6 +168,11 @@ export class BlockCollection implements Queryable {
 		return first(makeIterable(this, () => this[Symbol.iterator]()));
 	}
 
+	props(): BlockProperties {
+		// Remember that a Block is a BlockCollection of one element
+		return first(storage.get(this));
+	}
+
 	query(selector: string) {
 		const { attr, value, isType }: BlockQueryProperties = parseBlockQuerySelector(selector)
 		const allBlocks = storage.get(this);
@@ -194,12 +199,8 @@ export class Block extends BlockCollection {
 	}
 
 	prop(property: string) {
-		return storage.get(this).slice().pop()[property];
-	}
-
-	props(): BlockProperties {
-		// Remember that a Block is a BlockCollection of one element
-		return first(storage.get(this));
+		const props = this.props();
+		if (!props) return null; return props[property];
 	}
 }
 
