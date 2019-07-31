@@ -1,7 +1,7 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties, BlockQueryProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes, parseBlockQuerySelector } from './selector-parse';
-import { map, filter, makeIterable, first, makeIterableFromDifferentTypes } from './generators';
+import { map, filter, makeIterable, first } from './generators';
 
 enum ScratchProjectKeys {
 	TARGETS = 'targets'
@@ -45,15 +45,15 @@ export class ScratchProject {
 
 	blocks() {
 		// Getting an iterable collection of block properties from all the sprites
-		const allBlocksInProject: Iterable<BlockProperties> =
+		const blocks =
 			// A transformation from an Iterable<Sprite> to Iterable<BlockProperties>
-			makeIterableFromDifferentTypes(this.sprites(), function * (sprites) {
+			makeIterable(this.sprites(), function * (sprites) {
 				for (const sprite of sprites) {
-					yield* makeIterableFromDifferentTypes(sprite.blocks(), block => map(block, block => block.props()));
+					yield* sprite.blocks().propsIterable();
 				}
 			});
 
-		return new BlockCollection(allBlocksInProject);
+		return new BlockCollection(blocks);
 	}
 }
 
@@ -65,6 +65,10 @@ export class SpriteCollection implements Queryable  {
 	first(): Sprite {
 		const props: SpriteProperties = first(storage.get(this));
 		return props ? new Sprite(props) : null;
+	}
+
+	propsIterable(): Iterable<SpriteProperties> {
+		return storage.get(this);
 	}
 
 	prop(attribute: string) {
@@ -87,7 +91,7 @@ export class SpriteCollection implements Queryable  {
 		let sprites: Iterable<SpriteProperties>, 
 			filterFunction: (s: SpriteProperties) => boolean,
 			attrValue: any, // the attribute being queried for might be string, number, or bool
-			allSprites = storage.get(this);
+			allSprites = this.propsIterable();
 
 		// case when selector string is in [attr=value] form
 		if(isSelectorAttrValue(selectorBody)) {
@@ -161,6 +165,10 @@ export class Sprite extends SpriteCollection {
 export class BlockCollection implements Queryable {
 	constructor(blocks: Iterable<BlockProperties>) {
 		storage.set(this, blocks);
+	}
+
+	propsIterable(): Iterable<BlockProperties> {
+		return storage.get(this);
 	}
 
 	first(): Block {
