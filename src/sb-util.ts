@@ -47,7 +47,6 @@ export class ScratchProject {
 		// Getting an iterable collection of block properties from all the sprites
 		const allBlocksInProject: Iterable<BlockProperties> =
 			// A transformation from an Iterable<Sprite> to Iterable<BlockProperties>
-			// 	which requires a new function makeIterableFromDifferentTypes
 			makeIterableFromDifferentTypes(this.sprites(), function * (sprites) {
 				for (const sprite of sprites) {
 					yield* makeIterableFromDifferentTypes(sprite.blocks(), block => map(block, block => block.props()));

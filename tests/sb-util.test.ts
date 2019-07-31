@@ -161,7 +161,9 @@ describe('BlockCollection class ----------------', () => {
 
 	test('query for opcode', () => {
 		const eventFlagBlocks = blocks.query('event_whenflagclicked');
-		expect(eventFlagBlocks).toBeInstanceOf(BlockCollection);
+		for (const block of eventFlagBlocks) {
+			expect(block.prop('opcode')).toEqual('event_whenflagclicked');
+		}
 	});
 
 	test('query for opcode not present', () => {
