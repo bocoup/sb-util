@@ -1,5 +1,6 @@
 import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection, Block } from '../src/sb-util';
 import process from 'process';
+import { BlockProperties } from '../src/abstracts';
 
 describe('ScratchProject class --------------------', () => {
 	describe('loading functions', () => {
@@ -149,7 +150,7 @@ describe('Sprite class -------------------------', () => {
 	});
 });
 
-describe('BlockCollection class', () => {
+describe('BlockCollection class ----------------', () => {
 	let sp, blocks;
 
 	beforeAll(async () => {
@@ -161,10 +162,9 @@ describe('BlockCollection class', () => {
 	test('query for opcode', () => {
 		const eventFlagBlocks = blocks.query('event_whenflagclicked');
 		expect(eventFlagBlocks).toBeInstanceOf(BlockCollection);
-		expect(eventFlagBlocks.first()).toBeInstanceOf(Block);
 	});
 
-	test('query for invalid opcode', () => {
+	test('query for opcode not present', () => {
 		const invalidOpcodeBlocks = blocks.query('some_opcode');
 		expect(invalidOpcodeBlocks.first()).toBeNull();
 	});
@@ -180,5 +180,25 @@ describe('BlockCollection class', () => {
 	test('query for invalid block type', () => {
 		const invalidTypeBlocks = blocks.query(':invalid');
 		expect(invalidTypeBlocks.first()).toBeNull();
+	});
+});
+
+describe('Block class -------------------------', () => {
+	let sp, blocks;
+
+	beforeAll(async () => {
+		// Choosing this file because it has a lot of blocks
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+		blocks = sp.blocks();
+	});
+
+	test('the first block exists', () => {
+		expect(blocks.first()).toBeInstanceOf(Block);
+	});
+
+	test('get all properties of a block as an object', () => {
+		const blockProps: BlockProperties = blocks.first().props();
+		expect(blockProps).toBeInstanceOf(Object);
+		expect(blockProps).toHaveProperty('id');
 	});
 });

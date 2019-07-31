@@ -168,9 +168,8 @@ export class BlockCollection implements Queryable {
 		storage.set(this, blocks);
 	}
 
-	first() {
-		const props: BlockProperties = first(storage.get(this));
-		return props ? new Block(props) : null;
+	first(): Block {
+		return first(makeIterable(this, () => this[Symbol.iterator]()));
 	}
 
 	query(selector: string) {
@@ -178,9 +177,11 @@ export class BlockCollection implements Queryable {
 		const { attr, value, isType }: BlockQueryProperties = parseBlockQuerySelector(selector)
 
 		let filterFunction = (b: BlockProperties) => b[attr] === value;
+
+		// Check that the query is asking for block type
 		if (isType) filterFunction = (b: BlockProperties) => b[attr].includes(value);
 
-		const blocks: Iterable<BlockProperties> = makeIterable(allBlocks, b => filter(b, filterFunction));
+		const blocks: Iterable<BlockProperties> = makeIterable(allBlocks, (blockProps: Iterable<BlockProperties>) => filter(blockProps, filterFunction));
 
 		return new BlockCollection(blocks);
 	}
@@ -198,6 +199,10 @@ export class Block extends BlockCollection {
 
 	prop(property: string) {
 		return storage.get(this).slice().pop()[property];
+	}
+
+	props(): BlockProperties {
+		return first(storage.get(this));
 	}
 }
 
