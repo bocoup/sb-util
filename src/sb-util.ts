@@ -1,7 +1,7 @@
 import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties, BlockQueryProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes, parseBlockQuerySelector } from './selector-parse';
-import { map, filter, makeIterable, first, chain } from './generators';
+import { map, filter, makeIterable, first, makeIterableFromDifferentTypes } from './generators';
 
 enum ScratchProjectKeys {
 	TARGETS = 'targets'
@@ -44,21 +44,17 @@ export class ScratchProject {
 	}
 
 	blocks() {
-		const sprites = this.sprites();
-		const iters = [];
-		for(const sprite of sprites) {
-			const spriteBlocks: BlockCollection = sprite.blocks();
+		// Getting an iterable collection of block properties from all the sprites
+		const allBlocksInProject: Iterable<BlockProperties> =
+			// A transformation from an Iterable<Sprite> to Iterable<BlockProperties>
+			// 	which requires a new function makeIterableFromDifferentTypes
+			makeIterableFromDifferentTypes(this.sprites(), function * (sprites) {
+				for (const sprite of sprites) {
+					yield* makeIterableFromDifferentTypes(sprite.blocks(), block => map(block, block => block.props()));
+				}
+			});
 
-			// Iterating over a BlockCollection will return a Block as each element.
-			// Therefore, we should convert the Block to a raw BlockProperties object
-			//	which can be obtained by accessing the Block in storage and retrieving
-			//	the first element
-			const spriteBlocksProps = makeIterable(spriteBlocks, (s: Block) => map(s, s => storage.get(s).slice().pop()));
-			iters.push(spriteBlocksProps);
-		}
-
-		const chained: Iterable<BlockProperties> = makeIterable(iters, iters => chain(...iters));
-		return new BlockCollection(chained)
+		return new BlockCollection(allBlocksInProject);
 	}
 }
 
@@ -148,7 +144,7 @@ export class Sprite extends SpriteCollection {
 		return { x, y };
 	}
 
-	blocks() {
+	blocks(): BlockCollection {
 		const blocksObj: Object = this.prop('blocks');
 		const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(([blockId, block]) => ({id: blockId, ...block}));
 		return new BlockCollection(allBlocks);
@@ -173,8 +169,8 @@ export class BlockCollection implements Queryable {
 	}
 
 	query(selector: string) {
-		const allBlocks = storage.get(this);
 		const { attr, value, isType }: BlockQueryProperties = parseBlockQuerySelector(selector)
+		const allBlocks = storage.get(this);
 
 		let filterFunction = (b: BlockProperties) => b[attr] === value;
 
@@ -202,6 +198,7 @@ export class Block extends BlockCollection {
 	}
 
 	props(): BlockProperties {
+		// Remember that a Block is a BlockCollection of one element
 		return first(storage.get(this));
 	}
 }

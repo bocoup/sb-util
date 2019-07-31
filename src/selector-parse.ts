@@ -1,10 +1,10 @@
 import { BlockQueryProperties } from './abstracts';
 
 enum SelectorSyntax {
-	OPEN_BRACKET = '[',
-	CLOSED_BRACKET = ']',
-	EQUALS = '=',
-	DOUBLE_QUOTE = '\"',
+    OPEN_BRACKET = '[',
+    CLOSED_BRACKET = ']',
+    EQUALS = '=',
+    DOUBLE_QUOTE = '\"',
     SINGLE_QUOTE = '\'',
     TYPE_SELECTOR = '.'
 }

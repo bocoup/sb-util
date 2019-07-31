@@ -20,6 +20,14 @@ export function makeIterable<T>(iter: Iterable<T>, predicate: (item: Iterable<T>
     };
 }
 
+export function makeIterableFromDifferentTypes<T, U>(iter: Iterable<T>, predicate: (item: Iterable<T>) => Iterator<U>): Iterable<U> {
+    return {
+        [Symbol.iterator]() {
+            return predicate(iter);
+        }
+    };
+}
+
 export function * chain<T>(...iterables: Iterable<T>[]): Iterator<T> {
     for (const it of iterables) {
         yield* it;

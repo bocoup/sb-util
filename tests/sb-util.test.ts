@@ -90,13 +90,13 @@ describe('ScratchProject class --------------------', () => {
 			test('to query sprites where value is a string with double quotes', () => {
 				const sprite = sp.sprites('[name="Sprite1"]');;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
-				expect(sprites.first()).toBeInstanceOf(Sprite);
+				expect(sprite.prop('name')).toEqual('Sprite1');
 			});
 
 			test('to query sprites where value is a string with single quotes', () => {
 				const sprite = sp.sprites("[name='Sprite1']");;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
-				expect(sprites.first()).toBeInstanceOf(Sprite);
+				expect(sprite.prop('name')).toEqual('Sprite1');
 			});
 		});
 
