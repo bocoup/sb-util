@@ -32,3 +32,11 @@ export function first<T>(iter: Iterable<T>): T {
     }
     return null;
 }
+
+export function last<T>(iter: Iterable<T>): T {
+    let val: T = null;
+    for(const item of iter) {
+        val = item;
+    }
+    return val;
+}
