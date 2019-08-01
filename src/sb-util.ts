@@ -32,7 +32,7 @@ The classes below make up the sb-util API.
 const storage = new WeakMap();
 
 export class ScratchProject {
-    public constructor(projectJSON: Record<string, any>) {
+    public constructor(projectJSON: JSON) {
         storage.set(this, projectJSON);
     }
 
@@ -43,7 +43,7 @@ export class ScratchProject {
     public sprites(selector?: string): SpriteCollection {
         if (selector && typeof selector !== 'string') throw new Error('SpriteCollection selector should be a string!');
 
-        const sprites = this.prop(ScratchProjectKeys.TARGETS);
+        const sprites: Iterable<SpriteProperties> = this.prop(ScratchProjectKeys.TARGETS);
         if (!selector && typeof selector !== 'string') return new SpriteCollection(sprites);
         return new SpriteCollection(sprites).query(selector);
     }
@@ -99,7 +99,7 @@ export class SpriteCollection implements Queryable {
 
         let sprites: Iterable<SpriteProperties>,
             filterFunction: (s: SpriteProperties) => boolean,
-            attrValue: any, // the attribute being queried for might be string, number, or bool
+            attrValue: string | number | boolean, // the attribute being queried for might be string, number, or bool
             allSprites = this.propsIterable();
 
         // case when selector string is in [attr=value] form
@@ -173,7 +173,7 @@ export class Sprite extends SpriteCollection {
         return new BlockCollection(allBlocks);
     }
 
-    public broadcasts(): Record<string, any> {
+    public broadcasts(): Record<string, string> {
         return this.prop(SpriteAttributes.BROADCASTS);
     }
 

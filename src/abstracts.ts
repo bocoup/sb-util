@@ -3,7 +3,7 @@ export interface Queryable {
 }
 
 export interface AssetFetcher {
-    parse(source: any): Promise<JSON>;
+    parse(source: string | number): Promise<JSON>;
 }
 
 export interface SpriteProperties {
@@ -14,14 +14,14 @@ export interface SpriteProperties {
     blocks: object;
     comments: object;
     currentCostume: number;
-    costumes: Record<string, any>[];
-    sounds: Record<string, any>[];
+    costumes: Record<string, string>[];
+    sounds: Record<string, string>[];
     volume: number;
     layerOrder: number;
     tempo?: number;
     videoTransparency?: number;
     videoState?: string;
-    textToSpeechLanguage?: any;
+    textToSpeechLanguage?: string;
     visible?: boolean;
     x?: number;
     y?: number;

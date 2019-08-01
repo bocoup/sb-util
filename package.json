@@ -6,8 +6,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "lint": "eslint \"src/**/*.ts\" --fix"
+    "jest": "jest",
+    "lint": "eslint \"src/**/*.ts\"",
+    "prettier": "prettier \"src/**/*.ts\"",
+    "test": "npm run prettier -- --check && npm run lint && npm run jest"
   },
   "keywords": [
     "scratch",
