@@ -372,3 +372,9 @@ npm run build
 ```
 npm test
 ```
+
+## Linting Code
+This project uses [https://prettier.io](Prettier) to format code and [https://eslint.org/](ESLint) for linting (catching errors). To format and lint, run
+```
+npm run lint
+```
