@@ -1,4 +1,10 @@
-import { Queryable, SpriteProperties, SpritePosition, BlockProperties, BlockQueryProperties } from './abstracts';
+import {
+    Queryable,
+    SpriteProperties,
+    SpritePosition,
+    BlockProperties,
+    BlockQueryProperties,
+} from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 
@@ -41,7 +47,8 @@ export class ScratchProject {
     }
 
     public sprites(selector?: string): SpriteCollection {
-        if (selector && typeof selector !== 'string') throw new Error('SpriteCollection selector should be a string!');
+        if (selector && typeof selector !== 'string')
+            throw new Error('SpriteCollection selector should be a string!');
 
         const sprites: Iterable<SpriteProperties> = this.prop(ScratchProjectKeys.TARGETS);
         if (!selector && typeof selector !== 'string') return new SpriteCollection(sprites);
@@ -211,7 +218,8 @@ export class BlockCollection implements Queryable {
 
         const blocks: Iterable<BlockProperties> = makeIterable(
             allBlocks,
-            (blockProps: Iterable<BlockProperties>): Iterator<BlockProperties> => filter(blockProps, filterFunction),
+            (blockProps: Iterable<BlockProperties>): Iterator<BlockProperties> =>
+                filter(blockProps, filterFunction),
         );
 
         return new BlockCollection(blocks);
