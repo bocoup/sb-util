@@ -1,13 +1,7 @@
-import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties } from './abstracts';
+import { Queryable, AssetFetcher, SpriteProperties, SpritePosition, BlockProperties, BlockQueryProperties } from './abstracts';
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
-import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes } from './selector-parse';
+import { validateSpriteSelector, isSelectorAttrValue, getAttributeAndValueInSelector, attrValueContainsQuotes, parseBlockQuerySelector } from './selector-parse';
 import { map, filter, makeIterable, first } from './generators';
-
-enum CollectionTypes {
-	SPRITES = 'sprites',
-	BLOCKS = 'blocks',
-	ASSETS = 'assets'
-}
 
 enum ScratchProjectKeys {
 	TARGETS = 'targets'
@@ -17,10 +11,6 @@ enum SpriteAttributes {
 	BLOCKS = 'blocks',
 	BROADCASTS = 'broadcasts',
 	LISTS = 'lists'
-}
-
-enum BlockAttributes {
-	ID = 'id'
 }
 
 /*
@@ -49,12 +39,21 @@ export class ScratchProject {
 		return new SpriteCollection(sprites).query(selector);
 	}
 
-	stage() {
+	stage(): Sprite {
 		return this.sprites('[isStage=true]').first();
 	}
 
 	blocks() {
-		throw new Error('ScratchProject blocks() function not implemented yet!');
+		// Getting an iterable collection of block properties from all the sprites
+		const blocks =
+			// A transformation from an Iterable<Sprite> to Iterable<BlockProperties>
+			makeIterable(this.sprites(), function * (sprites) {
+				for (const sprite of sprites) {
+					yield* sprite.blocks().propsIterable();
+				}
+			});
+
+		return new BlockCollection(blocks);
 	}
 }
 
@@ -66,6 +65,10 @@ export class SpriteCollection implements Queryable  {
 	first(): Sprite {
 		const props: SpriteProperties = first(storage.get(this));
 		return props ? new Sprite(props) : null;
+	}
+
+	propsIterable(): Iterable<SpriteProperties> {
+		return storage.get(this);
 	}
 
 	prop(attribute: string) {
@@ -88,7 +91,7 @@ export class SpriteCollection implements Queryable  {
 		let sprites: Iterable<SpriteProperties>, 
 			filterFunction: (s: SpriteProperties) => boolean,
 			attrValue: any, // the attribute being queried for might be string, number, or bool
-			allSprites = storage.get(this);
+			allSprites = this.propsIterable();
 
 		// case when selector string is in [attr=value] form
 		if(isSelectorAttrValue(selectorBody)) {
@@ -127,7 +130,7 @@ export class SpriteCollection implements Queryable  {
 	}
 }
 
-export class Sprite extends SpriteCollection implements Queryable {
+export class Sprite extends SpriteCollection {
 	constructor(sprite: SpriteProperties) {
 		// Per documentation, Sprite is a singleton SpriteCollection
 		super([sprite]);
@@ -144,8 +147,10 @@ export class Sprite extends SpriteCollection implements Queryable {
 		return { x, y };
 	}
 
-	blocks(selector: string) {
-		throw new Error('Sprite blocks() not implemented yet!');
+	blocks(): BlockCollection {
+		const blocksObj: Object = this.prop('blocks');
+		const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(([blockId, block]) => ({id: blockId, ...block}));
+		return new BlockCollection(allBlocks);
 	}
 
 	broadcasts() {
@@ -162,10 +167,48 @@ export class BlockCollection implements Queryable {
 		storage.set(this, blocks);
 	}
 
-	query() {
-		throw new Error('BlockCollection queryable not implemented yet!')
+	propsIterable(): Iterable<BlockProperties> {
+		return storage.get(this);
 	}
 
+	first(): Block {
+		return first(makeIterable(this, () => this[Symbol.iterator]()));
+	}
+
+	props(): BlockProperties {
+		// Remember that a Block is a BlockCollection of one element
+		return first(storage.get(this));
+	}
+
+	query(selector: string) {
+		const { attr, value, isType }: BlockQueryProperties = parseBlockQuerySelector(selector)
+		const allBlocks = storage.get(this);
+
+		let filterFunction = (b: BlockProperties) => b[attr] === value;
+
+		// Check that the query is asking for block type
+		if (isType) filterFunction = (b: BlockProperties) => b[attr].includes(value);
+
+		const blocks: Iterable<BlockProperties> = makeIterable(allBlocks, (blockProps: Iterable<BlockProperties>) => filter(blockProps, filterFunction));
+
+		return new BlockCollection(blocks);
+	}
+
+	[Symbol.iterator]() {
+		const blocks: Iterable<BlockProperties> = storage.get(this);
+		return map(blocks, props => new Block(props));
+	}
+}
+
+export class Block extends BlockCollection {
+	constructor(block: BlockProperties) {
+		super([block]);
+	}
+
+	prop(property: string) {
+		const props = this.props();
+		if (!props) return null; return props[property];
+	}
 }
 
 /*

@@ -1,9 +1,12 @@
+import { BlockQueryProperties } from './abstracts';
+
 enum SelectorSyntax {
-	OPEN_BRACKET = '[',
-	CLOSED_BRACKET = ']',
-	EQUALS = '=',
-	DOUBLE_QUOTE = '\"',
-	SINGLE_QUOTE = '\''
+    OPEN_BRACKET = '[',
+    CLOSED_BRACKET = ']',
+    EQUALS = '=',
+    DOUBLE_QUOTE = '\"',
+    SINGLE_QUOTE = '\'',
+    TYPE_SELECTOR = '.'
 }
 
 export function validateSpriteSelector(selector: string){
@@ -25,4 +28,21 @@ export function getAttributeAndValueInSelector(selector: string) {
 export function attrValueContainsQuotes(value: string) {
     return (value[0] === SelectorSyntax.DOUBLE_QUOTE || value[0] === SelectorSyntax.SINGLE_QUOTE)
 					&& (value.slice(-1) === SelectorSyntax.DOUBLE_QUOTE || value.slice(-1) === SelectorSyntax.SINGLE_QUOTE);
+}
+
+export function parseBlockQuerySelector(selector: string): BlockQueryProperties {
+    let value = selector;
+    let isType = false;
+    
+
+    if (selector.includes(SelectorSyntax.TYPE_SELECTOR)) {
+        isType = true
+        value = selector.substring(1);
+    };
+
+    return {
+        attr: 'opcode',
+        value,
+        isType
+    }
 }

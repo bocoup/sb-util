@@ -1,5 +1,6 @@
-import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection } from '../src/sb-util';
+import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection, Block } from '../src/sb-util';
 import process from 'process';
+import { BlockProperties } from '../src/abstracts';
 
 describe('ScratchProject class --------------------', () => {
 	describe('loading functions', () => {
@@ -89,11 +90,13 @@ describe('ScratchProject class --------------------', () => {
 			test('to query sprites where value is a string with double quotes', () => {
 				const sprite = sp.sprites('[name="Sprite1"]');;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
+				expect(sprite.prop('name')).toEqual('Sprite1');
 			});
 
 			test('to query sprites where value is a string with single quotes', () => {
 				const sprite = sp.sprites("[name='Sprite1']");;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
+				expect(sprite.prop('name')).toEqual('Sprite1');
 			});
 		});
 
@@ -102,6 +105,11 @@ describe('ScratchProject class --------------------', () => {
 		
 			beforeAll(async () => {
 				sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+			});
+
+			test('get all blocks in a project', () => {
+				const blocks = sp.blocks();
+				expect(blocks).toBeInstanceOf(BlockCollection);
 			});
 		});
 
@@ -134,5 +142,65 @@ describe('Sprite class -------------------------', () => {
 	test('can get lists', () => {
 		const lists = sprite.lists();
 		expect(lists).toBeInstanceOf(Object);
-	})
+	});
+
+	test('can get all blocks', () => {
+		const blocks = sprite.blocks();
+		expect(blocks).toBeInstanceOf(BlockCollection);
+	});
+});
+
+describe('BlockCollection class ----------------', () => {
+	let sp, blocks;
+
+	beforeAll(async () => {
+		// Choosing this file because it has a lot of blocks
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+		blocks = sp.blocks();
+	});
+
+	test('query for opcode', () => {
+		const eventFlagBlocks = blocks.query('event_whenflagclicked');
+		for (const block of eventFlagBlocks) {
+			expect(block.prop('opcode')).toEqual('event_whenflagclicked');
+		}
+	});
+
+	test('query for opcode not present', () => {
+		const invalidOpcodeBlocks = blocks.query('some_opcode');
+		expect(invalidOpcodeBlocks.first()).toBeNull();
+	});
+
+	test('query for block type', () => {
+		const motionBlocks = blocks.query('.motion');
+		const first = motionBlocks.first();
+		expect(first).not.toBeNull();
+		expect(first).toBeInstanceOf(Block);
+		expect(first.prop('opcode')).toContain('motion');
+	});
+
+	test('query for invalid block type', () => {
+		const invalidTypeBlocks = blocks.query(':invalid');
+		expect(invalidTypeBlocks.first()).toBeNull();
+	});
+});
+
+describe('Block class -------------------------', () => {
+	let sp, blocks;
+
+	beforeAll(async () => {
+		// Choosing this file because it has a lot of blocks
+		sp = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
+		blocks = sp.blocks();
+	});
+
+	test('the first block exists', () => {
+		expect(blocks.first()).toBeInstanceOf(Block);
+	});
+
+	test('get all properties of a block as an object', () => {
+		const blockProps: BlockProperties = blocks.first().props();
+		expect(blockProps).toBeInstanceOf(Object);
+		expect(blockProps).toHaveProperty('id');
+	});
 });

@@ -118,6 +118,9 @@ A *SpriteCollection* represents an iterable collection of objects that represent
 
 **Methods**
 
+**first()**
+Return: the first element in the SpriteCollection, null if the collection is empty
+
 **prop(attribute)**
 Parameter: *attribute* string.
 Return: the value of the given attribute for the **first** element in the SpriteCollection, undefined if the prop does not exist, null if the SpriteCollection is empty
@@ -204,17 +207,20 @@ A *BlockCollection* represents and iterable collection of objects that represent
 
 **Methods**
 
+**first()**
+Return: the first element in the BlockCollection, null if the collection is empty
+
 **query(selector)**
 Parameter(s): *selector*, a string with the convention similar to CSS selector syntax  
 Return: *BlockCollection*
 
 This is a mapping of Block object attributes to selector syntax:  
 
-| Block Attribute     | CSS-like Selector Syntax      |
-| --------------------|-------------------------------|
-| opcode ([Full set of opcodes](https://github.com/LLK/scratch-vm/tree/develop/src/blocks )) | Type selector. `blocks.query('event_whenflagclicked')` or `blocks.query('control_if_else')`| 
-| block type ([Full set of block types](https://en.scratch-wiki.info/wiki/Blocks#List_of_Blocks)) | Class selector. `blocks.query('.motion')` or `blocks.query('.sensing')` |
-| block shape ([Full set of block shapes](https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes))| Pseudo class selector. `blocks.query(':hat')` or `blocks.query(':reporter')` |
+| Block Attribute     | CSS-like Selector Syntax      | Status |
+| --------------------|-------------------------------|--------|
+| opcode ([Full set of opcodes](https://github.com/LLK/scratch-vm/tree/develop/src/blocks )) | Type selector. `blocks.query('event_whenflagclicked')` or `blocks.query('control_if_else')`| implemented | 
+| block type ([Full set of block types](https://en.scratch-wiki.info/wiki/Blocks#List_of_Blocks)) | Class selector. `blocks.query('.motion')` or `blocks.query('.sensing')` | implemented |
+| block shape ([Full set of block shapes](https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes))| Pseudo class selector. `blocks.query(':hat')` or `blocks.query(':reporter')` | not implemented |
 
 The selector syntax can be combined for more fine-grained filtering.  
 
@@ -287,6 +293,13 @@ const blockTextRepresentation = sprite1Blocks.renderToText()
 A *Block* is a singleton of *BlockCollection*. It has additional methods, specific to the data held by an individual block.
 
 **Methods**
+
+**prop(attribute)**
+Parameter: *attribute* string.
+Return: *any* value for a given attribute
+
+Attributes available to pass: *opcode, next, parent, inputs, fields, shadow, topLevel*
+
 
 **args(selector)**  
 This method is similar to *query*. *args* returns the inputs or fields (depending on the query string) of a block using one of the strings defined below. Certain query strings can return an input or a field.

@@ -46,3 +46,9 @@ export interface BlockProperties {
 	shadow: boolean,
 	topLevel: boolean
 }
+
+export interface BlockQueryProperties {
+	attr: string,
+	value: string,
+	isType: boolean
+}
