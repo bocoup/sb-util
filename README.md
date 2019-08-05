@@ -28,8 +28,10 @@ The resulting tool should be usable in test suites, scripts, and applications.
 - [AssetCollection](https://github.com/bocoup/sb-util#assetcollection)
 - [Asset](https://github.com/bocoup/sb-util#asset)
 
+API methods that have been implmented are marked with *implemented*.
 
-### **Loading a Scratch Project**
+
+### **Loading a Scratch Project** - *implemented*
 sb-util exposes loading functions to asynchronously instantiate a **ScratchProject**
  object. These loading functions handle file I/O and HTTP request handling, decoupling that process from the ScratchProject object itself.
 
@@ -66,7 +68,7 @@ const sp = await loadCloudId(123456);
 
 ### ScratchProject
 
-**ScratchProject(*projectJSON*, *assetFetcher*)**  
+**ScratchProject(*projectJSON*)**  - *implemented*  
 A *ScratchProject* gets initialized by an object, represented by the project.json. The *assetFetcher* is an optional constructor argument that represents an object is responsible for retrieving asset buffers for an Asset object.
 
 ```
@@ -84,13 +86,13 @@ Return: *AssetCollection* representing all the assets of a project
 let assets = sp.assets()
 ```
 
-**blocks()**  
+**blocks()**  -- *implemented*  
 Return: *BlockCollection* representing all the blocks in the project. This *BlockCollection* can be further filtered to get specific blocks
 ```
 let blocks = sp.blocks();
 ```
 
-**sprites(...args)**  
+**sprites(...args)**  - *implemented*  
 Return: *SpriteCollection* representing all sprites in the project. A selector syntax can be passed to this function to get sprites that meet the syntax criteria
 ```
 let sprites = sp.sprites();
@@ -99,7 +101,7 @@ let stage = sp.sprites('[isStage=true]').pop();
 let sprite1 = sp.sprites('[name="Cat"]').pop(); 
 ```
 
-**stage()**  
+**stage()**  - *implemented*  
 Return: *Sprite* a stage
 ```
 let stage = sp.stage();
@@ -118,17 +120,17 @@ A *SpriteCollection* represents an iterable collection of objects that represent
 
 **Methods**
 
-**first()**
+**first()** - *implemented*  
 Return: the first element in the SpriteCollection, null if the collection is empty
 
-**prop(attribute)**
+**prop(attribute)** - *implemented*  
 Parameter: *attribute* string.
 Return: the value of the given attribute for the **first** element in the SpriteCollection, undefined if the prop does not exist, null if the SpriteCollection is empty
 
 Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
 
 
-**query(selector)**
+**query(selector)** - *implemented*  
 Parameter(s): *selector* string in the CSS selector syntax style.
 Return: *SpriteCollection*
 
@@ -154,7 +156,7 @@ A *Sprite* is a singleton of *SpriteCollection*, with additional methods that ar
 
 **Methods**   
 
-**prop(attribute)**
+**prop(attribute)** - *implemented*  
 Parameter: *attribute* string.
 Return: *any* value for a given attribute
 ```
@@ -163,7 +165,7 @@ const currentCostume = sprite.prop('currentCostume');
 
 Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
 
-**blocks()**  
+**blocks()** - *implemented*  
 Return: *BlockCollection*
 ```
 const sprite = sp.sprites('[name="Cat"]');
@@ -176,13 +178,13 @@ Return: *AssetCollection*
 const assets = sprite.assets();
 ```
 
-**position()**  
+**position()** - *implemented*  
 Return: the (X, Y) cooredinates of a Sprite in Object notation
 ```
 const { x, y } = sprite.position();
 ```
 
-**broadcasts()**  
+**broadcasts()** - *implemented*  
 Return: a list of Objects representing a broadcast, which contains an id and a message
 ```
 const broadcasts = sprite.broadcasts();
@@ -191,7 +193,7 @@ const broadcasts = sprite.broadcasts();
 Object.entries(broadcasts).map(([key, value]) => ({ messageId: key, message: value }));
 ```
 
-**lists()**  
+**lists()** - *implemented*  
 Return: a list of Objects representing a list, which contains an id, name, and an  Array of values
 
 ```
@@ -207,10 +209,10 @@ A *BlockCollection* represents and iterable collection of objects that represent
 
 **Methods**
 
-**first()**
+**first()** - *implemented*  
 Return: the first element in the BlockCollection, null if the collection is empty
 
-**query(selector)**
+**query(selector)** - *partially implemented*  
 Parameter(s): *selector*, a string with the convention similar to CSS selector syntax  
 Return: *BlockCollection*
 
@@ -294,7 +296,7 @@ A *Block* is a singleton of *BlockCollection*. It has additional methods, specif
 
 **Methods**
 
-**prop(attribute)**
+**prop(attribute)** - *implemented*  
 Parameter: *attribute* string.
 Return: *any* value for a given attribute
 
