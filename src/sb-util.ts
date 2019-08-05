@@ -16,7 +16,7 @@ import {
     parseBlockQuerySelector,
 } from './selector-parse';
 
-import { map, filter, first, MemoizedIterable } from './generators';
+import { map, filter, makeIterable, first } from './generators';
 
 enum ScratchProjectKeys {
     TARGETS = 'targets',
@@ -61,12 +61,13 @@ export class ScratchProject {
 
     public blocks(): BlockCollection {
         // Getting an iterable collection of block properties from all the sprites
-        const iter = function*(sprites): Iterator<BlockProperties> {
-            for (const sprite of sprites) {
-                yield* sprite.blocks().propsIterable();
-            }
-        };
-        const blocks = new MemoizedIterable(iter(this.sprites()));
+        const blocks =
+            // A transformation from an Iterable<Sprite> to Iterable<BlockProperties>
+            makeIterable(this.sprites(), function*(sprites): Iterator<BlockProperties> {
+                for (const sprite of sprites) {
+                    yield* sprite.blocks().propsIterable();
+                }
+            });
 
         return new BlockCollection(blocks);
     }
@@ -135,8 +136,10 @@ export class SpriteCollection implements Queryable {
             filterFunction = (s: SpriteProperties): boolean => attr in s;
         }
 
-        const iter = (s: Iterable<SpriteProperties>): Iterator<SpriteProperties> => filter(s, filterFunction);
-        sprites = new MemoizedIterable(iter(allSprites));
+        sprites = makeIterable(
+            allSprites,
+            (s: Iterable<SpriteProperties>): Iterator<SpriteProperties> => filter(s, filterFunction),
+        );
         return new SpriteCollection(sprites);
     }
 
@@ -196,8 +199,7 @@ export class BlockCollection implements Queryable {
     }
 
     public first(): Block {
-        const iter = (): Iterator<Block> => this[Symbol.iterator]();
-        return first(new MemoizedIterable(iter()));
+        return first(makeIterable(this, (): Iterator<Block> => this[Symbol.iterator]()));
     }
 
     public props(): BlockProperties {
@@ -214,10 +216,11 @@ export class BlockCollection implements Queryable {
         // Check that the query is asking for block type
         if (isType) filterFunction = (b: BlockProperties): boolean => b[attr].includes(value);
 
-        const iter = (blockProps: Iterable<BlockProperties>): Iterator<BlockProperties> =>
-            filter(blockProps, filterFunction);
-
-        const blocks: Iterable<BlockProperties> = new MemoizedIterable(iter(allBlocks));
+        const blocks: Iterable<BlockProperties> = makeIterable(
+            allBlocks,
+            (blockProps: Iterable<BlockProperties>): Iterator<BlockProperties> =>
+                filter(blockProps, filterFunction),
+        );
 
         return new BlockCollection(blocks);
     }
