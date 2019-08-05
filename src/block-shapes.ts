@@ -156,6 +156,16 @@ enum BlockOpcodes {
     SENSING_DAYSSINCE2000 = 'sensing_dayssince2000',
     SENSING_USERNAME = 'sensing_username',
     SENSING_USERID = 'sensing_userid',
+    SOUND_SOUNDS_MENU = 'sounds_sounds_menu',
+    SOUND_PLAY = 'sound_play',
+    SOUND_PLAYUNTILDONE = 'sound_playuntildone',
+    SOUND_STOPALLSOUNDS = 'sound_stopallsounds',
+    SOUND_SETEFFECTTO = 'sound_seteffectto',
+    SOUND_CHANGEEFFECTBY = 'sound_changeeffectby',
+    SOUND_CLEAREFFECTS = 'sound_cleareffects',
+    SOUND_CHANGEVOLUMEBY = 'sound_changevolumeby',
+    SOUND_SETVOLUMETO = 'sound_setvolumeto',
+    SOUND_VOLUME = 'sound_volume',
 }
 
 export const BlockOpcodeToShape = {
@@ -306,4 +316,14 @@ export const BlockOpcodeToShape = {
     [BlockOpcodes.SENSING_DAYSSINCE2000]: BlockShapes.REPORTER,
     [BlockOpcodes.SENSING_USERNAME]: BlockShapes.REPORTER,
     [BlockOpcodes.SENSING_USERID]: BlockShapes.REPORTER,
+    [BlockOpcodes.SOUND_SOUNDS_MENU]: BlockShapes.REPORTER,
+    [BlockOpcodes.SOUND_PLAY]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_PLAYUNTILDONE]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_STOPALLSOUNDS]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_SETEFFECTTO]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_CHANGEEFFECTBY]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_CLEAREFFECTS]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_CHANGEVOLUMEBY]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_SETVOLUMETO]: BlockShapes.STACK,
+    [BlockOpcodes.SOUND_VOLUME]: BlockShapes.REPORTER,
 }
