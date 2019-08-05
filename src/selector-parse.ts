@@ -7,6 +7,7 @@ enum SelectorSyntax {
     DOUBLE_QUOTE = '"',
     SINGLE_QUOTE = "'",
     TYPE_SELECTOR = '.',
+    SHAPE_SELECTOR = ':',
 }
 
 export function validateSpriteSelector(selector: string): void {
@@ -37,17 +38,32 @@ export function attrValueContainsQuotes(value: string): boolean {
 }
 
 export function parseBlockQuerySelector(selector: string): BlockQueryProperties {
-    let value = selector;
-    let isType = false;
+    let queryStrings = selector.split(' ');
+    let shape, type, opcode;
+
+    if (!selector.includes(SelectorSyntax.TYPE_SELECTOR) && !selector.includes(SelectorSyntax.SHAPE_SELECTOR))
+        opcode = selector;
 
     if (selector.includes(SelectorSyntax.TYPE_SELECTOR)) {
-        isType = true;
-        value = selector.substring(1);
+        type = queryStrings
+            .filter((s: string): boolean => s.includes(SelectorSyntax.TYPE_SELECTOR))
+            .map((s: string): string => s.substring(1))
+            .pop();
+    }
+
+    if (selector.includes(SelectorSyntax.SHAPE_SELECTOR)) {
+        shape = queryStrings
+            .filter((s: string): boolean => s.includes(SelectorSyntax.SHAPE_SELECTOR))
+            .map((s: string): string => s.substring(1))
+            .pop();
     }
 
     return {
         attr: 'opcode',
-        value,
-        isType,
+        queryValues: {
+            type,
+            shape,
+            opcode,
+        },
     };
 }

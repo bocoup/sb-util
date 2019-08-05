@@ -5,7 +5,7 @@ enum BlockShapes {
     C = 'c',
     CAP = 'cap',
     STACK = 'stack',
-    CUSTOM = 'custom'
+    CUSTOM = 'custom',
 }
 
 enum BlockOpcodes {
@@ -326,4 +326,4 @@ export const BlockOpcodeToShape = {
     [BlockOpcodes.SOUND_CHANGEVOLUMEBY]: BlockShapes.STACK,
     [BlockOpcodes.SOUND_SETVOLUMETO]: BlockShapes.STACK,
     [BlockOpcodes.SOUND_VOLUME]: BlockShapes.REPORTER,
-}
+};

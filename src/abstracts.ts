@@ -49,6 +49,9 @@ export interface BlockProperties {
 
 export interface BlockQueryProperties {
     attr: string;
-    value: string;
-    isType: boolean;
+    queryValues: {
+        opcode: string;
+        type: string;
+        shape: string;
+    };
 }
