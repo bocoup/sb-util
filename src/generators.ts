@@ -12,6 +12,17 @@ export function* filter<T>(iter: Iterable<T>, predicate: (item: T) => boolean): 
     }
 }
 
+export function makeIterable<T, U>(
+    iter: Iterable<T>,
+    predicate: (item: Iterable<T>) => Iterator<U>,
+): Iterable<U> {
+    return {
+        [Symbol.iterator](): Iterator<U> {
+            return predicate(iter);
+        },
+    };
+}
+
 export function* chain<T>(...iterables: Iterable<T>[]): Iterator<T> {
     for (const it of iterables) {
         yield* it;
