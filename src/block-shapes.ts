@@ -5,6 +5,7 @@ enum BlockShapes {
     C = 'c',
     CAP = 'cap',
     STACK = 'stack',
+    CUSTOM = 'custom'
 }
 
 enum BlockOpcodes {
@@ -123,6 +124,14 @@ enum BlockOpcodes {
     OPERATOR_MOD = 'operator_mod',
     OPERATOR_ROUND = 'operator_round',
     OPERATOR_MATHOP = 'operator_mathop',
+    PROCEDURES_DEFINITION = 'procedures_definition',
+    PROCEDURES_CALL = 'procedures_call',
+    PROCEDURES_PROTOTYPE = 'procedures_prototype',
+    PROCEDURES_DECLARATION = 'procedures_declaration',
+    ARGUMENT_REPORTER_BOOLEAN = 'argument_reporter_boolean',
+    ARGUMENT_REPORTER_STRING_NUMBER = 'argument_reporter_string_number',
+    ARGUMENT_EDITOR_BOOLEAN = 'argument_editor_boolean',
+    ARGUMENT_EDITOR_STRING_NUMBER = 'argument_editor_string_number',
 }
 
 export const BlockOpcodeToShape = {
@@ -241,4 +250,12 @@ export const BlockOpcodeToShape = {
     [BlockOpcodes.OPERATOR_MOD]: BlockShapes.REPORTER,
     [BlockOpcodes.OPERATOR_ROUND]: BlockShapes.REPORTER,
     [BlockOpcodes.OPERATOR_MATHOP]: BlockShapes.REPORTER,
+    [BlockOpcodes.PROCEDURES_DEFINITION]: BlockShapes.CUSTOM,
+    [BlockOpcodes.PROCEDURES_CALL]: BlockShapes.STACK,
+    [BlockOpcodes.PROCEDURES_PROTOTYPE]: BlockShapes.STACK,
+    [BlockOpcodes.PROCEDURES_DECLARATION]: BlockShapes.STACK,
+    [BlockOpcodes.ARGUMENT_REPORTER_BOOLEAN]: BlockShapes.BOOLEAN,
+    [BlockOpcodes.ARGUMENT_REPORTER_STRING_NUMBER]: BlockShapes.REPORTER,
+    [BlockOpcodes.ARGUMENT_EDITOR_BOOLEAN]: BlockShapes.BOOLEAN,
+    [BlockOpcodes.ARGUMENT_EDITOR_STRING_NUMBER]: BlockShapes.REPORTER,
 }
