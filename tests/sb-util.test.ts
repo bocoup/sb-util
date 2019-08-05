@@ -94,14 +94,9 @@ describe('ScratchProject class --------------------', () => {
 			});
 
 			test('to query sprites where value is a string with single quotes', () => {
-				const sprite = sp.sprites("[name='Sprite1']");
+				const sprite = sp.sprites("[name='Sprite1']");;
 				expect(sprite).toBeInstanceOf(SpriteCollection);
 				expect(sprite.prop('name')).toEqual('Sprite1');
-			});
-
-			test('to get length of queried sprites', () => {
-				const sprites = sp.sprites("[isStage=false]");
-				expect(sprites.propsIterable().length).toBeDefined;
 			});
 		});
 
@@ -169,11 +164,6 @@ describe('BlockCollection class ----------------', () => {
 		for (const block of eventFlagBlocks) {
 			expect(block.prop('opcode')).toEqual('event_whenflagclicked');
 		}
-	});
-
-	test('length of queried results', () => {
-		const eventFlagBlocks = blocks.query('event_whenflagclicked');
-		expect(eventFlagBlocks.propsIterable().length).toBeDefined();
 	});
 
 	test('query for opcode not present', () => {
