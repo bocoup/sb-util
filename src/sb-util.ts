@@ -264,6 +264,7 @@ export class BlockCollection implements Queryable {
 
     private getOpBody(block: Block) {
         const opcode = block.prop('opcode');
+        const inputs = block.prop('inputs');
         if (opcode === BlockOpcodes.DATA_CHANGEVARIABLEBY) {
             return {
                 variable: block.prop('fields')[DataBlockArgs.VARIABLE][0],
@@ -277,6 +278,23 @@ export class BlockCollection implements Queryable {
                 Y: block.prop('inputs')[MotionBlockArgs.Y][1][1],
             };
         }
+
+        if (SensingBlockArgs.KEY_OPTION in inputs) {
+            const keyOptionBlock = new Block(
+                filter(
+                    this.propsIterable(),
+                    b => b.id === block.prop('inputs')[SensingBlockArgs.KEY_OPTION][1],
+                ).next().value,
+            );
+
+            return {
+                [opcode]: {
+                    [keyOptionBlock.prop('opcode')]: keyOptionBlock.prop('fields')[
+                        SensingBlockArgs.KEY_OPTION
+                    ][0],
+                },
+            };
+        }
         return {};
     }
 
@@ -285,15 +303,22 @@ export class BlockCollection implements Queryable {
             const lastStep = steps.pop();
             const opcode = block.prop('opcode');
             if (inputArgName === ControlBlocksArgs.CONDITION) {
-                steps.push({
-                    [lastStep]: {
-                        if: {
-                            condition: {
-                                [opcode]: {},
+                if (lastStep === BlockOpcodes.CONTROL_IF_ELSE) {
+                    const blockBody = this.getOpBody(block);
+                    steps.push({
+                        [lastStep]: {
+                            if: {
+                                condition: {
+                                    [opcode]: blockBody,
+                                },
                             },
                         },
-                    },
-                });
+                    });
+                } else {
+                    steps.push(this.getOpBody(block));
+                }
+
+                return steps;
             }
 
             if (inputArgName === ControlBlocksArgs.SUBSTACK) {
@@ -333,8 +358,6 @@ export class BlockCollection implements Queryable {
                 controlBody['else'].push(opBody);
                 steps.push(lastStep);
 
-                console.log(steps);
-
                 // if there are more in the stack
                 if (block.prop('next')) {
                     const next = new Block(
@@ -345,24 +368,6 @@ export class BlockCollection implements Queryable {
             }
 
             return steps;
-            
-        } else if (fieldArgName) {
-            if (fieldArgName === SensingBlockArgs.KEY_OPTION) {
-                const lastStep = steps.pop();
-                if (Object.keys(lastStep)[0] === BlockOpcodes.CONTROL_IF_ELSE) {
-                    steps.push({
-                        [Object.keys(lastStep)[0]]: {
-                            if: {
-                                [BlockOpcodes.SENSING_KEYPRESSED]: {
-                                    [BlockOpcodes.SENSING_KEYOPTIONS]: block.prop('fields')[
-                                        SensingBlockArgs.KEY_OPTION
-                                    ][0],
-                                },
-                            },
-                        },
-                    });
-                }
-            }
         } else {
             steps.push(block.prop('opcode'));
         }
@@ -398,16 +403,6 @@ export class BlockCollection implements Queryable {
                     ).next().value,
                 );
                 steps = this.render(next, steps, ControlBlocksArgs.SUBSTACK2);
-            }
-
-            if (SensingBlockArgs.KEY_OPTION in blockInputs) {
-                const next = new Block(
-                    filter(
-                        this.propsIterable(),
-                        b => b.id === block.prop('inputs')[SensingBlockArgs.KEY_OPTION][1],
-                    ).next().value,
-                );
-                steps = this.render(next, steps, '', SensingBlockArgs.KEY_OPTION);
             }
         }
 
