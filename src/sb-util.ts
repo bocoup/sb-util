@@ -284,7 +284,6 @@ export class BlockCollection implements Queryable {
         if (inputArgName) {
             const lastStep = steps.pop();
             const opcode = block.prop('opcode');
-            const inputs = block.prop('inputs');
             if (inputArgName === ControlBlocksArgs.CONDITION) {
                 steps.push({
                     [lastStep]: {
@@ -317,9 +316,36 @@ export class BlockCollection implements Queryable {
                         filter(this.propsIterable(), b => b.id === block.prop('next')).next().value,
                     );
                     this.render(next, controlBody['then'], ControlBlocksArgs.SUBSTACK);
-                    return steps;
                 }
             }
+
+            if (inputArgName === ControlBlocksArgs.SUBSTACK2) {
+                const controlOpcode = Object.keys(lastStep)[0];
+                const controlBody = lastStep[controlOpcode];
+                if (!('else' in controlBody)) {
+                    controlBody['else'] = [];
+                }
+
+                const opBody = {
+                    [opcode]: this.getOpBody(block),
+                };
+
+                controlBody['else'].push(opBody);
+                steps.push(lastStep);
+
+                console.log(steps);
+
+                // if there are more in the stack
+                if (block.prop('next')) {
+                    const next = new Block(
+                        filter(this.propsIterable(), b => b.id === block.prop('next')).next().value,
+                    );
+                    this.render(next, controlBody['else'], ControlBlocksArgs.SUBSTACK);
+                }
+            }
+
+            return steps;
+            
         } else if (fieldArgName) {
             if (fieldArgName === SensingBlockArgs.KEY_OPTION) {
                 const lastStep = steps.pop();
@@ -362,6 +388,16 @@ export class BlockCollection implements Queryable {
                     ).next().value,
                 );
                 steps = this.render(next, steps, ControlBlocksArgs.SUBSTACK);
+            }
+
+            if (ControlBlocksArgs.SUBSTACK2 in blockInputs) {
+                const next = new Block(
+                    filter(
+                        this.propsIterable(),
+                        b => b.id === block.prop('inputs')[ControlBlocksArgs.SUBSTACK2][1],
+                    ).next().value,
+                );
+                steps = this.render(next, steps, ControlBlocksArgs.SUBSTACK2);
             }
 
             if (SensingBlockArgs.KEY_OPTION in blockInputs) {

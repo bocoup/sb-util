@@ -152,7 +152,7 @@ describe('Sprite class -------------------------', () => {
 
 	test('get text version of scripts', () => {
 		const scripts = sprite.blocks().renderToText();
-		console.log(JSON.stringify(scripts));
+		console.log(JSON.stringify(scripts, null, 2));
 	});
 });
 

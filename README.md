@@ -271,8 +271,10 @@ const blockTextRepresentation = sprite1Blocks.renderToText()
                         "else": [
                             {
                                 "control_wait_until": {
-                                    "sensing_keypressed": {
-                                        "sensing_keyoptions": "space"
+                                    "condition" : {
+                                        "sensing_keypressed": {
+                                            "sensing_keyoptions": "space"
+                                        }
                                     }
                                 }
                             }
