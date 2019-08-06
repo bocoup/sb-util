@@ -43,7 +43,7 @@ export class ScratchProject {
         storage.set(this, projectJSON);
     }
 
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
         return storage.get(this)[property];
     }
@@ -89,7 +89,7 @@ export class SpriteCollection implements Queryable {
         return storage.get(this);
     }
 
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(attribute: string): any {
         const first = this.first();
         if (!first) return null;
@@ -158,7 +158,7 @@ export class Sprite extends SpriteCollection {
         super([sprite]);
     }
 
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
         const sprite = storage
             .get(this)
@@ -174,7 +174,7 @@ export class Sprite extends SpriteCollection {
     }
 
     public blocks(): BlockCollection {
-        // eslint-disable-next-line
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const blocksObj: Record<string, any> = this.prop('blocks');
         const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(
             ([blockId, block]): BlockProperties => ({
@@ -186,11 +186,11 @@ export class Sprite extends SpriteCollection {
     }
 
     public broadcasts(): Record<string, string> {
-        // eslint-disable-next-line
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return this.prop(SpriteAttributes.BROADCASTS);
     }
 
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public lists(): Record<string, any> {
         return this.prop(SpriteAttributes.LISTS);
     }
@@ -256,7 +256,7 @@ export class Block extends BlockCollection {
         super([block]);
     }
 
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
         const props = this.props();
         if (!props) return null;
