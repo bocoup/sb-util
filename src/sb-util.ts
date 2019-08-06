@@ -17,6 +17,7 @@ import {
 } from './selector-parse';
 
 import { map, filter, makeIterable, first } from './generators';
+import { BlockOpcodeToShape } from './block-shapes';
 
 enum ScratchProjectKeys {
     TARGETS = 'targets',
@@ -42,6 +43,8 @@ export class ScratchProject {
         storage.set(this, projectJSON);
     }
 
+    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
         return storage.get(this)[property];
     }
@@ -87,6 +90,8 @@ export class SpriteCollection implements Queryable {
         return storage.get(this);
     }
 
+    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(attribute: string): any {
         const first = this.first();
         if (!first) return null;
@@ -155,6 +160,8 @@ export class Sprite extends SpriteCollection {
         super([sprite]);
     }
 
+    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
         const sprite = storage
             .get(this)
@@ -170,6 +177,8 @@ export class Sprite extends SpriteCollection {
     }
 
     public blocks(): BlockCollection {
+        // DISABLING ESLINT: the blocks in a sprite are an object with many things nested inside
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const blocksObj: Record<string, any> = this.prop('blocks');
         const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(
             ([blockId, block]): BlockProperties => ({
@@ -181,9 +190,13 @@ export class Sprite extends SpriteCollection {
     }
 
     public broadcasts(): Record<string, string> {
+        // DISABLING ESLINT: broadcasts are a nested object
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return this.prop(SpriteAttributes.BROADCASTS);
     }
 
+    // DISABLING ESLINT: lists are a nested object
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public lists(): Record<string, any> {
         return this.prop(SpriteAttributes.LISTS);
     }
@@ -208,13 +221,26 @@ export class BlockCollection implements Queryable {
     }
 
     public query(selector: string): BlockCollection {
-        const { attr, value, isType }: BlockQueryProperties = parseBlockQuerySelector(selector);
-        const allBlocks = storage.get(this);
+        const {
+            attr,
+            queryValues: { type, shape, opcode },
+        }: BlockQueryProperties = parseBlockQuerySelector(selector);
 
-        let filterFunction = (b: BlockProperties): boolean => b[attr] === value;
+        const allBlocks = this.propsIterable();
+
+        let filterFunction = (b: BlockProperties): boolean => b[attr] === opcode;
 
         // Check that the query is asking for block type
-        if (isType) filterFunction = (b: BlockProperties): boolean => b[attr].includes(value);
+        if (type) filterFunction = (b: BlockProperties): boolean => b[attr].includes(type);
+
+        if (shape) {
+            if (type) {
+                filterFunction = (b: BlockProperties): boolean =>
+                    b[attr].includes(type) && BlockOpcodeToShape[b.opcode] === shape;
+            } else {
+                filterFunction = (b: BlockProperties): boolean => BlockOpcodeToShape[b.opcode] === shape;
+            }
+        }
 
         const blocks: Iterable<BlockProperties> = makeIterable(
             allBlocks,
@@ -236,6 +262,8 @@ export class Block extends BlockCollection {
         super([block]);
     }
 
+    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
         const props = this.props();
         if (!props) return null;

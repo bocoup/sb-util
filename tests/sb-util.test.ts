@@ -1,6 +1,7 @@
 import { loadSb3, loadProjectJson, loadCloudId, ScratchProject, SpriteCollection, Sprite, BlockCollection, Block } from '../src/sb-util';
 import process from 'process';
 import { BlockProperties } from '../src/abstracts';
+import { BlockOpcodeToShape } from '../src/block-shapes';
 
 describe('ScratchProject class --------------------', () => {
 	describe('loading functions', () => {
@@ -182,6 +183,25 @@ describe('BlockCollection class ----------------', () => {
 	test('query for invalid block type', () => {
 		const invalidTypeBlocks = blocks.query(':invalid');
 		expect(invalidTypeBlocks.first()).toBeNull();
+	});
+
+	test('query for block shape', () => {
+		const reporterBlocks = blocks.query(':reporter');
+		expect(BlockOpcodeToShape[reporterBlocks.first().prop('opcode')]).toEqual('reporter');
+	});
+
+	test('query for block type and shape', () => {
+		const reporterBlocks = blocks.query('.operator :reporter');
+		const first = reporterBlocks.first();
+		expect(first.prop('opcode')).toContain('operator');
+		expect(BlockOpcodeToShape[first.prop('opcode')]).toEqual('reporter');
+	});
+
+	test('query for block type and shape, order does not matter', () => {
+		const reporterBlocks = blocks.query(':reporter .operator');
+		const first = reporterBlocks.first();
+		expect(first.prop('opcode')).toContain('operator');
+		expect(BlockOpcodeToShape[first.prop('opcode')]).toEqual('reporter');
 	});
 });
 
