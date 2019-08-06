@@ -7,3 +7,13 @@ export enum ControlBlocksArgs {
 export enum SensingBlockArgs {
     KEY_OPTION = 'KEY_OPTION',
 }
+
+export enum DataBlockArgs {
+    VARIABLE = 'VARIABLE',
+    VALUE = 'VALUE',
+}
+
+export enum MotionBlockArgs {
+    X = 'X',
+    Y = 'Y',
+}

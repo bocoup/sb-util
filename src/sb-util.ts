@@ -18,6 +18,8 @@ import {
 
 import { map, filter, makeIterable, first } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
+import { BlockOpcodes } from './block-opcodes';
+import { SensingBlockArgs, ControlBlocksArgs, DataBlockArgs, MotionBlockArgs } from './block-args';
 
 enum ScratchProjectKeys {
     TARGETS = 'targets',
@@ -260,14 +262,32 @@ export class BlockCollection implements Queryable {
         return this.render(this.first(), []);
     }
 
+    private getOpBody(block: Block) {
+        const opcode = block.prop('opcode');
+        if (opcode === BlockOpcodes.DATA_CHANGEVARIABLEBY) {
+            return {
+                variable: block.prop('fields')[DataBlockArgs.VARIABLE][0],
+                value: block.prop('inputs')[DataBlockArgs.VALUE][1][1],
+            };
+        }
+
+        if (opcode === BlockOpcodes.MOTION_GOTOXY) {
+            return {
+                X: block.prop('inputs')[MotionBlockArgs.X][1][1],
+                Y: block.prop('inputs')[MotionBlockArgs.Y][1][1],
+            };
+        }
+        return {};
+    }
+
     private render(block: Block, steps: any[], inputArgName?: string, fieldArgName?: string): string[] {
         if (inputArgName) {
+            const lastStep = steps.pop();
+            const opcode = block.prop('opcode');
+            const inputs = block.prop('inputs');
             if (inputArgName === ControlBlocksArgs.CONDITION) {
-                const controlOpcode = steps[steps.length - 1];
-                steps.pop();
-                const opcode = block.prop('opcode');
                 steps.push({
-                    [controlOpcode]: {
+                    [lastStep]: {
                         if: {
                             condition: {
                                 [opcode]: {},
@@ -275,6 +295,30 @@ export class BlockCollection implements Queryable {
                         },
                     },
                 });
+            }
+
+            if (inputArgName === ControlBlocksArgs.SUBSTACK) {
+                const controlOpcode = Object.keys(lastStep)[0];
+                const controlBody = lastStep[controlOpcode];
+                if (!('then' in controlBody)) {
+                    controlBody['then'] = [];
+                }
+
+                const opBody = {
+                    [opcode]: this.getOpBody(block),
+                };
+
+                controlBody['then'].push(opBody);
+                steps.push(lastStep);
+
+                // if there are more in the stack
+                if (block.prop('next')) {
+                    const next = new Block(
+                        filter(this.propsIterable(), b => b.id === block.prop('next')).next().value,
+                    );
+                    this.render(next, controlBody['then'], ControlBlocksArgs.SUBSTACK);
+                    return steps;
+                }
             }
         } else if (fieldArgName) {
             if (fieldArgName === SensingBlockArgs.KEY_OPTION) {
@@ -308,6 +352,16 @@ export class BlockCollection implements Queryable {
                     ).next().value,
                 );
                 steps = this.render(next, steps, ControlBlocksArgs.CONDITION);
+            }
+
+            if (ControlBlocksArgs.SUBSTACK in blockInputs) {
+                const next = new Block(
+                    filter(
+                        this.propsIterable(),
+                        b => b.id === block.prop('inputs')[ControlBlocksArgs.SUBSTACK][1],
+                    ).next().value,
+                );
+                steps = this.render(next, steps, ControlBlocksArgs.SUBSTACK);
             }
 
             if (SensingBlockArgs.KEY_OPTION in blockInputs) {
