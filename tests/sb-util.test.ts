@@ -149,6 +149,11 @@ describe('Sprite class -------------------------', () => {
 		const blocks = sprite.blocks();
 		expect(blocks).toBeInstanceOf(BlockCollection);
 	});
+
+	test('get text version of scripts', () => {
+		const scripts = sprite.blocks().renderToText();
+		console.log(JSON.stringify(scripts));
+	});
 });
 
 describe('BlockCollection class ----------------', () => {

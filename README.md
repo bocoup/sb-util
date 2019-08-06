@@ -240,8 +240,8 @@ const blockTextRepresentation = sprite1Blocks.renderToText()
 
 // Output
 {
-    "blockGroups" : [
-        // First group of blocks
+    "scripts" : [
+        // First script
         {
             "output": [
                 "event_whenflagclicked",

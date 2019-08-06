@@ -18,6 +18,8 @@ import {
 
 import { map, filter, makeIterable, first } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
+import { BlockOpcodes } from './block-opcodes';
+import { ControlBlocksArgs, SensingBlockArgs } from './block-args';
 
 enum ScratchProjectKeys {
     TARGETS = 'targets',
@@ -248,6 +250,80 @@ export class BlockCollection implements Queryable {
     public [Symbol.iterator](): Iterator<Block> {
         const blocks: Iterable<BlockProperties> = storage.get(this);
         return map(blocks, (props: BlockProperties): Block => new Block(props));
+    }
+
+    public renderToText(): Record<string, any> {
+        return this.render(this.first(), []);
+    }
+
+    private render(block: Block, steps: any[], inputArgName?: string, fieldArgName?: string): string[] {
+        if (inputArgName) {
+            if (inputArgName === ControlBlocksArgs.CONDITION) {
+                const controlOpcode = steps[steps.length - 1];
+                steps.pop();
+                const opcode = block.prop('opcode');
+                steps.push({
+                    [controlOpcode]: {
+                        if: {
+                            condition: {
+                                [opcode]: {},
+                            },
+                        },
+                    },
+                });
+            }
+        } else if (fieldArgName) {
+            if (fieldArgName === SensingBlockArgs.KEY_OPTION) {
+                const lastStep = steps.pop();
+                if (Object.keys(lastStep)[0] === BlockOpcodes.CONTROL_IF_ELSE) {
+                    steps.push({
+                        [Object.keys(lastStep)[0]]: {
+                            if: {
+                                [BlockOpcodes.SENSING_KEYPRESSED]: {
+                                    [BlockOpcodes.SENSING_KEYOPTIONS]: block.prop('fields')[
+                                        SensingBlockArgs.KEY_OPTION
+                                    ][0],
+                                },
+                            },
+                        },
+                    });
+                }
+            }
+        } else {
+            steps.push(block.prop('opcode'));
+        }
+
+        if (block.prop('inputs')) {
+            const blockInputs = block.prop('inputs');
+            if (ControlBlocksArgs.CONDITION in blockInputs) {
+                // The CONDITION arg in Control-If* blocks is an array of length 2, the first element being shadow, the second being the block id
+                const next = new Block(
+                    filter(
+                        this.propsIterable(),
+                        b => b.id === block.prop('inputs')[ControlBlocksArgs.CONDITION][1],
+                    ).next().value,
+                );
+                steps = this.render(next, steps, ControlBlocksArgs.CONDITION);
+            }
+
+            if (SensingBlockArgs.KEY_OPTION in blockInputs) {
+                const next = new Block(
+                    filter(
+                        this.propsIterable(),
+                        b => b.id === block.prop('inputs')[SensingBlockArgs.KEY_OPTION][1],
+                    ).next().value,
+                );
+                steps = this.render(next, steps, '', SensingBlockArgs.KEY_OPTION);
+            }
+        }
+
+        // STOP CONDITION
+        if (block.prop('next') === null) {
+            return steps;
+        }
+
+        const next = new Block(filter(this.propsIterable(), b => b.id === block.prop('next')).next().value);
+        return this.render(next, steps);
     }
 }
 
