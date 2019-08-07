@@ -1,6 +1,6 @@
 {
   "name": "sb-util",
-  "version": "0.0.1-prealpha.1",
+  "version": "0.0.1-prealpha.2",
   "description": "Scratch blocks utilities: open and query Scratch blocks formats",
   "repository": "https://github.com/bocoup/sb-util",
   "types": "dist/index.d.ts",
@@ -11,6 +11,7 @@
     "prettier": "prettier \"src/**/*.ts\"",
     "test": "npm run prettier -- --check && npm run lint && npm run jest"
   },
+  "main": "dist/sb-util.js",
   "keywords": [
     "scratch",
     "scratchblocks",
@@ -57,8 +58,5 @@
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.3"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }
