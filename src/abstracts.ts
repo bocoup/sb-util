@@ -10,6 +10,27 @@ export interface SB3ProjectJSON {
     targets: SpriteProperties[];
 }
 
+// Serialized Block Interfaces - We should maybe move the serialization typedefs some other file?
+
+export enum SB3SerializedBlockType {
+    MATH_NUM_PRIMITIVE = 4,
+    POSITIVE_NUM_PRIMITIVE = 5,
+    WHOLE_NUM_PRIMITIVE = 6,
+    INTEGER_NUM_PRIMITIVE = 7,
+    ANGLE_NUM_PRIMITIVE = 8,
+    COLOR_PICKER_PRIMITIVE = 9,
+    TEXT_PRIMITIVE = 10,
+    BROADCAST_PRIMITIVE = 11,
+    VAR_PRIMITIVE = 12,
+    LIST_PRIMITIVE = 13,
+}
+
+export enum ScratchVariableTypes {
+    SCALAR_TYPE = '',
+    LIST_TYPE = 'list',
+    BROADCAST_MESSAGE_TYPE = 'broadcast_msg',
+}
+
 export interface SerializedBlockObject {
     opcode: string;
     parent: string;
@@ -17,10 +38,12 @@ export interface SerializedBlockObject {
     inputs: object;
     fields: object;
     shadow: boolean;
-    topLevel: boolean;
+    topLevel?: boolean;
+    x?: number;
+    y?: number;
 }
 
-export type SerializedBlockArray = [];
+export type SerializedBlockArray = [SB3SerializedBlockType, ...any[]];
 
 export type SerializedBlock = SerializedBlockObject | SerializedBlockArray;
 
@@ -58,8 +81,16 @@ export interface SpritePosition {
     y: number;
 }
 
+export interface BlockFields {
+    [name: string]: {
+        name: string;
+        value: any;
+    };
+}
+
 export interface BlockProperties extends SerializedBlockObject {
     id: string;
+    fields: BlockFields | object;
 }
 
 export interface BlockQueryProperties {
