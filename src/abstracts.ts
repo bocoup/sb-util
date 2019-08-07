@@ -11,6 +11,11 @@ export interface SB3ProjectJSON {
 }
 
 // Serialized Block Interfaces - We should maybe move the serialization typedefs some other file?
+export enum SB3SerializedInputType {
+    INPUT_SAME_BLOCK_SHADOW = 1,
+    INPUT_BLOCK_NO_SHADOW = 2,
+    INPUT_DIFF_BLOCK_SHADOW = 3,
+}
 
 export enum SB3SerializedBlockType {
     MATH_NUM_PRIMITIVE = 4,
@@ -31,24 +36,42 @@ export enum ScratchVariableTypes {
     BROADCAST_MESSAGE_TYPE = 'broadcast_msg',
 }
 
-export interface SerializedBlockObject {
+export type SB3SerializedField = [any, string?];
+
+export interface SB3SerializedFields {
+    [name: string]: SB3SerializedField;
+}
+
+export type SB3SerializedInput = [
+    SB3SerializedInputType,
+    SB3SerializedBlockArray | string,
+    (SB3SerializedBlockArray | string)?,
+];
+export interface SB3SerializedInputs {
+    [name: string]: SB3SerializedInput;
+}
+
+export interface SB3SharedBlockProperties {
     opcode: string;
     parent: string;
     next: string;
-    inputs: object;
-    fields: object;
     shadow: boolean;
     topLevel?: boolean;
     x?: number;
     y?: number;
 }
 
-export type SerializedBlockArray = [SB3SerializedBlockType, ...any[]];
+export interface SB3SerializedBlockObject extends SB3SharedBlockProperties {
+    inputs: SB3SerializedInputs;
+    fields: SB3SerializedFields;
+}
 
-export type SerializedBlock = SerializedBlockObject | SerializedBlockArray;
+export type SB3SerializedBlockArray = [SB3SerializedBlockType, ...any[]];
 
-export interface SerializedBlocks {
-    [id: string]: SerializedBlock;
+export type SB3SerializedBlock = SB3SerializedBlockObject | SB3SerializedBlockArray;
+
+export interface SB3SerializedBlocks {
+    [id: string]: SB3SerializedBlock;
 }
 
 export interface SpriteProperties {
@@ -81,16 +104,29 @@ export interface SpritePosition {
     y: number;
 }
 
-export interface BlockFields {
-    [name: string]: {
-        name: string;
-        value: any;
-    };
+export interface BlockField {
+    name: string;
+    value: any;
+    id?: string;
+    variableType?: ScratchVariableTypes;
 }
 
-export interface BlockProperties extends SerializedBlockObject {
+export interface BlockFields {
+    [name: string]: BlockField;
+}
+
+export interface BlockInput {
+    name: string;
+    block: string;
+    shadow: string;
+}
+
+export interface BlockProperties extends SB3SharedBlockProperties {
     id: string;
-    fields: BlockFields | object;
+    inputs: {
+        [name: string]: BlockInput;
+    };
+    fields: BlockFields;
 }
 
 export interface BlockQueryProperties {

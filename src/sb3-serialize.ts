@@ -1,11 +1,16 @@
 import {
     BlockProperties,
-    SerializedBlock,
-    SerializedBlocks,
-    SerializedBlockObject,
-    SerializedBlockArray,
+    SB3SerializedBlock,
+    SB3SerializedBlocks,
+    SB3SerializedBlockObject,
+    SB3SerializedBlockArray,
     SB3SerializedBlockType,
     ScratchVariableTypes,
+    SB3SerializedFields,
+    BlockFields,
+    SB3SerializedInputs,
+    BlockInput,
+    SB3SerializedInputType,
 } from './abstracts';
 
 let blockCounter = 0;
@@ -14,27 +19,24 @@ export function _resetCounterForTests(): void {
     blockCounter = 0;
 }
 
-const deserializedCache = new WeakMap<SerializedBlock, BlockProperties>();
+const deserializedCache = new WeakMap<SB3SerializedBlock, BlockProperties[]>();
 
-export function* deserializeBlocks(blocks: SerializedBlocks): Iterator<BlockProperties> {
+export function* deserializeBlocks(blocks: SB3SerializedBlocks): Iterator<BlockProperties> {
     for (const id in blocks) {
-        if (deserializedCache.has(blocks[id])) {
-            yield deserializedCache.get(blocks[id]);
-        }
-
-        let block: BlockProperties;
         const serialized = blocks[id];
-        if (Array.isArray(serialized)) {
-            block = deserializeBlockArray(serialized);
-        } else {
-            block = {
-                id,
-                ...(serialized as SerializedBlockObject),
-            };
+
+        if (!deserializedCache.has(serialized)) {
+            let result: BlockProperties[];
+            if (Array.isArray(serialized)) {
+                result = [deserializeBlockArray(serialized, id)];
+            } else {
+                result = deserializeBlockObject(serialized, id);
+            }
+
+            deserializedCache.set(blocks[id], result);
         }
 
-        deserializedCache.set(blocks[id], block);
-        yield block;
+        yield* deserializedCache.get(serialized);
     }
 }
 
@@ -47,12 +49,13 @@ const NUMBER_PRIMITIVE_MAP = {
 };
 
 export function deserializeBlockArray(
-    data: SerializedBlockArray,
+    data: SB3SerializedBlockArray,
+    id: string = newBlockId(),
     parentId: string = null,
     shadow: boolean = false,
 ): BlockProperties {
     const block: BlockProperties = {
-        id: newBlockId(),
+        id,
         opcode: null,
         next: null,
         parent: parentId,
@@ -136,4 +139,81 @@ export function deserializeBlockArray(
             throw new Error(`sb-util: Unknown serialized block type ${type}`);
     }
     return block;
+}
+
+function deserializeFields(serialized: SB3SerializedFields): BlockFields {
+    const fields: BlockFields = {};
+    for (const [name, data] of Object.entries(serialized)) {
+        if (Array.isArray(data)) {
+            fields[name] = {
+                name,
+                value: data[0],
+                id: data[1],
+            };
+
+            if (name === 'BROADCAST_OPTION') {
+                fields[name].variableType = ScratchVariableTypes.BROADCAST_MESSAGE_TYPE;
+            } else if (name === 'VARIABLE') {
+                fields[name].variableType = ScratchVariableTypes.SCALAR_TYPE;
+            } else if (name === 'LIST') {
+                fields[name].variableType = ScratchVariableTypes.LIST_TYPE;
+            }
+        } else {
+            fields[name] = data;
+        }
+    }
+    return fields;
+}
+
+function deserializeInputs(
+    serialized: SB3SerializedInputs,
+    parentId: string,
+): { inputs: BlockProperties['inputs']; newBlocks: BlockProperties[] } {
+    const inputs: BlockProperties['inputs'] = {};
+    const newBlocks: BlockProperties[] = [];
+
+    function parse(data: SB3SerializedBlockArray | string, shadow: boolean = false): string {
+        if (typeof data === 'string') {
+            return data;
+        }
+        const parsed = deserializeBlockArray(data, newBlockId(), parentId, shadow);
+        newBlocks.push(parsed);
+        return parsed.id;
+    }
+
+    for (const [name, data] of Object.entries(serialized)) {
+        if (Array.isArray(data)) {
+            const [type, blockData, shadowData] = data;
+            let block = null;
+            let shadow = null;
+            if (type === SB3SerializedInputType.INPUT_SAME_BLOCK_SHADOW) {
+                block = parse(blockData, true);
+                shadow = block;
+            } else if (type === SB3SerializedInputType.INPUT_BLOCK_NO_SHADOW) {
+                block = parse(blockData);
+            } else if (type === SB3SerializedInputType.INPUT_DIFF_BLOCK_SHADOW) {
+                block = parse(blockData);
+                shadow = parse(shadowData, true);
+            }
+            inputs[name] = { name, block, shadow };
+        } else {
+            inputs[name] = data as BlockInput;
+        }
+    }
+
+    return { inputs, newBlocks };
+}
+
+function deserializeBlockObject(serialized: SB3SerializedBlockObject, id: string): BlockProperties[] {
+    const { fields, inputs: serializedInputs, ...rest } = serialized;
+
+    const { inputs, newBlocks } = deserializeInputs(serializedInputs, id);
+
+    const block: BlockProperties = {
+        id,
+        ...rest,
+        fields: deserializeFields(fields),
+        inputs,
+    };
+    return [block, ...newBlocks];
 }
