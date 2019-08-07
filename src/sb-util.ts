@@ -263,7 +263,7 @@ export class BlockCollection implements Queryable {
     }
 
     private getSubstackRef(block: Block, key: string) {
-        return block.prop('inputs')[ControlBlocksArgs.CONDITION][1];
+        return block.prop('inputs')[key][1];
     }
 
     private getOpBody(block: Block) {
@@ -271,15 +271,19 @@ export class BlockCollection implements Queryable {
         const inputs = block.prop('inputs');
         if (opcode === BlockOpcodes.DATA_CHANGEVARIABLEBY) {
             return {
-                variable: block.prop('fields')[DataBlockArgs.VARIABLE][0],
-                value: block.prop('inputs')[DataBlockArgs.VALUE][1][1],
+                [opcode]: {
+                    variable: block.prop('fields')[DataBlockArgs.VARIABLE][0],
+                    value: block.prop('inputs')[DataBlockArgs.VALUE][1][1],
+                },
             };
         }
 
         if (opcode === BlockOpcodes.MOTION_GOTOXY) {
             return {
-                X: block.prop('inputs')[MotionBlockArgs.X][1][1],
-                Y: block.prop('inputs')[MotionBlockArgs.Y][1][1],
+                [opcode]: {
+                    X: block.prop('inputs')[MotionBlockArgs.X][1][1],
+                    Y: block.prop('inputs')[MotionBlockArgs.Y][1][1],
+                },
             };
         }
 
@@ -312,9 +316,8 @@ export class BlockCollection implements Queryable {
     }
 
     // This method assumes that there is an input body in a block
-    private getSubstackBody(block: Block) {
-        const inputs = block.prop('inputs');
-        if (ControlBlocksArgs.CONDITION in inputs) {
+    private getSubstackBody(block: Block, substackType: string) {
+        if (ControlBlocksArgs.CONDITION === substackType) {
             if (block.prop('opcode') === BlockOpcodes.CONTROL_IF_ELSE) {
                 const conditionBlockRef = this.getSubstackRef(block, ControlBlocksArgs.CONDITION);
                 const opBody = this.getOpBody(this.getBlockByID(conditionBlockRef));
@@ -325,6 +328,19 @@ export class BlockCollection implements Queryable {
                 };
             }
         }
+
+        if (ControlBlocksArgs.SUBSTACK === substackType) {
+            if (block.prop('opcode') === BlockOpcodes.CONTROL_IF_ELSE) {
+                const substackBlockRef = this.getSubstackRef(block, ControlBlocksArgs.SUBSTACK);
+                const firstSubstackBlock = this.getBlockByID(substackBlockRef);
+                const body = this.render(firstSubstackBlock, []);
+                return {
+                    then: body,
+                };
+            }
+        }
+
+        console.log(`${substackType} not implemented yet!`);
         return {};
     }
 
@@ -333,14 +349,31 @@ export class BlockCollection implements Queryable {
         if (!block) {
             return steps;
         }
-        steps.push(block.prop('opcode'));
 
-        if (ControlBlocksArgs.CONDITION in block.prop('inputs')) {
+        const opBody = this.getOpBody(block);
+        if (Object.keys(opBody).length === 0) {
+            steps.push(block.prop('opcode'));
+        } else {
+            steps.push(opBody);
+        }
+
+        const inputs = block.prop('inputs');
+        if (ControlBlocksArgs.CONDITION in inputs) {
             const lastOpcode = steps.pop();
             steps.push({
-                [lastOpcode]: this.getSubstackBody(block),
+                [lastOpcode]: this.getSubstackBody(block, ControlBlocksArgs.CONDITION),
             });
-            return steps;
+        }
+
+        if (ControlBlocksArgs.SUBSTACK in inputs) {
+            console.log('handling substack');
+            let substack = steps.pop();
+            if (typeof substack === 'string') {
+                substack = { [substack]: {} };
+            }
+            const lastOpcode = Object.keys(substack)[0];
+            Object.assign(substack[lastOpcode], this.getSubstackBody(block, ControlBlocksArgs.SUBSTACK));
+            steps.push(substack);
         }
 
         const nextBlock = this.getNextBlock(block);
