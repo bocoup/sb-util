@@ -317,30 +317,42 @@ export class BlockCollection implements Queryable {
 
     // This method assumes that there is an input body in a block
     private getSubstackBody(block: Block, substackType: string) {
+        const opcode = block.prop('opcode');
         if (ControlBlocksArgs.CONDITION === substackType) {
-            if (block.prop('opcode') === BlockOpcodes.CONTROL_IF_ELSE) {
-                const conditionBlockRef = this.getSubstackRef(block, ControlBlocksArgs.CONDITION);
-                const opBody = this.getOpBody(this.getBlockByID(conditionBlockRef));
+            const conditionBlockRef = this.getSubstackRef(block, ControlBlocksArgs.CONDITION);
+            const opBody = this.getOpBody(this.getBlockByID(conditionBlockRef));
+            if (opcode === BlockOpcodes.CONTROL_IF_ELSE) {
                 return {
                     if: {
                         condition: opBody,
                     },
                 };
             }
-        }
 
-        if (ControlBlocksArgs.SUBSTACK === substackType) {
-            if (block.prop('opcode') === BlockOpcodes.CONTROL_IF_ELSE) {
-                const substackBlockRef = this.getSubstackRef(block, ControlBlocksArgs.SUBSTACK);
-                const firstSubstackBlock = this.getBlockByID(substackBlockRef);
-                const body = this.render(firstSubstackBlock, []);
+            if (opcode === BlockOpcodes.CONTROL_WAIT_UNTIL) {
                 return {
-                    then: body,
+                    condition: opBody,
                 };
             }
         }
 
-        console.log(`${substackType} not implemented yet!`);
+        if (ControlBlocksArgs.SUBSTACK === substackType || ControlBlocksArgs.SUBSTACK2 === substackType) {
+            const substack =
+                ControlBlocksArgs.SUBSTACK2 === substackType
+                    ? ControlBlocksArgs.SUBSTACK2
+                    : ControlBlocksArgs.SUBSTACK;
+            if (opcode === BlockOpcodes.CONTROL_IF_ELSE) {
+                const substackBlockRef = this.getSubstackRef(block, substack);
+                const firstSubstackBlock = this.getBlockByID(substackBlockRef);
+                const body = this.render(firstSubstackBlock, []);
+                const then = substack === ControlBlocksArgs.SUBSTACK2 ? 'else' : 'then';
+                return {
+                    [then]: body,
+                };
+            }
+        }
+
+        console.warn(`${substackType} not implemented yet!`);
         return {};
     }
 
@@ -366,7 +378,6 @@ export class BlockCollection implements Queryable {
         }
 
         if (ControlBlocksArgs.SUBSTACK in inputs) {
-            console.log('handling substack');
             let substack = steps.pop();
             if (typeof substack === 'string') {
                 substack = { [substack]: {} };
@@ -374,6 +385,16 @@ export class BlockCollection implements Queryable {
             const lastOpcode = Object.keys(substack)[0];
             Object.assign(substack[lastOpcode], this.getSubstackBody(block, ControlBlocksArgs.SUBSTACK));
             steps.push(substack);
+        }
+
+        if (ControlBlocksArgs.SUBSTACK2 in inputs) {
+            let substack2 = steps.pop();
+            if (typeof substack2 === 'string') {
+                substack2 = { [substack2]: {} };
+            }
+            const lastOpcode = Object.keys(substack2)[0];
+            Object.assign(substack2[lastOpcode], this.getSubstackBody(block, ControlBlocksArgs.SUBSTACK2));
+            steps.push(substack2);
         }
 
         const nextBlock = this.getNextBlock(block);
