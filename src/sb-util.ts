@@ -5,7 +5,6 @@ import {
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
-    AssetFetcher,
 } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
@@ -53,11 +52,8 @@ export class ScratchProject {
     }
 
     public sprites(selector?: string): SpriteCollection {
-        if (selector && typeof selector !== 'string')
-            throw new Error('SpriteCollection selector should be a string!');
-
         const collection = new SpriteCollection(this.projectJSON.targets);
-        if (selector) {
+        if (selector !== undefined) {
             return collection.query(selector);
         }
         return collection;
