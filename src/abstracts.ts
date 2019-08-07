@@ -6,6 +6,10 @@ export interface AssetFetcher {
     parse(source: string | number): Promise<JSON>;
 }
 
+export interface SB3ProjectJSON {
+    targets: SpriteProperties[];
+}
+
 export interface SpriteProperties {
     isStage: boolean;
     name: string;

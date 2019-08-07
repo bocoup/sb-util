@@ -4,6 +4,8 @@ import {
     SpritePosition,
     BlockProperties,
     BlockQueryProperties,
+    SB3ProjectJSON,
+    AssetFetcher,
 } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
@@ -19,15 +21,22 @@ import {
 import { map, filter, makeIterable, first } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 
-enum ScratchProjectKeys {
-    TARGETS = 'targets',
-}
-
 enum SpriteAttributes {
     BLOCKS = 'blocks',
     BROADCASTS = 'broadcasts',
     LISTS = 'lists',
 }
+
+/**
+ * A default (broken) asset fetcher
+ */
+const NoAssetFetcher: AssetFetcher = {
+    parse(filename): Promise<JSON> {
+        return Promise.reject(
+            new Error(`Asset ${filename} unavailable in this scratch project, no asset fetcher provided.`),
+        );
+    },
+};
 
 /*
 sb-util CLASSES.
@@ -39,23 +48,35 @@ The classes below make up the sb-util API.
 const storage = new WeakMap();
 
 export class ScratchProject {
-    public constructor(projectJSON: JSON) {
-        storage.set(this, projectJSON);
+    /**
+     * The project JSON as read from the project.
+     */
+    public projectJSON: SB3ProjectJSON;
+    /**
+     * An interface capable of fetching the assets, later used by AssetCollections.
+     */
+    public assetFetcher: AssetFetcher;
+
+    public constructor(projectJSON: SB3ProjectJSON | JSON, assetFetcher: AssetFetcher = NoAssetFetcher) {
+        this.projectJSON = projectJSON as SB3ProjectJSON;
+        this.assetFetcher = assetFetcher;
     }
 
     // DISABLING ESLINT: a prop can be a string, number, object, or boolean
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
-        return storage.get(this)[property];
+        return this.projectJSON[property];
     }
 
     public sprites(selector?: string): SpriteCollection {
         if (selector && typeof selector !== 'string')
             throw new Error('SpriteCollection selector should be a string!');
 
-        const sprites: Iterable<SpriteProperties> = this.prop(ScratchProjectKeys.TARGETS);
-        if (!selector && typeof selector !== 'string') return new SpriteCollection(sprites);
-        return new SpriteCollection(sprites).query(selector);
+        const collection = new SpriteCollection(this.projectJSON.targets);
+        if (selector) {
+            return collection.query(selector);
+        }
+        return collection;
     }
 
     public stage(): Sprite {
