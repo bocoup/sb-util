@@ -48,7 +48,7 @@ const NUMBER_PRIMITIVE_MAP = {
     [SB3SerializedBlockType.ANGLE_NUM_PRIMITIVE]: 'math_angle',
 };
 
-export function deserializeBlockArray(
+function deserializeBlockArray(
     data: SB3SerializedBlockArray,
     id: string = newBlockId(),
     parentId: string = null,
@@ -173,12 +173,12 @@ function deserializeInputs(
     const newBlocks: BlockProperties[] = [];
 
     function parse(data: SB3SerializedBlockArray | string, shadow: boolean = false): string {
-        if (typeof data === 'string') {
-            return data;
+        if (Array.isArray(data)) {
+            const parsed = deserializeBlockArray(data, newBlockId(), parentId, shadow);
+            newBlocks.push(parsed);
+            return parsed.id;
         }
-        const parsed = deserializeBlockArray(data, newBlockId(), parentId, shadow);
-        newBlocks.push(parsed);
-        return parsed.id;
+        return data;
     }
 
     for (const [name, data] of Object.entries(serialized)) {
@@ -211,9 +211,9 @@ function deserializeBlockObject(serialized: SB3SerializedBlockObject, id: string
 
     const block: BlockProperties = {
         id,
-        ...rest,
         fields: deserializeFields(fields),
         inputs,
+        ...rest,
     };
     return [block, ...newBlocks];
 }
