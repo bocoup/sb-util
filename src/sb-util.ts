@@ -262,6 +262,10 @@ export class BlockCollection implements Queryable {
         return this.render(this.first(), []);
     }
 
+    private getSubstackRef(block: Block, key: string) {
+        return block.prop('inputs')[ControlBlocksArgs.CONDITION][1];
+    }
+
     private getOpBody(block: Block) {
         const opcode = block.prop('opcode');
         const inputs = block.prop('inputs');
@@ -295,124 +299,52 @@ export class BlockCollection implements Queryable {
                 },
             };
         }
+        console.warn(`${opcode} body is not implemented yet`);
+        return {};
+    }
+
+    private getNextBlock(block: Block) {
+        return new Block(filter(this.propsIterable(), b => b.id === block.prop('next')).next().value);
+    }
+
+    private getBlockByID(id: string) {
+        return new Block(filter(this.propsIterable(), b => b.id === id).next().value);
+    }
+
+    // This method assumes that there is an input body in a block
+    private getSubstackBody(block: Block) {
+        const inputs = block.prop('inputs');
+        if (ControlBlocksArgs.CONDITION in inputs) {
+            if (block.prop('opcode') === BlockOpcodes.CONTROL_IF_ELSE) {
+                const conditionBlockRef = this.getSubstackRef(block, ControlBlocksArgs.CONDITION);
+                const opBody = this.getOpBody(this.getBlockByID(conditionBlockRef));
+                return {
+                    if: {
+                        condition: opBody,
+                    },
+                };
+            }
+        }
         return {};
     }
 
     private render(block: Block, steps: any[], inputArgName?: string, fieldArgName?: string): string[] {
-        if (inputArgName) {
-            const lastStep = steps.pop();
-            const opcode = block.prop('opcode');
-            if (inputArgName === ControlBlocksArgs.CONDITION) {
-                if (lastStep === BlockOpcodes.CONTROL_IF_ELSE) {
-                    const blockBody = this.getOpBody(block);
-                    steps.push({
-                        [lastStep]: {
-                            if: {
-                                condition: {
-                                    [opcode]: blockBody,
-                                },
-                            },
-                        },
-                    });
-                } else {
-                    steps.push(this.getOpBody(block));
-                }
-
-                return steps;
-            }
-
-            if (inputArgName === ControlBlocksArgs.SUBSTACK) {
-                const controlOpcode = Object.keys(lastStep)[0];
-                const controlBody = lastStep[controlOpcode];
-                if (!('then' in controlBody)) {
-                    controlBody['then'] = [];
-                }
-
-                const opBody = {
-                    [opcode]: this.getOpBody(block),
-                };
-
-                controlBody['then'].push(opBody);
-                steps.push(lastStep);
-
-                // if there are more in the stack
-                if (block.prop('next')) {
-                    const next = new Block(
-                        filter(this.propsIterable(), b => b.id === block.prop('next')).next().value,
-                    );
-                    this.render(next, controlBody['then'], ControlBlocksArgs.SUBSTACK);
-                }
-            }
-
-            if (inputArgName === ControlBlocksArgs.SUBSTACK2) {
-                const controlOpcode = Object.keys(lastStep)[0];
-                const controlBody = lastStep[controlOpcode];
-                if (!('else' in controlBody)) {
-                    controlBody['else'] = [];
-                }
-
-                const opBody = {
-                    [opcode]: this.getOpBody(block),
-                };
-
-                controlBody['else'].push(opBody);
-                steps.push(lastStep);
-
-                // if there are more in the stack
-                if (block.prop('next')) {
-                    const next = new Block(
-                        filter(this.propsIterable(), b => b.id === block.prop('next')).next().value,
-                    );
-                    this.render(next, controlBody['else'], ControlBlocksArgs.SUBSTACK);
-                }
-            }
-
-            return steps;
-        } else {
-            steps.push(block.prop('opcode'));
-        }
-
-        if (block.prop('inputs')) {
-            const blockInputs = block.prop('inputs');
-            if (ControlBlocksArgs.CONDITION in blockInputs) {
-                // The CONDITION arg in Control-If* blocks is an array of length 2, the first element being shadow, the second being the block id
-                const next = new Block(
-                    filter(
-                        this.propsIterable(),
-                        b => b.id === block.prop('inputs')[ControlBlocksArgs.CONDITION][1],
-                    ).next().value,
-                );
-                steps = this.render(next, steps, ControlBlocksArgs.CONDITION);
-            }
-
-            if (ControlBlocksArgs.SUBSTACK in blockInputs) {
-                const next = new Block(
-                    filter(
-                        this.propsIterable(),
-                        b => b.id === block.prop('inputs')[ControlBlocksArgs.SUBSTACK][1],
-                    ).next().value,
-                );
-                steps = this.render(next, steps, ControlBlocksArgs.SUBSTACK);
-            }
-
-            if (ControlBlocksArgs.SUBSTACK2 in blockInputs) {
-                const next = new Block(
-                    filter(
-                        this.propsIterable(),
-                        b => b.id === block.prop('inputs')[ControlBlocksArgs.SUBSTACK2][1],
-                    ).next().value,
-                );
-                steps = this.render(next, steps, ControlBlocksArgs.SUBSTACK2);
-            }
-        }
-
         // STOP CONDITION
-        if (block.prop('next') === null) {
+        if (!block) {
+            return steps;
+        }
+        steps.push(block.prop('opcode'));
+
+        if (ControlBlocksArgs.CONDITION in block.prop('inputs')) {
+            const lastOpcode = steps.pop();
+            steps.push({
+                [lastOpcode]: this.getSubstackBody(block),
+            });
             return steps;
         }
 
-        const next = new Block(filter(this.propsIterable(), b => b.id === block.prop('next')).next().value);
-        return this.render(next, steps);
+        const nextBlock = this.getNextBlock(block);
+        return this.render(nextBlock.props() ? nextBlock : null, steps);
     }
 }
 
