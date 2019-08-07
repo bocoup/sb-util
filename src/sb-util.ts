@@ -369,6 +369,7 @@ export class BlockCollection implements Queryable {
             steps.push(opBody);
         }
 
+        // Follow the tree down condition and substack branches
         const inputs = block.prop('inputs');
         if (ControlBlocksArgs.CONDITION in inputs) {
             const lastOpcode = steps.pop();
