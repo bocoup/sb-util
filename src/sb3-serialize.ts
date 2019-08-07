@@ -12,8 +12,10 @@ import {
     BlockInput,
     SB3SerializedInputType,
 } from './abstracts';
+import { flatmap } from './generators';
 
 let blockCounter = 0;
+// todo: slightly more scratch formula ids maybe?
 const newBlockId = (): string => `sb-util-deserialized-block-${blockCounter++}`;
 export function _resetCounterForTests(): void {
     blockCounter = 0;
@@ -21,10 +23,8 @@ export function _resetCounterForTests(): void {
 
 const deserializedCache = new WeakMap<SB3SerializedBlock, BlockProperties[]>();
 
-export function* deserializeBlocks(blocks: SB3SerializedBlocks): Iterator<BlockProperties> {
-    for (const id in blocks) {
-        const serialized = blocks[id];
-
+export function deserializeBlocks(blocks: SB3SerializedBlocks): Iterator<BlockProperties> {
+    return flatmap(Object.entries(blocks), ([id, serialized]) => {
         if (!deserializedCache.has(serialized)) {
             let result: BlockProperties[];
             if (Array.isArray(serialized)) {
@@ -36,8 +36,8 @@ export function* deserializeBlocks(blocks: SB3SerializedBlocks): Iterator<BlockP
             deserializedCache.set(blocks[id], result);
         }
 
-        yield* deserializedCache.get(serialized);
-    }
+        return deserializedCache.get(serialized);
+    });
 }
 
 const NUMBER_PRIMITIVE_MAP = {

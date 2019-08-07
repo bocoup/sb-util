@@ -4,6 +4,12 @@ export function* map<T, O>(iter: Iterable<T>, predicate: (item: T) => O): Iterat
     }
 }
 
+export function* flatmap<T, O>(iter: Iterable<T>, predicate: (item: T) => Iterable<O>): Iterator<O> {
+    for (const item of iter) {
+        yield* predicate(item);
+    }
+}
+
 export function* filter<T>(iter: Iterable<T>, predicate: (item: T) => boolean): Iterator<T> {
     for (const item of iter) {
         if (predicate(item)) {
