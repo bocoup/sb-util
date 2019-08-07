@@ -27,17 +27,6 @@ enum SpriteAttributes {
     LISTS = 'lists',
 }
 
-/**
- * A default (broken) asset fetcher
- */
-const NoAssetFetcher: AssetFetcher = {
-    parse(filename): Promise<JSON> {
-        return Promise.reject(
-            new Error(`Asset ${filename} unavailable in this scratch project, no asset fetcher provided.`),
-        );
-    },
-};
-
 /*
 sb-util CLASSES.
 
@@ -52,14 +41,9 @@ export class ScratchProject {
      * The project JSON as read from the project.
      */
     public projectJSON: SB3ProjectJSON;
-    /**
-     * An interface capable of fetching the assets, later used by AssetCollections.
-     */
-    public assetFetcher: AssetFetcher;
 
-    public constructor(projectJSON: SB3ProjectJSON | JSON, assetFetcher: AssetFetcher = NoAssetFetcher) {
+    public constructor(projectJSON: SB3ProjectJSON | JSON) {
         this.projectJSON = projectJSON as SB3ProjectJSON;
-        this.assetFetcher = assetFetcher;
     }
 
     // DISABLING ESLINT: a prop can be a string, number, object, or boolean
