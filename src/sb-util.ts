@@ -19,6 +19,7 @@ import {
 
 import { map, filter, makeIterable, first } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
+import { deserializeBlocks } from './sb3-serialize';
 
 enum SpriteAttributes {
     BLOCKS = 'blocks',
@@ -178,16 +179,7 @@ export class Sprite extends SpriteCollection {
     }
 
     public blocks(): BlockCollection {
-        // DISABLING ESLINT: the blocks in a sprite are an object with many things nested inside
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const blocksObj: Record<string, any> = this.prop('blocks');
-        const allBlocks: Iterable<BlockProperties> = Object.entries(blocksObj).map(
-            ([blockId, block]): BlockProperties => ({
-                id: blockId,
-                ...block,
-            }),
-        );
-        return new BlockCollection(allBlocks);
+        return new BlockCollection(makeIterable(this.prop('blocks'), deserializeBlocks));
     }
 
     public broadcasts(): Record<string, string> {

@@ -10,6 +10,24 @@ export interface SB3ProjectJSON {
     targets: SpriteProperties[];
 }
 
+export interface SerializedBlockObject {
+    opcode: string;
+    parent: string;
+    next: string;
+    inputs: object;
+    fields: object;
+    shadow: boolean;
+    topLevel: boolean;
+}
+
+export type SerializedBlockArray = [];
+
+export type SerializedBlock = SerializedBlockObject | SerializedBlockArray;
+
+export interface SerializedBlocks {
+    [id: string]: SerializedBlock;
+}
+
 export interface SpriteProperties {
     isStage: boolean;
     name: string;
@@ -40,15 +58,8 @@ export interface SpritePosition {
     y: number;
 }
 
-export interface BlockProperties {
+export interface BlockProperties extends SerializedBlockObject {
     id: string;
-    opcode: string;
-    parent: string;
-    next: string;
-    inputs: object;
-    fields: object;
-    shadow: boolean;
-    topLevel: boolean;
 }
 
 export interface BlockQueryProperties {
