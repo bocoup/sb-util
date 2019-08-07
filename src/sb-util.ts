@@ -258,6 +258,9 @@ export class BlockCollection implements Queryable {
         return map(blocks, (props: BlockProperties): Block => new Block(props));
     }
 
+    // THIS METHOD ONLY RENDERS THE FIRST OUTPUT EXAMPLE IN THE README
+    // The render method must be updated to handle other block types on
+    //   a case by case basis.
     public renderToText(): Record<string, any> {
         return this.render(this.first(), []);
     }

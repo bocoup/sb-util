@@ -222,7 +222,7 @@ This is a mapping of Block object attributes to selector syntax:
 | --------------------|-------------------------------|--------|
 | opcode ([Full set of opcodes](https://github.com/LLK/scratch-vm/tree/develop/src/blocks )) | Type selector. `blocks.query('event_whenflagclicked')` or `blocks.query('control_if_else')`| implemented | 
 | block type ([Full set of block types](https://en.scratch-wiki.info/wiki/Blocks#List_of_Blocks)) | Class selector. `blocks.query('.motion')` or `blocks.query('.sensing')` | implemented |
-| block shape ([Full set of block shapes](https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes))| Pseudo class selector. `blocks.query(':hat')` or `blocks.query(':reporter')` | not implemented |
+| block shape ([Full set of block shapes](https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes))| Pseudo class selector. `blocks.query(':hat')` or `blocks.query(':reporter')` | implemented |
 
 The selector syntax can be combined for more fine-grained filtering.  
 
