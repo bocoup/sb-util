@@ -236,6 +236,13 @@ describe('Block class -------------------------', () => {
         expect(blocks.first()).toBeInstanceOf(Block);
     });
 
+    test('can find top blocks', () => {
+        expect.assertions(10);
+        for (const block of blocks.top()) {
+            expect(block.prop('topLevel')).toBeTruthy();
+        }
+    });
+
     test('get all properties of a block as an object', () => {
         const blockProps: BlockProperties = blocks.first().props();
         expect(blockProps).toBeInstanceOf(Object);
