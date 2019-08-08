@@ -7,8 +7,8 @@
   "scripts": {
     "build": "tsc",
     "jest": "jest",
-    "lint": "eslint \"src/**/*.ts\"",
-    "prettier": "prettier \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "prettier": "prettier \"src/**/*.ts\" \"tests/**/*.ts\"",
     "test": "npm run prettier -- --check && npm run lint && npm run jest",
     "prepublish": "npm run build"
   },
