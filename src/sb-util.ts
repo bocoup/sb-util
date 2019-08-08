@@ -208,6 +208,12 @@ export class BlockCollection implements Queryable {
         return storage.get(this);
     }
 
+    public top(): BlockCollection {
+        return new BlockCollection(
+            makeIterable(this.propsIterable(), iter => filter(iter, ({ topLevel }) => topLevel)),
+        );
+    }
+
     public first(): Block {
         return first(makeIterable(this, (): Iterator<Block> => this[Symbol.iterator]()));
     }
