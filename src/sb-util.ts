@@ -19,6 +19,7 @@ import {
 
 import { map, filter, makeIterable, first } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
+export { BlockShapes } from './block-shapes';
 import { deserializeBlocks } from './sb3-serialize';
 
 enum SpriteAttributes {

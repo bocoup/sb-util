@@ -1,0 +1,14 @@
+{
+  "name": "sb-util-node-example",
+  "version": "0.0.1-prealpha.0",
+  "description": "sb-util node example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sb-util": "0.0.1-prealpha.3"
+  }
+}
