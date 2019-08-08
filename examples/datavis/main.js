@@ -18,6 +18,13 @@ const svg = d3.select('body').append('svg')
     .append('g')
     .attr('transform', `translate(${width/2}, ${height/2})`);
 
+svg.append("g")
+	.attr("class", "slices");
+svg.append("g")
+	.attr("class", "labels");
+svg.append("g")
+	.attr("class", "lines");
+
 // Set the category colors
 const color = d3.scaleOrdinal().range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);;
 
@@ -35,33 +42,51 @@ const outerArc = d3.arc()
 
 const arcs = pie(data.filter(d => d.count > 0));
 
-const g = svg.selectAll('.arc')
+/* ------- PIE SLICES -------*/
+const slice = svg.select(".slices")
+    .selectAll("path.slice")
     .data(arcs)
-    .enter().append('g')
-    .attr('class', 'arc');
 
-    g.append('path')
+slice.enter()
+    .insert("path")
         .attr('d', arc)
-        .style('fill', d => color(d.data.name));
+        .style("fill", d => color(d.data.name))
+        .attr("class", "slice");
 
-const text = svg.append('g')
-        .attr("font-family", "sans-serif")
-        .attr("font-size", 12)
-        .attr("text-anchor", "middle")
-    .selectAll("text")
-    .data(arcs, d => d.data.name)
+/* ------- TEXT LABELS -------*/
 
+const text = svg.select(".labels").selectAll("text")
+    .data(arcs, d => d.data.name);
 
-
-
-
+// This is from: http://bl.ocks.org/dbuezas/9306799
 text.enter()
-    .append('text')
-    .attr('dy', '.35mm')
-    .text(d => d.data.name)
-    .attr("transform", d => `translate(${arc.centroid(d)})`)
-    .call(text => text.filter(d => (d.endAngle - d.startAngle) > 0.25).append("tspan")
-          .attr("x", 0)
-          .attr("y", "1.0em")
-          .attr("fill-opacity", 0.7)
-          .text(d => d.data.count));
+    .append("text")
+    .attr("dy", ".35em")
+    .attr("transform", d => {
+        let pos = outerArc.centroid(d);
+        pos[0] = radius * (midAngle(d) < Math.PI ? 1 : -1);
+        return `translate(${pos})`
+    })
+    .text(function(d) {
+        return d.data.name;
+    });
+
+/* ------- SLICE TO TEXT POLYLINES -------*/
+
+const polyline = svg.select(".lines").selectAll("polyline")
+    .data(arcs, d => d.data.name);
+
+// This is from: http://bl.ocks.org/dbuezas/9306799
+polyline.enter()
+    .append("polyline")
+    .attr('points', d => {
+        let pos = outerArc.centroid(d);
+        pos[0] = radius * 0.95 * (midAngle(d) < Math.PI ? 1 : -1);
+        return [arc.centroid(d), outerArc.centroid(d), pos]
+    });
+
+function midAngle(d){
+    return d.startAngle + (d.endAngle - d.startAngle)/2;
+}
+
+
