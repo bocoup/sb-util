@@ -178,8 +178,12 @@ export class Sprite extends SpriteCollection {
         return { x, y };
     }
 
-    public blocks(): BlockCollection {
-        return new BlockCollection(makeIterable(this.prop('blocks'), deserializeBlocks));
+    public blocks(query?: string): BlockCollection {
+        const blocks = new BlockCollection(makeIterable(this.prop('blocks'), deserializeBlocks));
+        if (query !== undefined) {
+            return blocks.query(query);
+        }
+        return blocks;
     }
 
     public broadcasts(): Record<string, string> {
