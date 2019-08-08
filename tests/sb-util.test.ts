@@ -241,4 +241,9 @@ describe('Block class -------------------------', () => {
         expect(blockProps).toBeInstanceOf(Object);
         expect(blockProps).toHaveProperty('id');
     });
+
+    test('can find block by id', () => {
+        const block = blocks.byId('8RrT-%*Y/x{|LPTvspp_');
+        expect(block.prop('opcode')).toEqual('motion_changexby');
+    });
 });

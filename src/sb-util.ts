@@ -217,6 +217,16 @@ export class BlockCollection implements Queryable {
         return first(storage.get(this));
     }
 
+    // todo: eventually this should be able to be written as return this.query(`[id="${id}"]`).first()
+    public byId(id: string): Block {
+        for (const block of this) {
+            if (block.prop('id') === id) {
+                return block;
+            }
+        }
+        return null;
+    }
+
     public query(selector: string): BlockCollection {
         const {
             attr,
