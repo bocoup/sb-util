@@ -258,4 +258,19 @@ describe('Block class -------------------------', () => {
         const block = blocks.byId('8RrT-%*Y/x{|LPTvspp_');
         expect(block.parent().prop('opcode')).toEqual('control_if');
     });
+
+    test('Walking parent tree', () => {
+        let block = blocks.byId('Mcy_y_f^@Ag~9t=i]Nq6');
+        expect(block.prop('id')).toEqual('Mcy_y_f^@Ag~9t=i]Nq6');
+        block = block.parent();
+        expect(block.prop('id')).toEqual('q[yiIaRe%!BrOtywvIl)');
+        block = block.parent();
+        expect(block.prop('id')).toEqual('9.BsT/=;}v36:]Bl*z8x');
+        block = block.parent();
+        expect(block.prop('id')).toEqual('GpW}XGe^n|-l,IYd.}}T');
+        block = block.parent();
+        expect(block.prop('id')).toEqual('J%zJt7edHvK]!OSrFLhU');
+        block = block.parent();
+        expect(block).toEqual(null);
+    });
 });
