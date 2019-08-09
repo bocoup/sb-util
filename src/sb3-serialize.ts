@@ -24,20 +24,23 @@ export function _resetCounterForTests(): void {
 const deserializedCache = new WeakMap<SB3SerializedBlock, BlockProperties[]>();
 
 export function deserializeBlocks(blocks: SB3SerializedBlocks): Iterator<BlockProperties> {
-    return flatmap(Object.entries(blocks), ([id, serialized]) => {
-        if (!deserializedCache.has(serialized)) {
-            let result: BlockProperties[];
-            if (Array.isArray(serialized)) {
-                result = [deserializeBlockArray(serialized, id)];
-            } else {
-                result = deserializeBlockObject(serialized, id);
+    return flatmap(
+        Object.entries(blocks),
+        ([id, serialized]): Iterable<BlockProperties> => {
+            if (!deserializedCache.has(serialized)) {
+                let result: BlockProperties[];
+                if (Array.isArray(serialized)) {
+                    result = [deserializeBlockArray(serialized, id)];
+                } else {
+                    result = deserializeBlockObject(serialized, id);
+                }
+
+                deserializedCache.set(blocks[id], result);
             }
 
-            deserializedCache.set(blocks[id], result);
-        }
-
-        return deserializedCache.get(serialized);
-    });
+            return deserializedCache.get(serialized);
+        },
+    );
 }
 
 const NUMBER_PRIMITIVE_MAP = {

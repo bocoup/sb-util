@@ -253,4 +253,9 @@ describe('Block class -------------------------', () => {
         const block = blocks.byId('8RrT-%*Y/x{|LPTvspp_');
         expect(block.prop('opcode')).toEqual('motion_changexby');
     });
+
+    test('can find parent block', () => {
+        const block = blocks.byId('8RrT-%*Y/x{|LPTvspp_');
+        expect(block.parent().prop('opcode')).toEqual('control_if');
+    });
 });

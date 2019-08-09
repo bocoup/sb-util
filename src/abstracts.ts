@@ -36,7 +36,7 @@ export enum ScratchVariableTypes {
     BROADCAST_MESSAGE_TYPE = 'broadcast_msg',
 }
 
-export type SB3SerializedField = [any, string?];
+export type SB3SerializedField = [string?, string?];
 
 export interface SB3SerializedFields {
     [name: string]: SB3SerializedField;
@@ -66,6 +66,7 @@ export interface SB3SerializedBlockObject extends SB3SharedBlockProperties {
     fields: SB3SerializedFields;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SB3SerializedBlockArray = [SB3SerializedBlockType, ...any[]];
 
 export type SB3SerializedBlock = SB3SerializedBlockObject | SB3SerializedBlockArray;
@@ -106,7 +107,7 @@ export interface SpritePosition {
 
 export interface BlockField {
     name: string;
-    value: any;
+    value: string | number;
     id?: string;
     variableType?: ScratchVariableTypes;
 }

@@ -17,9 +17,10 @@ import {
     parseBlockQuerySelector,
 } from './selector-parse';
 
-import { map, filter, makeIterable, first } from './generators';
+import { map, filter, makeIterable, first, flatmap } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 import { deserializeBlocks } from './sb3-serialize';
+import { getSpriteMeta, getBlockMeta } from './meta-data';
 
 enum SpriteAttributes {
     BLOCKS = 'blocks',
@@ -53,6 +54,9 @@ export class ScratchProject {
     }
 
     public sprites(selector?: string): SpriteCollection {
+        this.projectJSON.targets.forEach((p): void => {
+            getSpriteMeta(p).project = this;
+        });
         const collection = new SpriteCollection(this.projectJSON.targets);
         if (selector !== undefined) {
             return collection.query(selector);
@@ -65,16 +69,7 @@ export class ScratchProject {
     }
 
     public blocks(): BlockCollection {
-        // Getting an iterable collection of block properties from all the sprites
-        const blocks =
-            // A transformation from an Iterable<Sprite> to Iterable<BlockProperties>
-            makeIterable(this.sprites(), function*(sprites): Iterator<BlockProperties> {
-                for (const sprite of sprites) {
-                    yield* sprite.blocks().propsIterable();
-                }
-            });
-
-        return new BlockCollection(blocks);
+        return this.sprites().blocks();
     }
 }
 
@@ -90,6 +85,16 @@ export class SpriteCollection implements Queryable {
 
     public propsIterable(): Iterable<SpriteProperties> {
         return storage.get(this);
+    }
+
+    public blocks(): BlockCollection {
+        return new BlockCollection(
+            makeIterable(
+                this,
+                (iter): Iterator<BlockProperties> =>
+                    flatmap(iter, (sp): Iterable<BlockProperties> => sp.blocks().propsIterable()),
+            ),
+        );
     }
 
     // DISABLING ESLINT: a prop can be a string, number, object, or boolean
@@ -165,11 +170,11 @@ export class Sprite extends SpriteCollection {
     // DISABLING ESLINT: a prop can be a string, number, object, or boolean
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public prop(property: string): any {
-        const sprite = storage
-            .get(this)
-            .slice(-1)
-            .pop();
-        return sprite[property];
+        return this.props()[property];
+    }
+
+    public props(): SpriteProperties {
+        return storage.get(this)[0];
     }
 
     public position(): SpritePosition {
@@ -179,7 +184,19 @@ export class Sprite extends SpriteCollection {
     }
 
     public blocks(query?: string): BlockCollection {
-        const blocks = new BlockCollection(makeIterable(this.prop('blocks'), deserializeBlocks));
+        const deserialized = makeIterable(this.prop('blocks'), deserializeBlocks);
+        const tagOwnerIterator = makeIterable(
+            deserialized,
+            (d): Iterator<BlockProperties> =>
+                map(
+                    d,
+                    (b): BlockProperties => {
+                        getBlockMeta(b).sprite = this.props();
+                        return b;
+                    },
+                ),
+        );
+        const blocks = new BlockCollection(tagOwnerIterator);
         if (query !== undefined) {
             return blocks.query(query);
         }
@@ -210,7 +227,10 @@ export class BlockCollection implements Queryable {
 
     public top(): BlockCollection {
         return new BlockCollection(
-            makeIterable(this.propsIterable(), iter => filter(iter, ({ topLevel }) => topLevel)),
+            makeIterable(
+                this.propsIterable(),
+                (iter): Iterator<BlockProperties> => filter(iter, ({ topLevel }): boolean => topLevel),
+            ),
         );
     }
 
@@ -281,6 +301,14 @@ export class Block extends BlockCollection {
         const props = this.props();
         if (!props) return null;
         return props[property];
+    }
+
+    public parent(): Block {
+        const parentId: string = this.prop('parent');
+        if (parentId) {
+            return new Sprite(getBlockMeta(this.props()).sprite).blocks().byId(parentId);
+        }
+        return null;
     }
 }
 
