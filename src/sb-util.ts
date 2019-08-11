@@ -303,10 +303,38 @@ export class Block extends BlockCollection {
         return props[property];
     }
 
+    public sprite(): Sprite {
+        return new Sprite(getBlockMeta(this.props()).sprite);
+    }
+
     public parent(): Block {
         const parentId: string = this.prop('parent');
         if (parentId) {
-            return new Sprite(getBlockMeta(this.props()).sprite).blocks().byId(parentId);
+            return this.sprite()
+                .blocks()
+                .byId(parentId);
+        }
+        return null;
+    }
+
+    public input(name: string): Block {
+        const { inputs } = this.props();
+        const blockId = inputs[name] && inputs[name].block;
+        if (blockId) {
+            return this.sprite()
+                .blocks()
+                .byId(blockId);
+        }
+        return null;
+    }
+
+    public shadow(name: string): Block {
+        const { inputs } = this.props();
+        const blockId = inputs[name] && inputs[name].shadow;
+        if (blockId) {
+            return this.sprite()
+                .blocks()
+                .byId(blockId);
         }
         return null;
     }
