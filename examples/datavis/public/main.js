@@ -7,6 +7,9 @@ const data = [ { name: 'hat', count: 8 },
 { name: 'stack', count: 40 },
 { name: 'custom', count: 0 } ]
 
+//TODO: enable tip after integration with express
+//const tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
+
 const width = 600,
     height = 400,
     radius = Math.min(width, height) / 2;
@@ -43,6 +46,10 @@ const outerArc = d3.arc()
 const arcs = pie(data.filter(d => d.count > 0));
 
 /* ------- PIE SLICES -------*/
+
+//TODO: tooltip
+//svg.call(tip)
+
 const slice = svg.select(".slices")
     .selectAll("path.slice")
     .data(arcs)
@@ -51,7 +58,12 @@ slice.enter()
     .insert("path")
         .attr('d', arc)
         .style("fill", d => color(d.data.name))
-        .attr("class", "slice");
+        .attr("class", "slice")
+ 
+
+//TODO: tooltip
+//       .on('mouseover', tip.show)
+//       .on('mouseout', tip.hide)
 
 /* ------- TEXT LABELS -------*/
 

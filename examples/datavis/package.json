@@ -1,0 +1,14 @@
+{
+  "name": "sb-util-datavis-example",
+  "version": "0.0.0-prealpha.1",
+  "description": "Open index.html in a browser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
