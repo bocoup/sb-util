@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const port = 3000;
+
+// BlockShapes will change to be a better API, perhaps BlockOpcodeMeta
 const { loadProjectJson, BlockShapes } = require('sb-util');
 
 app.get('/', (req, res) => res.send('Hello World!'));
