@@ -1,6 +1,5 @@
 
 //TODO: enable tip after integration with express
-//const tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
 
 (async () => {
 
@@ -37,7 +36,8 @@
     /* ------- PIE SLICES -------*/
 
     //TODO: tooltip
-    //svg.call(tip)
+    const tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return d; });
+    svg.call(tip)
 
     var g = svg.selectAll(".arc")
                 .data(pie(data))
@@ -46,7 +46,16 @@
 
     g.append("path")
         .attr("d", arc)
-        .style("fill", function(d) { return color(d.data.count); });
+        .style("fill", function(d) { return color(d.data.count); })
+        .on('mouseover', (d) => {
+            const blockContainer = document.getElementById('blocks');
+            const shapeBlocks = data.filter(b => b.name === d.data.name).pop();
+            shapeBlocksHTMLString = `<h2 style="font-family: sans-serif; text-transform: uppercase;">${d.data.name} BLOCKS</h2>`;
+            Object.entries(shapeBlocks.blocks).forEach(([k,v]) => {
+                shapeBlocksHTMLString += `<p style="font-family: sans-serif"><span style="font-weight: bold">${k}</span>: ${v}</p>`
+            });
+            blockContainer.innerHTML = shapeBlocksHTMLString;
+        });
 
     /* ------- TEXT IN PIE SLICES -------*/
 

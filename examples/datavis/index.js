@@ -13,8 +13,16 @@ app.get('/shapes', async (req, res) => {
     let shapeCounts = [];
     for (let [key, shape] of Object.entries(BlockShapes)) {
         const shapeBlocks = blocks.query(`:${shape}`);
-        const blocksCount = Array.from(shapeBlocks.propsIterable()).length;
-        shapeCounts.push({ name: shape, count: blocksCount});
+        const totalShapeCount = Array.from(shapeBlocks.propsIterable()).length;
+        const blocksCount = {};
+        Array.from(shapeBlocks.propsIterable()).map(b => {
+            if(!(b.opcode in blocksCount)) {
+                blocksCount[b.opcode] = 1;
+            } else {
+                blocksCount[b.opcode] = blocksCount[b.opcode] + 1;
+            }
+        })
+        shapeCounts.push({ name: shape, count: totalShapeCount, blocks: blocksCount});
     }
 
     res.send(shapeCounts);
