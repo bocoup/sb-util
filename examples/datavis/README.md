@@ -1,2 +1,6 @@
 # Viewing chart
-Open index.html in a browser.
+```
+npm run dev
+```
+
+View in browser at: [localhost:3000/datavis](localhost:3000/datavis)
