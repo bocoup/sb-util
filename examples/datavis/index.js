@@ -20,4 +20,6 @@ app.get('/shapes', async (req, res) => {
     res.send(shapeCounts);
 });
 
+app.use('/datavis', express.static('public'));
+
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

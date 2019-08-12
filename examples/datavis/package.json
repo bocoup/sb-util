@@ -4,6 +4,7 @@
   "description": "Open index.html in a browser.",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -11,5 +12,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "sb-util": "0.0.1-prealpha.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
   }
 }
