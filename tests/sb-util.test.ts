@@ -273,4 +273,15 @@ describe('Block class -------------------------', () => {
         block = block.parent();
         expect(block).toEqual(null);
     });
+
+    test('Find input block', () => {
+        let block = blocks.byId('GpW}XGe^n|-l,IYd.}}T').input('VALUE');
+        expect(block.prop('id')).toEqual('xo,i:*{j^3jkOsM:EBwY');
+    });
+
+    test('Find shadow block', () => {
+        let block = blocks.byId('GpW}XGe^n|-l,IYd.}}T').shadow('VALUE');
+        expect(block.prop('opcode')).toEqual('text');
+        expect(block.prop('shadow')).toEqual(true);
+    });
 });
