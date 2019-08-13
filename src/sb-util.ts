@@ -5,6 +5,7 @@ import {
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
+    SB3ScratchVariable,
 } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
@@ -27,6 +28,7 @@ enum SpriteAttributes {
     BLOCKS = 'blocks',
     BROADCASTS = 'broadcasts',
     LISTS = 'lists',
+    VARIABLES = 'variables',
 }
 
 /*
@@ -156,6 +158,10 @@ export class SpriteCollection implements Queryable {
         return new SpriteCollection(sprites);
     }
 
+    public isStage(): boolean {
+        return this.prop('isStage');
+    }
+
     public [Symbol.iterator](): Iterator<Sprite> {
         const sprites: Iterable<SpriteProperties> = storage.get(this);
         return map(sprites, (props: SpriteProperties): Sprite => new Sprite(props));
@@ -214,6 +220,25 @@ export class Sprite extends SpriteCollection {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public lists(): Record<string, any> {
         return this.prop(SpriteAttributes.LISTS);
+    }
+
+    /**
+     * @return {SB3ScratchVariable}. The variables available to a Sprite include the
+     *      variables attached to the sprite as well as variables in the
+     *      global scope, which are attached to the stage
+     */
+    public variables(): SB3ScratchVariable {
+        if (!this.isStage()) {
+            // add global scope from stage
+            const stage = getSpriteMeta(this.props()).project.stage();
+            return Object.assign(
+                {},
+                this.prop(SpriteAttributes.VARIABLES),
+                stage.prop(SpriteAttributes.VARIABLES),
+            );
+        }
+
+        return this.prop('variables');
     }
 }
 
