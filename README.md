@@ -357,6 +357,13 @@ Return: *Promise* to the file buffer of this Asset
 
 ---
 
+### Variable Collection
+A *Variable* collection represents a collection of local and global variables belonging to a sprite.
+
+### Variable
+
+---
+
 ## Development
 sb-util is implemented in TypeScript and will be available as a JavaScript library on [npm](https://www.npmjs.com/package/sb-util) and as a CLI tool.
 
