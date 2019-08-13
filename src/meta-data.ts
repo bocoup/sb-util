@@ -1,4 +1,4 @@
-import { SpriteProperties, BlockProperties } from './abstracts';
+import { SpriteProperties, BlockProperties, VariableProperties } from './abstracts';
 import { ScratchProject } from './sb-util';
 
 export interface SpriteMeta {
@@ -25,4 +25,18 @@ export const getBlockMeta = (p: BlockProperties): BlockMeta => {
         });
     }
     return blockMeta.get(p);
+};
+
+export interface VariableMeta {
+    sprite: SpriteProperties;
+}
+const variableMeta = new WeakMap<VariableProperties, VariableMeta>();
+export const getVariableMeta = (p: VariableProperties): VariableMeta => {
+    if (!variableMeta.has(p)) {
+        variableMeta.set(p, {
+            sprite: null,
+        });
+
+        return variableMeta.get(p);
+    }
 };

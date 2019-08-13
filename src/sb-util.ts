@@ -5,7 +5,6 @@ import {
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
-    SB3Variables,
     VariableProperties,
 } from './abstracts';
 
@@ -19,11 +18,11 @@ import {
     parseBlockQuerySelector,
 } from './selector-parse';
 
-import { map, filter, makeIterable, first, flatmap } from './generators';
+import { map, filter, makeIterable, first, flatmap, chain } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
 import { deserializeBlocks, deserializeVariables } from './sb3-serialize';
-import { getSpriteMeta, getBlockMeta } from './meta-data';
+import { getSpriteMeta, getBlockMeta, getVariableMeta } from './meta-data';
 
 enum SpriteAttributes {
     BLOCKS = 'blocks',
@@ -229,21 +228,36 @@ export class Sprite extends SpriteCollection {
      *      global scope, which are attached to the stage
      */
     public variables(): VariableCollection {
-        let serialized: SB3Variables;
-        if (!this.isStage()) {
-            // add global scope from stage
-            const stage = getSpriteMeta(this.props()).project.stage();
-            serialized = Object.assign(
-                {},
-                this.prop(SpriteAttributes.VARIABLES),
-                stage.prop(SpriteAttributes.VARIABLES),
-            );
-        } else {
-            serialized = this.prop('variables');
+        let taggedVariables: Iterable<VariableProperties>;
+
+        const stage = getSpriteMeta(this.props()).project.stage();
+        const deserializedGlobalVars = makeIterable(
+            stage.prop(SpriteAttributes.VARIABLES),
+            deserializeVariables,
+        );
+
+        for (let v of deserializedGlobalVars) {
+            getVariableMeta(v).sprite = stage.props();
         }
 
-        const deserialized: Iterable<VariableProperties> = makeIterable(serialized, deserializeVariables);
-        return new VariableCollection(deserialized);
+        taggedVariables = deserializedGlobalVars;
+
+        if (!this.isStage()) {
+            // add global scope from stage
+            const deserializedLocalVars = makeIterable(
+                this.prop(SpriteAttributes.VARIABLES),
+                deserializeVariables,
+            );
+            for (let v of deserializedLocalVars) {
+                getVariableMeta(v).sprite = this.props();
+            }
+
+            taggedVariables = makeIterable(
+                null,
+                (): Iterator<VariableProperties> => chain(deserializedGlobalVars, deserializedLocalVars),
+            );
+        }
+        return new VariableCollection(taggedVariables);
     }
 }
 
