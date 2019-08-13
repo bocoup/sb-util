@@ -5,7 +5,7 @@ import {
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
-    ScratchVariable,
+    SB3ScratchVariable,
 } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
@@ -223,11 +223,11 @@ export class Sprite extends SpriteCollection {
     }
 
     /**
-     * @return {ScratchVariable}. The variables available to a Sprite include the
+     * @return {SB3ScratchVariable}. The variables available to a Sprite include the
      *      variables attached to the sprite as well as variables in the
      *      global scope, which are attached to the stage
      */
-    public variables(): ScratchVariable {
+    public variables(): SB3ScratchVariable {
         if (!this.isStage()) {
             // add global scope from stage
             const stage = getSpriteMeta(this.props()).project.stage();
