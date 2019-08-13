@@ -138,3 +138,9 @@ export interface BlockQueryProperties {
         shape: string;
     };
 }
+
+export interface ScratchVariable {
+    [id: string]: ScratchVariableProperties;
+}
+
+export type ScratchVariableProperties = [string, (string | number)];

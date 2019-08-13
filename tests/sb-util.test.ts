@@ -132,11 +132,13 @@ describe('ScratchProject class --------------------', () => {
 	 method can be done, but it is redundant.
 */
 describe('Sprite class -------------------------', () => {
-    let sp, sprite;
+    let sp, spBig, sprite, spriteWithVars;
 
     beforeAll(async () => {
         sp = await loadProjectJson(`${process.cwd()}/tests/data/project.json`);
+        spBig = await loadProjectJson(`${process.cwd()}/tests/data/accelerator.json`);
         sprite = sp.sprites('[name="Sprite1"]').first(); // know the sprite's name because of knowledge of project.json file
+        spriteWithVars = spBig.sprites('[name="alt_othersprites"]').first();
     });
 
     test('can get sprite position', () => {
@@ -158,6 +160,11 @@ describe('Sprite class -------------------------', () => {
     test('can get all blocks', () => {
         const blocks = sprite.blocks();
         expect(blocks).toBeInstanceOf(BlockCollection);
+    });
+
+    test('get all variables on a Sprite', () => {
+        const variables = spriteWithVars.variables();
+        expect(variables).toHaveProperty('58`Aw=nriuw[2/#s@20!-X vel');
     });
 });
 
