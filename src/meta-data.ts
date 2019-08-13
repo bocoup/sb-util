@@ -36,7 +36,6 @@ export const getVariableMeta = (p: VariableProperties): VariableMeta => {
         variableMeta.set(p, {
             sprite: null,
         });
-
-        return variableMeta.get(p);
     }
+    return variableMeta.get(p);
 };

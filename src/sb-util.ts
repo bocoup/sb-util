@@ -231,16 +231,24 @@ export class Sprite extends SpriteCollection {
         let taggedVariables: Iterable<VariableProperties>;
 
         const stage = getSpriteMeta(this.props()).project.stage();
-        const deserializedGlobalVars = makeIterable(
+        const deserializedGlobalVars: Iterable<VariableProperties> = makeIterable(
             stage.prop(SpriteAttributes.VARIABLES),
             deserializeVariables,
         );
 
-        for (let v of deserializedGlobalVars) {
-            getVariableMeta(v).sprite = stage.props();
-        }
+        const globalVariableIter = makeIterable(
+            deserializedGlobalVars,
+            (d): Iterator<VariableProperties> =>
+                map(
+                    d,
+                    (v): VariableProperties => {
+                        getVariableMeta(v).sprite = stage.props();
+                        return v;
+                    },
+                ),
+        );
 
-        taggedVariables = deserializedGlobalVars;
+        taggedVariables = globalVariableIter;
 
         if (!this.isStage()) {
             // add global scope from stage
@@ -248,15 +256,22 @@ export class Sprite extends SpriteCollection {
                 this.prop(SpriteAttributes.VARIABLES),
                 deserializeVariables,
             );
-            for (let v of deserializedLocalVars) {
-                getVariableMeta(v).sprite = this.props();
-            }
 
-            taggedVariables = makeIterable(
-                null,
-                (): Iterator<VariableProperties> => chain(deserializedGlobalVars, deserializedLocalVars),
+            const localVariableIter = makeIterable(
+                deserializedLocalVars,
+                (d): Iterator<VariableProperties> =>
+                    map(
+                        d,
+                        (v): VariableProperties => {
+                            getVariableMeta(v).sprite = this.props();
+                            return v;
+                        },
+                    ),
             );
+
+            taggedVariables = chain(globalVariableIter, localVariableIter);
         }
+
         return new VariableCollection(taggedVariables);
     }
 }
@@ -398,7 +413,7 @@ export class VariableCollection {
     /**
      * @returns The first variable in this collection and its props
      */
-    public props(): SpriteProperties {
+    public props(): VariableProperties {
         return first(storage.get(this));
     }
 
@@ -440,9 +455,28 @@ export class VariableCollection {
     }
 }
 
+/** Class representing a Scratch variable. It is a singleton VariableCollection */
 export class Variable extends VariableCollection {
+    /**
+     *
+     * @param variable an object with fields of VariableProperties
+     */
     public constructor(variable: VariableProperties) {
         super([variable]);
+    }
+
+    /**
+     * @returns Sprite that this variable belongs to
+     */
+    public sprite(): Sprite {
+        return new Sprite(getVariableMeta(this.props()).sprite);
+    }
+
+    /**
+     * @returns boolean representing if this is a global variable or not
+     */
+    public global(): boolean {
+        return this.sprite().isStage();
     }
 }
 
