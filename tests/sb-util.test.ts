@@ -162,9 +162,20 @@ describe('Sprite class -------------------------', () => {
         expect(blocks).toBeInstanceOf(BlockCollection);
     });
 
-    test('get all variables on a Sprite', () => {
+    test('get all variables on a Sprite and make sure global scope vars from stage included', () => {
         const variables = spriteWithVars.variables();
         expect(variables).toHaveProperty('58`Aw=nriuw[2/#s@20!-X vel');
+
+        // variable in global scope
+        expect(variables).toHaveProperty('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+    });
+
+    test('get all variables on stage and ensure that there are no vars from other sprites', () => {
+        const stageVariables = spBig.stage().variables();
+        expect(stageVariables).toHaveProperty('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+
+        // ensure that vars outside of global scope are not included
+        expect(stageVariables).not.toHaveProperty('58`Aw=nriuw[2/#s@20!-X vel');
     });
 });
 

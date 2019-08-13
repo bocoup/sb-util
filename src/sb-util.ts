@@ -229,6 +229,7 @@ export class Sprite extends SpriteCollection {
      */
     public variables(): ScratchVariable {
         if (!this.isStage()) {
+            // add global scope from stage
             const stage = getSpriteMeta(this.props()).project.stage();
             return Object.assign(
                 {},
