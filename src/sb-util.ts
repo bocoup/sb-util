@@ -19,6 +19,7 @@ import {
 
 import { map, filter, makeIterable, first, flatmap } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
+export { BlockShapes } from './block-shapes';
 import { deserializeBlocks } from './sb3-serialize';
 import { getSpriteMeta, getBlockMeta } from './meta-data';
 

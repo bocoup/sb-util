@@ -1,6 +1,6 @@
 {
   "name": "sb-util",
-  "version": "0.0.1-prealpha.3",
+  "version": "0.0.1-prealpha.4",
   "description": "Scratch blocks utilities: open and query Scratch blocks formats",
   "repository": "https://github.com/bocoup/sb-util",
   "types": "dist/index.d.ts",

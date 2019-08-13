@@ -1,4 +1,4 @@
-enum BlockShapes { // information about each block shape can be found here: https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes
+export enum BlockShapes { // information about each block shape can be found here: https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes
     HAT = 'hat',
     BOOLEAN = 'boolean',
     REPORTER = 'reporter',
