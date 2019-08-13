@@ -164,18 +164,25 @@ describe('Sprite class -------------------------', () => {
 
     test('get all variables on a Sprite and make sure global scope vars from stage included', () => {
         const variables = spriteWithVars.variables();
-        expect(variables).toHaveProperty('58`Aw=nriuw[2/#s@20!-X vel');
+
+        const localVar = variables.byId('58`Aw=nriuw[2/#s@20!-X vel');
+        expect(localVar.prop('name')).toEqual('X vel');
+        expect(localVar.prop('value')).toEqual(-0.44432764720836493);
 
         // variable in global scope
-        expect(variables).toHaveProperty('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+        const globalVar = variables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+        expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
+        expect(globalVar.prop('value')).toEqual('50');
     });
 
     test('get all variables on stage and ensure that there are no vars from other sprites', () => {
         const stageVariables = spBig.stage().variables();
-        expect(stageVariables).toHaveProperty('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+        const globalVar = stageVariables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+        expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
 
         // ensure that vars outside of global scope are not included
-        expect(stageVariables).not.toHaveProperty('58`Aw=nriuw[2/#s@20!-X vel');
+        const localVar = stageVariables.byId('58`Aw=nriuw[2/#s@20!-X vel');
+        expect(localVar).toBeNull();
     });
 });
 

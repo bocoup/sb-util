@@ -11,8 +11,10 @@ import {
     SB3SerializedInputs,
     BlockInput,
     SB3SerializedInputType,
+    VariableProperties,
+    SB3Variables,
 } from './abstracts';
-import { flatmap } from './generators';
+import { flatmap, map } from './generators';
 
 let blockCounter = 0;
 // todo: slightly more scratch formula ids maybe?
@@ -219,4 +221,17 @@ function deserializeBlockObject(serialized: SB3SerializedBlockObject, id: string
         ...rest,
     };
     return [block, ...newBlocks];
+}
+
+export function deserializeVariables(serialized: SB3Variables): Iterator<VariableProperties> {
+    return map(
+        Object.entries(serialized),
+        ([id, [name, value, isCloud]]): VariableProperties => ({
+            id,
+            name,
+            value,
+            isCloud: !isCloud ? false : true, //when  isCloud is undefined
+            type: '', // this means scalar type in https://github.com/LLK/scratch-vm/blob/33ef283787d4ea9a90c3d0d069a6b97dee24f51b/src/engine/variable.js#L49
+        }),
+    );
 }

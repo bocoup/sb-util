@@ -5,7 +5,8 @@ import {
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
-    SB3ScratchVariable,
+    SB3Variables,
+    VariableProperties,
 } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
@@ -21,7 +22,7 @@ import {
 import { map, filter, makeIterable, first, flatmap } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
-import { deserializeBlocks } from './sb3-serialize';
+import { deserializeBlocks, deserializeVariables } from './sb3-serialize';
 import { getSpriteMeta, getBlockMeta } from './meta-data';
 
 enum SpriteAttributes {
@@ -223,22 +224,26 @@ export class Sprite extends SpriteCollection {
     }
 
     /**
-     * @return {SB3ScratchVariable}. The variables available to a Sprite include the
+     * @return {VariableCollection}. The variables available to a Sprite include the
      *      variables attached to the sprite as well as variables in the
      *      global scope, which are attached to the stage
      */
-    public variables(): SB3ScratchVariable {
+    public variables(): VariableCollection {
+        let serialized: SB3Variables;
         if (!this.isStage()) {
             // add global scope from stage
             const stage = getSpriteMeta(this.props()).project.stage();
-            return Object.assign(
+            serialized = Object.assign(
                 {},
                 this.prop(SpriteAttributes.VARIABLES),
                 stage.prop(SpriteAttributes.VARIABLES),
             );
+        } else {
+            serialized = this.prop('variables');
         }
 
-        return this.prop('variables');
+        const deserialized: Iterable<VariableProperties> = makeIterable(serialized, deserializeVariables);
+        return new VariableCollection(deserialized);
     }
 }
 
@@ -363,6 +368,67 @@ export class Block extends BlockCollection {
                 .byId(blockId);
         }
         return null;
+    }
+}
+
+/** Class representing a variable collection */
+export class VariableCollection {
+    /**
+     *
+     * @param variables an Iterable of VariableProperties
+     */
+    public constructor(variables: Iterable<VariableProperties>) {
+        storage.set(this, variables);
+    }
+
+    /**
+     * @returns The first variable in this collection and its props
+     */
+    public props(): SpriteProperties {
+        return first(storage.get(this));
+    }
+
+    /**
+     *
+     * @param property string representing property name
+     * @returns a prop value. can be string, number, object, array, or boolean
+     */
+    // DISABLING ESLINT: a prop can be a string, number, object, array, or boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public prop(property: string): any {
+        return this.props()[property];
+    }
+
+    /**
+     * @returns Iterable of VariableProperties
+     */
+    public propsIterable(): Iterable<VariableProperties> {
+        return storage.get(this);
+    }
+
+    /**
+     *
+     * @param id the id string of a variable
+     * @returns Variable object
+     */
+    public byId(id: string): Variable {
+        for (const variable of this) {
+            if (variable.prop('id') === id) {
+                return variable;
+            }
+        }
+        return null;
+    }
+
+    public [Symbol.iterator](): Iterator<Variable> {
+        const blocks: Iterable<VariableProperties> = storage.get(this);
+        return map(blocks, (props: VariableProperties): Variable => new Variable(props));
+    }
+}
+
+export class Variable extends VariableCollection {
+    public constructor(variable: VariableProperties) {
+        super([variable]);
     }
 }
 
