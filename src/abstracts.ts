@@ -150,5 +150,5 @@ export interface VariableProperties {
     name: string;
     type?: string;
     isCloud: boolean;
-    value: number | string | string;
+    value: number | string | string[];
 }
