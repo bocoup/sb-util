@@ -5,7 +5,7 @@ import {
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
-    SB3ScratchVariable,
+    VariableProperties,
 } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
@@ -18,11 +18,11 @@ import {
     parseBlockQuerySelector,
 } from './selector-parse';
 
-import { map, filter, makeIterable, first, flatmap } from './generators';
+import { map, filter, makeIterable, first, flatmap, chain } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
-import { deserializeBlocks } from './sb3-serialize';
-import { getSpriteMeta, getBlockMeta } from './meta-data';
+import { deserializeBlocks, deserializeVariables } from './sb3-serialize';
+import { getSpriteMeta, getBlockMeta, getVariableMeta, setMetaIterable } from './meta-data';
 
 enum SpriteAttributes {
     BLOCKS = 'blocks',
@@ -192,16 +192,12 @@ export class Sprite extends SpriteCollection {
 
     public blocks(query?: string): BlockCollection {
         const deserialized = makeIterable(this.prop('blocks'), deserializeBlocks);
-        const tagOwnerIterator = makeIterable(
+        const tagOwnerIterator = setMetaIterable(
             deserialized,
-            (d): Iterator<BlockProperties> =>
-                map(
-                    d,
-                    (b): BlockProperties => {
-                        getBlockMeta(b).sprite = this.props();
-                        return b;
-                    },
-                ),
+            (b): BlockProperties => {
+                getBlockMeta(b).sprite = this.props();
+                return b;
+            },
         );
         const blocks = new BlockCollection(tagOwnerIterator);
         if (query !== undefined) {
@@ -223,22 +219,48 @@ export class Sprite extends SpriteCollection {
     }
 
     /**
-     * @return {SB3ScratchVariable}. The variables available to a Sprite include the
+     * @return {VariableCollection}. The variables available to a Sprite include the
      *      variables attached to the sprite as well as variables in the
      *      global scope, which are attached to the stage
      */
-    public variables(): SB3ScratchVariable {
+    public variables(): VariableCollection {
+        let taggedVariables: Iterable<VariableProperties>;
+
+        const stage = getSpriteMeta(this.props()).project.stage();
+        const deserializedGlobalVars: Iterable<VariableProperties> = makeIterable(
+            stage.prop(SpriteAttributes.VARIABLES),
+            deserializeVariables,
+        );
+
+        const globalVariableIter = setMetaIterable(
+            deserializedGlobalVars,
+            (v): VariableProperties => {
+                getVariableMeta(v).sprite = stage.props();
+                return v;
+            },
+        );
+
+        taggedVariables = globalVariableIter;
+
         if (!this.isStage()) {
             // add global scope from stage
-            const stage = getSpriteMeta(this.props()).project.stage();
-            return Object.assign(
-                {},
+            const deserializedLocalVars = makeIterable(
                 this.prop(SpriteAttributes.VARIABLES),
-                stage.prop(SpriteAttributes.VARIABLES),
+                deserializeVariables,
             );
+
+            const localVariableIter = setMetaIterable(
+                deserializedLocalVars,
+                (v): VariableProperties => {
+                    getVariableMeta(v).sprite = this.props();
+                    return v;
+                },
+            );
+
+            taggedVariables = chain(globalVariableIter, localVariableIter);
         }
 
-        return this.prop('variables');
+        return new VariableCollection(taggedVariables);
     }
 }
 
@@ -363,6 +385,86 @@ export class Block extends BlockCollection {
                 .byId(blockId);
         }
         return null;
+    }
+}
+
+/** Class representing a variable collection */
+export class VariableCollection {
+    /**
+     *
+     * @param variables an Iterable of VariableProperties
+     */
+    public constructor(variables: Iterable<VariableProperties>) {
+        storage.set(this, variables);
+    }
+
+    /**
+     * @returns The first variable in this collection and its props
+     */
+    public props(): VariableProperties {
+        return first(storage.get(this));
+    }
+
+    /**
+     *
+     * @param property string representing property name
+     * @returns a prop value. can be string, number, object, array, or boolean
+     */
+    // DISABLING ESLINT: a prop can be a string, number, object, array, or boolean
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    public prop(property: string): any {
+        return this.props()[property];
+    }
+
+    /**
+     * @returns Iterable of VariableProperties
+     */
+    public propsIterable(): Iterable<VariableProperties> {
+        return storage.get(this);
+    }
+
+    /**
+     *
+     * @param id the id string of a variable
+     * @returns Variable object
+     */
+    public byId(id: string): Variable {
+        for (const variable of this) {
+            if (variable.prop('id') === id) {
+                return variable;
+            }
+        }
+        return null;
+    }
+
+    public [Symbol.iterator](): Iterator<Variable> {
+        const blocks: Iterable<VariableProperties> = storage.get(this);
+        return map(blocks, (props: VariableProperties): Variable => new Variable(props));
+    }
+}
+
+/** Class representing a Scratch variable. It is a singleton VariableCollection */
+export class Variable extends VariableCollection {
+    /**
+     *
+     * @param variable an object with fields of VariableProperties
+     */
+    public constructor(variable: VariableProperties) {
+        super([variable]);
+    }
+
+    /**
+     * @returns Sprite that this variable belongs to
+     */
+    public sprite(): Sprite {
+        return new Sprite(getVariableMeta(this.props()).sprite);
+    }
+
+    /**
+     * @returns boolean representing if this is a global variable or not
+     */
+    public global(): boolean {
+        return this.sprite().isStage();
     }
 }
 

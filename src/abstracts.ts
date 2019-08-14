@@ -75,11 +75,11 @@ export interface SB3SerializedBlocks {
     [id: string]: SB3SerializedBlock;
 }
 
-export interface SB3ScratchVariable {
-    [id: string]: SB3ScratchVariableProperties;
+export interface SB3Variables {
+    [id: string]: SB3VariableProperties;
 }
 
-export type SB3ScratchVariableProperties = [string, (string | number)];
+export type SB3VariableProperties = [string, (string | number), boolean];
 
 export interface SpriteProperties {
     isStage: boolean;
@@ -143,4 +143,12 @@ export interface BlockQueryProperties {
         type: string;
         shape: string;
     };
+}
+
+export interface VariableProperties {
+    id: string;
+    name: string;
+    type?: string;
+    isCloud: boolean;
+    value: number | string | string[];
 }
