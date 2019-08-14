@@ -230,7 +230,7 @@ export function deserializeVariables(serialized: SB3Variables): Iterator<Variabl
             id,
             name,
             value,
-            isCloud: !isCloud ? false : true, //when  isCloud is undefined
+            isCloud: Boolean(isCloud), //when  isCloud is undefined
             type: '', // this means scalar type in https://github.com/LLK/scratch-vm/blob/33ef283787d4ea9a90c3d0d069a6b97dee24f51b/src/engine/variable.js#L49
         }),
     );

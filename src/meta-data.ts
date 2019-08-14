@@ -1,5 +1,6 @@
 import { SpriteProperties, BlockProperties, VariableProperties } from './abstracts';
 import { ScratchProject } from './sb-util';
+import { makeIterable, map } from './generators';
 
 export interface SpriteMeta {
     project: ScratchProject;
@@ -39,3 +40,7 @@ export const getVariableMeta = (p: VariableProperties): VariableMeta => {
     }
     return variableMeta.get(p);
 };
+
+export function setMetaIterable<T>(iterable: Iterable<T>, predicate: (item: T) => T): Iterable<T> {
+    return makeIterable(iterable, (d): Iterator<T> => map(d, predicate));
+}
