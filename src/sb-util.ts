@@ -221,7 +221,9 @@ export class Sprite extends SpriteCollection {
     /**
      * @return {VariableCollection}. The variables available to a Sprite include the
      *      variables attached to the sprite as well as variables in the
-     *      global scope, which are attached to the stage
+     *      global scope, which are attached to the stage. Also included in variables
+     *      are broadcasts (which are always global) and lists, which can be global
+     *      or local.
      */
     public variables(): VariableCollection {
         let taggedVariables: Iterable<VariableProperties>;
