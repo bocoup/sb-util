@@ -12,9 +12,11 @@ import {
     BlockInput,
     SB3SerializedInputType,
     VariableProperties,
-    SB3Variables,
+    SB3ScalarVariables,
+    SB3BroadcastVariables,
 } from './abstracts';
 import { flatmap, map } from './generators';
+import { Variable } from './sb-util';
 
 let blockCounter = 0;
 // todo: slightly more scratch formula ids maybe?
@@ -223,7 +225,7 @@ function deserializeBlockObject(serialized: SB3SerializedBlockObject, id: string
     return [block, ...newBlocks];
 }
 
-export function deserializeVariables(serialized: SB3Variables): Iterator<VariableProperties> {
+export function deserializeVariables(serialized: SB3ScalarVariables): Iterator<VariableProperties> {
     return map(
         Object.entries(serialized),
         ([id, [name, value, isCloud]]): VariableProperties => ({
@@ -231,7 +233,22 @@ export function deserializeVariables(serialized: SB3Variables): Iterator<Variabl
             name,
             value,
             isCloud: Boolean(isCloud), //when  isCloud is undefined
-            type: '', // this means scalar type in https://github.com/LLK/scratch-vm/blob/33ef283787d4ea9a90c3d0d069a6b97dee24f51b/src/engine/variable.js#L49
+            type: ScratchVariableTypes.SCALAR_TYPE, // this means scalar type in https://github.com/LLK/scratch-vm/blob/33ef283787d4ea9a90c3d0d069a6b97dee24f51b/src/engine/variable.js#L49
+        }),
+    );
+}
+
+export function deserializeBroadcastVariables(
+    serialized: SB3BroadcastVariables,
+): Iterator<VariableProperties> {
+    return map(
+        Object.entries(serialized),
+        // name and value are the same for broadcasts. documented here: https://github.com/LLK/scratch-vm/blob/5adf5ba8fcbd9099a7258c810fd9099ceb39aadf/src/serialization/sb3.js#L398
+        ([id, value]): VariableProperties => ({
+            id,
+            name: value,
+            value,
+            type: ScratchVariableTypes.BROADCAST_MESSAGE_TYPE,
         }),
     );
 }

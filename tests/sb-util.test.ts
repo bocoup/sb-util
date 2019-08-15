@@ -181,10 +181,15 @@ describe('Sprite class -------------------------', () => {
         expect(localVar.prop('value')).toEqual(-0.44432764720836493);
         expect(localVar.global()).toBeFalsy();
 
-        // variable in global scope
-        const globalVar = variables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
-        expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
-        expect(globalVar.prop('value')).toEqual('50');
+        // scalar variable in global scope
+        const globalScalarVar = variables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+        expect(globalScalarVar.prop('name')).toEqual('glitch_Acceleration');
+        expect(globalScalarVar.prop('value')).toEqual('50');
+
+        // broadcast variable in global scope
+        const globalBroadcastVar = variables.byId('broadcastMsgId-start glowing (accelerator)');
+        expect(globalBroadcastVar.prop('name')).toEqual('start glowing (accelerator)');
+        expect(globalBroadcastVar.prop('value')).toEqual('start glowing (accelerator)');
     });
 });
 

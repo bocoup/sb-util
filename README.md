@@ -351,16 +351,27 @@ An *Asset* is a singleton of *AssetCollection*.
 **toBuffer()**
 Return: *Promise* to the file buffer of this Asset
 
- ## CLI Proposal
-
- *Coming soon*
-
 ---
-
 ### Variable Collection
 A *Variable* collection represents a collection of local and global variables belonging to a sprite.
 
+**query(selector)**  
+Parameter(s): A string in the CSS selector style
+Return: *AssetCollection*
+
+Possible selector syntax:
+
+| Variable Attribute | Selector Syntax |
+|-----------------|-----------------|
+| type            | Pseudo-class selector. `variables.query(':scalar')`, `variables.query(':list')`, `variables.query(':broadcast')`|
+
 ### Variable
+
+---
+
+ ## CLI Proposal
+
+ *Coming soon*
 
 ---
 

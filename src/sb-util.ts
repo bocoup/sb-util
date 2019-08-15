@@ -21,7 +21,7 @@ import {
 import { map, filter, makeIterable, first, flatmap, chain } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
-import { deserializeBlocks, deserializeVariables } from './sb3-serialize';
+import { deserializeBlocks, deserializeVariables, deserializeBroadcastVariables } from './sb3-serialize';
 import { getSpriteMeta, getBlockMeta, getVariableMeta, setMetaIterable } from './meta-data';
 
 enum SpriteAttributes {
@@ -229,20 +229,36 @@ export class Sprite extends SpriteCollection {
         let taggedVariables: Iterable<VariableProperties>;
 
         const stage = getSpriteMeta(this.props()).project.stage();
-        const deserializedGlobalVars: Iterable<VariableProperties> = makeIterable(
+
+        // Handle Global SCALAR vars
+        const deserializedGlobalScalarVars: Iterable<VariableProperties> = makeIterable(
             stage.prop(SpriteAttributes.VARIABLES),
             deserializeVariables,
         );
 
-        const globalVariableIter = setMetaIterable(
-            deserializedGlobalVars,
+        const globalScalarVariableIterable = setMetaIterable(
+            deserializedGlobalScalarVars,
             (v): VariableProperties => {
                 getVariableMeta(v).sprite = stage.props();
                 return v;
             },
         );
 
-        taggedVariables = globalVariableIter;
+        // Handle Global BROADCAST vars
+        const deserializedGlobalBroadcastVars: Iterable<VariableProperties> = makeIterable(
+            stage.prop(SpriteAttributes.BROADCASTS),
+            deserializeBroadcastVariables,
+        );
+
+        const globalBroadcastVariableIterable = setMetaIterable(
+            deserializedGlobalBroadcastVars,
+            (v): VariableProperties => {
+                getVariableMeta(v).sprite = stage.props();
+                return v;
+            },
+        );
+
+        taggedVariables = chain(globalScalarVariableIterable, globalBroadcastVariableIterable);
 
         if (!this.isStage()) {
             // add global scope from stage
@@ -259,7 +275,11 @@ export class Sprite extends SpriteCollection {
                 },
             );
 
-            taggedVariables = chain(globalVariableIter, localVariableIter);
+            taggedVariables = chain(
+                globalScalarVariableIterable,
+                globalBroadcastVariableIterable,
+                localVariableIter,
+            );
         }
 
         return new VariableCollection(taggedVariables);
