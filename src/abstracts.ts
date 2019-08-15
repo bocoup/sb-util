@@ -85,6 +85,12 @@ export interface SB3BroadcastVariables {
     [id: string]: string;
 }
 
+export type SB3ListVariableProperties = [string, string[]];
+
+export interface SB3ListVariables {
+    [id: string]: SB3ListVariableProperties;
+}
+
 export interface SpriteProperties {
     isStage: boolean;
     name: string;

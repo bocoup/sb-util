@@ -14,9 +14,9 @@ import {
     VariableProperties,
     SB3ScalarVariables,
     SB3BroadcastVariables,
+    SB3ListVariables,
 } from './abstracts';
 import { flatmap, map } from './generators';
-import { Variable } from './sb-util';
 
 let blockCounter = 0;
 // todo: slightly more scratch formula ids maybe?
@@ -249,6 +249,18 @@ export function deserializeBroadcastVariables(
             name: value,
             value,
             type: ScratchVariableTypes.BROADCAST_MESSAGE_TYPE,
+        }),
+    );
+}
+
+export function deserializeListVariables(serialized: SB3ListVariables): Iterator<VariableProperties> {
+    return map(
+        Object.entries(serialized),
+        ([id, [name, value]]): VariableProperties => ({
+            id,
+            name,
+            value,
+            type: ScratchVariableTypes.LIST_TYPE,
         }),
     );
 }
