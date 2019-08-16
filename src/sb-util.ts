@@ -32,7 +32,6 @@ import {
     getBlockMeta,
     getVariableMeta,
     setMetaIterable,
-    setVariableMetaIterable,
     setVariableMetaSprite,
 } from './meta-data';
 
@@ -218,10 +217,23 @@ export class Sprite extends SpriteCollection {
         return blocks;
     }
 
-    public broadcasts(): Record<string, string> {
-        // DISABLING ESLINT: broadcasts are a nested object
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return this.prop(SpriteAttributes.BROADCASTS);
+    /**
+     * @return {VariableCollection}
+     *
+     * In the Scratch VM, broadcasts are variables, and
+     *  in the Scratch GUI are always global
+     */
+    public broadcasts(): VariableCollection {
+        const stage = getSpriteMeta(this.props()).project.stage();
+
+        const deserializedBroadcastVars: Iterable<VariableProperties> = makeIterable(
+            stage.prop(SpriteAttributes.BROADCASTS),
+            deserializeBroadcastVariables,
+        );
+
+        const broadcastVariables = setVariableMetaSprite(deserializedBroadcastVars, stage.props());
+
+        return new VariableCollection(broadcastVariables);
     }
 
     /**

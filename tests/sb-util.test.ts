@@ -183,7 +183,10 @@ describe('Sprite class -------------------------', () => {
         });
 
         test('broadcast var on stage is global', () => {
-            const globalBroadcastVar = stageVariables.byId('broadcastMsgId-start glowing (accelerator)');
+            const globalBroadcastVar = spBig
+                .stage()
+                .broadcasts()
+                .byId('broadcastMsgId-start glowing (accelerator)');
             expect(globalBroadcastVar.global()).toBeTruthy();
         });
 
@@ -231,7 +234,9 @@ describe('Sprite class -------------------------', () => {
 
         test('global broadcast var from stage available', () => {
             // broadcast variable in global scope
-            const globalBroadcastVar = variables.byId('broadcastMsgId-start glowing (accelerator)');
+            const globalBroadcastVar = spriteWithVars
+                .broadcasts()
+                .byId('broadcastMsgId-start glowing (accelerator)');
             expect(globalBroadcastVar.prop('name')).toEqual('start glowing (accelerator)');
             expect(globalBroadcastVar.prop('value')).toEqual('start glowing (accelerator)');
             expect(globalBroadcastVar.global()).toBeTruthy();
