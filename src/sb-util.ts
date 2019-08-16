@@ -18,7 +18,7 @@ import {
     parseBlockQuerySelector,
 } from './selector-parse';
 
-import { map, filter, makeIterable, first, flatmap, chain } from './generators';
+import { map, makeIterable, first, chain, filterIterable, flatmapIterable } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
 import { deserializeBlocks, deserializeVariables } from './sb3-serialize';
@@ -92,11 +92,7 @@ export class SpriteCollection implements Queryable {
 
     public blocks(): BlockCollection {
         return new BlockCollection(
-            makeIterable(
-                this,
-                (iter): Iterator<BlockProperties> =>
-                    flatmap(iter, (sp): Iterable<BlockProperties> => sp.blocks().propsIterable()),
-            ),
+            flatmapIterable(this, (sp): Iterable<BlockProperties> => sp.blocks().propsIterable()),
         );
     }
 
@@ -119,10 +115,9 @@ export class SpriteCollection implements Queryable {
         // string between brackets
         const selectorBody = selector.slice(1, -1);
 
-        let sprites: Iterable<SpriteProperties>,
-            filterFunction: (s: SpriteProperties) => boolean,
-            attrValue: string | number | boolean, // the attribute being queried for might be string, number, or bool
-            allSprites = this.propsIterable();
+        let filterFunction: (s: SpriteProperties) => boolean;
+        // the attribute being queried for might be string, number, or bool
+        let attrValue: string | number | boolean;
 
         // case when selector string is in [attr=value] form
         if (isSelectorAttrValue(selectorBody)) {
@@ -151,11 +146,7 @@ export class SpriteCollection implements Queryable {
             filterFunction = (s: SpriteProperties): boolean => attr in s;
         }
 
-        sprites = makeIterable(
-            allSprites,
-            (s: Iterable<SpriteProperties>): Iterator<SpriteProperties> => filter(s, filterFunction),
-        );
-        return new SpriteCollection(sprites);
+        return new SpriteCollection(filterIterable(this.propsIterable(), filterFunction));
     }
 
     public isStage(): boolean {
@@ -163,8 +154,7 @@ export class SpriteCollection implements Queryable {
     }
 
     public [Symbol.iterator](): Iterator<Sprite> {
-        const sprites: Iterable<SpriteProperties> = storage.get(this);
-        return map(sprites, (props: SpriteProperties): Sprite => new Sprite(props));
+        return map(this.propsIterable(), (props: SpriteProperties): Sprite => new Sprite(props));
     }
 }
 
@@ -274,16 +264,11 @@ export class BlockCollection implements Queryable {
     }
 
     public top(): BlockCollection {
-        return new BlockCollection(
-            makeIterable(
-                this.propsIterable(),
-                (iter): Iterator<BlockProperties> => filter(iter, ({ topLevel }): boolean => topLevel),
-            ),
-        );
+        return new BlockCollection(filterIterable(this.propsIterable(), ({ topLevel }): boolean => topLevel));
     }
 
     public first(): Block {
-        return first(makeIterable(this, (): Iterator<Block> => this[Symbol.iterator]()));
+        return first(this);
     }
 
     public props(): BlockProperties {
@@ -323,11 +308,7 @@ export class BlockCollection implements Queryable {
             }
         }
 
-        const blocks: Iterable<BlockProperties> = makeIterable(
-            allBlocks,
-            (blockProps: Iterable<BlockProperties>): Iterator<BlockProperties> =>
-                filter(blockProps, filterFunction),
-        );
+        const blocks: Iterable<BlockProperties> = filterIterable(allBlocks, filterFunction);
 
         return new BlockCollection(blocks);
     }
