@@ -477,6 +477,19 @@ export class VariableCollection {
         return null;
     }
 
+    /**
+     *
+     * @param selector string
+     * Currently, the selector syntax only supports the individual strings:
+     *  ":list", ":broadcast", ":scalar".
+     *
+     * TODO: More advanced query patterns with combination selectors
+     */
+    public query(selector: string): VariableCollection {
+        const variableProps: Iterable<VariableProperties> = this.propsIterable();
+        return;
+    }
+
     public [Symbol.iterator](): Iterator<Variable> {
         const blocks: Iterable<VariableProperties> = storage.get(this);
         return map(blocks, (props: VariableProperties): Variable => new Variable(props));

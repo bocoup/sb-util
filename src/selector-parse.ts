@@ -1,4 +1,4 @@
-import { BlockQueryProperties } from './abstracts';
+import { BlockQueryProperties, VariableQueryProperties } from './abstracts';
 
 enum SelectorSyntax {
     OPEN_BRACKET = '[',
@@ -7,7 +7,7 @@ enum SelectorSyntax {
     DOUBLE_QUOTE = '"',
     SINGLE_QUOTE = "'",
     TYPE_SELECTOR = '.',
-    SHAPE_SELECTOR = ':',
+    PSEUDO_SELECTOR = ':',
 }
 
 export function validateSpriteSelector(selector: string): void {
@@ -41,7 +41,10 @@ export function parseBlockQuerySelector(selector: string): BlockQueryProperties 
     let queryStrings = selector.split(' ');
     let shape, type, opcode;
 
-    if (!selector.includes(SelectorSyntax.TYPE_SELECTOR) && !selector.includes(SelectorSyntax.SHAPE_SELECTOR))
+    if (
+        !selector.includes(SelectorSyntax.TYPE_SELECTOR) &&
+        !selector.includes(SelectorSyntax.PSEUDO_SELECTOR)
+    )
         opcode = selector;
 
     if (selector.includes(SelectorSyntax.TYPE_SELECTOR)) {
@@ -51,9 +54,9 @@ export function parseBlockQuerySelector(selector: string): BlockQueryProperties 
             .pop();
     }
 
-    if (selector.includes(SelectorSyntax.SHAPE_SELECTOR)) {
+    if (selector.includes(SelectorSyntax.PSEUDO_SELECTOR)) {
         shape = queryStrings
-            .filter((s: string): boolean => s.includes(SelectorSyntax.SHAPE_SELECTOR))
+            .filter((s: string): boolean => s.includes(SelectorSyntax.PSEUDO_SELECTOR))
             .map((s: string): string => s.substring(1))
             .pop();
     }
@@ -66,4 +69,8 @@ export function parseBlockQuerySelector(selector: string): BlockQueryProperties 
             opcode,
         },
     };
+}
+
+export function parseVariableQuerySelector(selector: string): VariableQueryProperties {
+    return
 }

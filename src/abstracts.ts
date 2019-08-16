@@ -155,6 +155,10 @@ export interface BlockQueryProperties {
     };
 }
 
+export interface VariableQueryProperties {
+    type: string
+}
+
 export interface VariableProperties {
     id: string;
     name: string;
