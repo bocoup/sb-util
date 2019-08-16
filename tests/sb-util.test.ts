@@ -168,15 +168,19 @@ describe('Sprite class -------------------------', () => {
             stageVariables = spBig.stage().variables();
         });
 
-        test('get all variables on stage and ensure that there are no vars from other sprites', () => {
+        test('get global variable on stage', () => {
             const globalVar = stageVariables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
             expect(globalVar.global()).toBeTruthy();
             expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
+        });
 
+        test('local scalar vars not on stage', () => {
             // ensure that scalar vars outside of global scope are not included
             const localScalarVar = stageVariables.byId('58`Aw=nriuw[2/#s@20!-X vel');
             expect(localScalarVar).toBeNull();
+        });
 
+        test('local list var not on stage', () => {
             // ensure that list vars outside of global scope are not included
             const localListVar = stageVariables.byId('2Q_=y9u5Qq|~fG25;O7V');
             expect(localListVar).toBeNull();
@@ -219,7 +223,7 @@ describe('Sprite class -------------------------', () => {
             expect(
                 localListVar
                     .prop('value')
-                    .map((v: string) => +v)
+                    .map(Number)
                     .reduce((a: number, b: number) => a + b),
             ).toEqual(66);
         });
@@ -248,7 +252,7 @@ describe('Sprite class -------------------------', () => {
             expect(
                 globalListVar
                     .prop('value')
-                    .map((v: string) => +v)
+                    .map(Number)
                     .reduce((a: number, b: number) => a + b),
             ).toEqual(55);
         });
