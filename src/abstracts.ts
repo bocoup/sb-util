@@ -159,6 +159,7 @@ export interface VariableProperties {
     id: string;
     name: string;
     type: string;
-    isCloud?: boolean; // this only applies to scalar type varibles
+    // this only applies to scalar type variables
+    isCloud?: boolean;
     value: number | string | string[];
 }
