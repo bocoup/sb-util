@@ -188,7 +188,10 @@ describe('Sprite class -------------------------', () => {
         });
 
         test('list var on stage is global', () => {
-            const globalListVar = stageVariables.byId('Pi3E!fcsKWLQ}5(ugkcS');
+            const globalListVar = spBig
+                .stage()
+                .lists()
+                .byId('Pi3E!fcsKWLQ}5(ugkcS');
             expect(globalListVar.global()).toBeTruthy();
         });
     });
@@ -208,7 +211,7 @@ describe('Sprite class -------------------------', () => {
         });
 
         test('get a local list variable on a Sprite', () => {
-            const localListVar = variables.byId('2Q_=y9u5Qq|~fG25;O7V');
+            const localListVar = spriteWithVars.lists().byId('2Q_=y9u5Qq|~fG25;O7V');
             expect(localListVar.prop('name')).toEqual('sprite-list');
             expect(
                 localListVar
@@ -235,7 +238,7 @@ describe('Sprite class -------------------------', () => {
         });
 
         test('global list var from stage available', () => {
-            const globalListVar = variables.byId('Pi3E!fcsKWLQ}5(ugkcS');
+            const globalListVar = spriteWithVars.lists().byId('Pi3E!fcsKWLQ}5(ugkcS');
             expect(globalListVar.prop('name')).toEqual('global-list');
             expect(
                 globalListVar
