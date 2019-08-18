@@ -224,14 +224,18 @@ export class Sprite extends SpriteCollection {
      *  in the Scratch GUI are always global
      */
     public broadcasts(): VariableCollection {
-        const stage = getSpriteMeta(this.props()).project.stage();
+        if (!this.isStage()) {
+            return getSpriteMeta(this.props())
+                .project.stage()
+                .broadcasts();
+        }
 
         const deserializedBroadcastVars: Iterable<VariableProperties> = makeIterable(
-            stage.prop(SpriteAttributes.BROADCASTS),
+            this.prop(SpriteAttributes.BROADCASTS),
             deserializeBroadcastVariables,
         );
 
-        const broadcastVariables = setVariableMetaSprite(deserializedBroadcastVars, stage.props());
+        const broadcastVariables = setVariableMetaSprite(deserializedBroadcastVars, this.props());
 
         return new VariableCollection(broadcastVariables);
     }
@@ -244,27 +248,20 @@ export class Sprite extends SpriteCollection {
      */
     public lists(): VariableCollection {
         let listVariables: Iterable<VariableProperties>;
-        const stage = getSpriteMeta(this.props()).project.stage();
-
-        // Handle Global SCALAR vars
-        const deserializedGlobalListVars: Iterable<VariableProperties> = makeIterable(
-            stage.prop(SpriteAttributes.LISTS),
+        const deserializedLocalListVars: Iterable<VariableProperties> = makeIterable(
+            this.prop(SpriteAttributes.LISTS),
             deserializeListVariables,
         );
 
-        const globalListVariableIterable = setVariableMetaSprite(deserializedGlobalListVars, stage.props());
-
-        listVariables = globalListVariableIterable;
-
-        // Handle Local SCALAR vars
+        listVariables = setVariableMetaSprite(deserializedLocalListVars, this.props());
         if (!this.isStage()) {
-            const deserializedLocalListVars: Iterable<VariableProperties> = makeIterable(
-                this.prop(SpriteAttributes.LISTS),
-                deserializeListVariables,
+            listVariables = chain(
+                listVariables,
+                getSpriteMeta(this.props())
+                    .project.stage()
+                    .lists()
+                    .propsIterable(),
             );
-
-            const localListVariableIterable = setVariableMetaSprite(deserializedLocalListVars, this.props());
-            listVariables = chain(globalListVariableIterable, localListVariableIterable);
         }
 
         return new VariableCollection(listVariables);
@@ -279,33 +276,22 @@ export class Sprite extends SpriteCollection {
      */
     public variables(): VariableCollection {
         let scalarVariables: Iterable<VariableProperties>;
-
-        const stage = getSpriteMeta(this.props()).project.stage();
-
-        // Handle Global SCALAR vars
-        const deserializedGlobalScalarVars: Iterable<VariableProperties> = makeIterable(
-            stage.prop(SpriteAttributes.VARIABLES),
+        // Handle Local SCALAR vars
+        const deserializedLocalScalarVars = makeIterable(
+            this.prop(SpriteAttributes.VARIABLES),
             deserializeVariables,
         );
-        const globalScalarVariableIterable = setVariableMetaSprite(
-            deserializedGlobalScalarVars,
-            stage.props(),
-        );
 
-        scalarVariables = globalScalarVariableIterable;
+        scalarVariables = setVariableMetaSprite(deserializedLocalScalarVars, this.props());
 
         if (!this.isStage()) {
-            // Handle Local SCALAR vars
-            const deserializedLocalScalarVars = makeIterable(
-                this.prop(SpriteAttributes.VARIABLES),
-                deserializeVariables,
+            scalarVariables = chain(
+                scalarVariables,
+                getSpriteMeta(this.props())
+                    .project.stage()
+                    .variables()
+                    .propsIterable(),
             );
-            const localScalarVariableIterable = setVariableMetaSprite(
-                deserializedLocalScalarVars,
-                this.props(),
-            );
-
-            scalarVariables = chain(globalScalarVariableIterable, localScalarVariableIterable);
         }
 
         return new VariableCollection(scalarVariables);
