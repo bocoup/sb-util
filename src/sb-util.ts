@@ -21,8 +21,19 @@ import {
 import { map, makeIterable, first, chain, filterIterable, flatmapIterable } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
-import { deserializeBlocks, deserializeVariables } from './sb3-serialize';
-import { getSpriteMeta, getBlockMeta, getVariableMeta, setMetaIterable } from './meta-data';
+import {
+    deserializeBlocks,
+    deserializeVariables,
+    deserializeBroadcastVariables,
+    deserializeListVariables,
+} from './sb3-serialize';
+import {
+    getSpriteMeta,
+    getBlockMeta,
+    getVariableMeta,
+    setMetaIterable,
+    setVariableMetaSprite,
+} from './meta-data';
 
 enum SpriteAttributes {
     BLOCKS = 'blocks',
@@ -196,61 +207,88 @@ export class Sprite extends SpriteCollection {
         return blocks;
     }
 
-    public broadcasts(): Record<string, string> {
-        // DISABLING ESLINT: broadcasts are a nested object
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return this.prop(SpriteAttributes.BROADCASTS);
+    /**
+     * @return {VariableCollection}
+     *
+     * In the Scratch VM, broadcasts are variables, and
+     *  in the Scratch GUI are always global
+     */
+    public broadcasts(): VariableCollection {
+        const stage = getSpriteMeta(this.props()).project.stage();
+
+        const deserializedBroadcastVars: Iterable<VariableProperties> = makeIterable(
+            stage.prop(SpriteAttributes.BROADCASTS),
+            deserializeBroadcastVariables,
+        );
+
+        const broadcastVariables = setVariableMetaSprite(deserializedBroadcastVars, stage.props());
+
+        return new VariableCollection(broadcastVariables);
     }
 
-    // DISABLING ESLINT: lists are a nested object
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public lists(): Record<string, any> {
-        return this.prop(SpriteAttributes.LISTS);
+    /**
+     * @return {VariableCollection}
+     *
+     * In the Scratch VM, lists are a variable type. They can
+     *  be local or global to a Sprite
+     */
+    public lists(): VariableCollection {
+        let listVariables: Iterable<VariableProperties>;
+
+        // Handle Local LIST vars
+        const deserializedLocalListVars: Iterable<VariableProperties> = makeIterable(
+            this.prop(SpriteAttributes.LISTS),
+            deserializeListVariables,
+        );
+
+        const localListVariableIterable = setVariableMetaSprite(deserializedLocalListVars, this.props());
+        listVariables = localListVariableIterable;
+
+        // Add global lists vars to local scope
+        if (!this.isStage()) {
+            listVariables = chain(
+                localListVariableIterable,
+                getSpriteMeta(this.props())
+                    .project.stage()
+                    .lists()
+                    .propsIterable(),
+            );
+        }
+
+        return new VariableCollection(listVariables);
     }
 
     /**
      * @return {VariableCollection}. The variables available to a Sprite include the
      *      variables attached to the sprite as well as variables in the
-     *      global scope, which are attached to the stage
+     *      global scope, which are attached to the stage. Also included in variables
+     *      are broadcasts (which are always global) and lists, which can be global
+     *      or local.
      */
     public variables(): VariableCollection {
-        let taggedVariables: Iterable<VariableProperties>;
+        let scalarVariables: Iterable<VariableProperties>;
 
-        const stage = getSpriteMeta(this.props()).project.stage();
-        const deserializedGlobalVars: Iterable<VariableProperties> = makeIterable(
-            stage.prop(SpriteAttributes.VARIABLES),
+        // Handle Local SCALAR vars
+        const deserializedLocalScalarVars = makeIterable(
+            this.prop(SpriteAttributes.VARIABLES),
             deserializeVariables,
         );
+        const localScalarVariableIterable = setVariableMetaSprite(deserializedLocalScalarVars, this.props());
 
-        const globalVariableIter = setMetaIterable(
-            deserializedGlobalVars,
-            (v): VariableProperties => {
-                getVariableMeta(v).sprite = stage.props();
-                return v;
-            },
-        );
-
-        taggedVariables = globalVariableIter;
+        scalarVariables = localScalarVariableIterable;
 
         if (!this.isStage()) {
-            // add global scope from stage
-            const deserializedLocalVars = makeIterable(
-                this.prop(SpriteAttributes.VARIABLES),
-                deserializeVariables,
+            // Handle Global SCALAR vars
+            scalarVariables = chain(
+                localScalarVariableIterable,
+                getSpriteMeta(this.props())
+                    .project.stage()
+                    .variables()
+                    .propsIterable(),
             );
-
-            const localVariableIter = setMetaIterable(
-                deserializedLocalVars,
-                (v): VariableProperties => {
-                    getVariableMeta(v).sprite = this.props();
-                    return v;
-                },
-            );
-
-            taggedVariables = chain(globalVariableIter, localVariableIter);
         }
 
-        return new VariableCollection(taggedVariables);
+        return new VariableCollection(scalarVariables);
     }
 }
 

@@ -75,11 +75,21 @@ export interface SB3SerializedBlocks {
     [id: string]: SB3SerializedBlock;
 }
 
-export interface SB3Variables {
-    [id: string]: SB3VariableProperties;
+export interface SB3ScalarVariables {
+    [id: string]: SB3ScalarVariableProperties;
 }
 
-export type SB3VariableProperties = [string, (string | number), boolean];
+export type SB3ScalarVariableProperties = [string, (string | number), boolean];
+
+export interface SB3BroadcastVariables {
+    [id: string]: string;
+}
+
+export type SB3ListVariableProperties = [string, string[]];
+
+export interface SB3ListVariables {
+    [id: string]: SB3ListVariableProperties;
+}
 
 export interface SpriteProperties {
     isStage: boolean;
@@ -148,7 +158,8 @@ export interface BlockQueryProperties {
 export interface VariableProperties {
     id: string;
     name: string;
-    type?: string;
-    isCloud: boolean;
+    type: string;
+    // this only applies to scalar type variables
+    isCloud?: boolean;
     value: number | string | string[];
 }

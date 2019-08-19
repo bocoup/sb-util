@@ -162,29 +162,100 @@ describe('Sprite class -------------------------', () => {
         expect(blocks).toBeInstanceOf(BlockCollection);
     });
 
-    test('get all variables on stage and ensure that there are no vars from other sprites', () => {
-        const stageVariables = spBig.stage().variables();
-        const globalVar = stageVariables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
-        expect(globalVar.global()).toBeTruthy();
-        expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
+    describe('global variables tests on stage', () => {
+        let stageVariables;
+        beforeAll(() => {
+            stageVariables = spBig.stage().variables();
+        });
 
-        // ensure that vars outside of global scope are not included
-        const localVar = stageVariables.byId('58`Aw=nriuw[2/#s@20!-X vel');
-        expect(localVar).toBeNull();
+        test('get global variable on stage', () => {
+            const globalVar = stageVariables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+            expect(globalVar.global()).toBeTruthy();
+            expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
+        });
+
+        test('local scalar vars not on stage', () => {
+            // ensure that scalar vars outside of global scope are not included
+            const localScalarVar = stageVariables.byId('58`Aw=nriuw[2/#s@20!-X vel');
+            expect(localScalarVar).toBeNull();
+        });
+
+        test('local list var not on stage', () => {
+            // ensure that list vars outside of global scope are not included
+            const localListVar = stageVariables.byId('2Q_=y9u5Qq|~fG25;O7V');
+            expect(localListVar).toBeNull();
+        });
+
+        test('broadcast var on stage is global', () => {
+            const globalBroadcastVar = spBig
+                .stage()
+                .broadcasts()
+                .byId('broadcastMsgId-start glowing (accelerator)');
+            expect(globalBroadcastVar.global()).toBeTruthy();
+        });
+
+        test('list var on stage is global', () => {
+            const globalListVar = spBig
+                .stage()
+                .lists()
+                .byId('Pi3E!fcsKWLQ}5(ugkcS');
+            expect(globalListVar.global()).toBeTruthy();
+        });
     });
 
-    test('get all variables on a Sprite and make sure global scope vars from stage included', () => {
-        const variables = spriteWithVars.variables();
+    describe('variable tests on sprite', () => {
+        let variables;
 
-        const localVar = variables.byId('58`Aw=nriuw[2/#s@20!-X vel');
-        expect(localVar.prop('name')).toEqual('X vel');
-        expect(localVar.prop('value')).toEqual(-0.44432764720836493);
-        expect(localVar.global()).toBeFalsy();
+        beforeAll(() => {
+            variables = spriteWithVars.variables();
+        });
 
-        // variable in global scope
-        const globalVar = variables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
-        expect(globalVar.prop('name')).toEqual('glitch_Acceleration');
-        expect(globalVar.prop('value')).toEqual('50');
+        test('get a local scalar variable on a Sprite', () => {
+            const localScalarVar = variables.byId('58`Aw=nriuw[2/#s@20!-X vel');
+            expect(localScalarVar.prop('name')).toEqual('X vel');
+            expect(localScalarVar.prop('value')).toEqual(-0.44432764720836493);
+            expect(localScalarVar.global()).toBeFalsy();
+        });
+
+        test('get a local list variable on a Sprite', () => {
+            const localListVar = spriteWithVars.lists().byId('2Q_=y9u5Qq|~fG25;O7V');
+            expect(localListVar.prop('name')).toEqual('sprite-list');
+            expect(
+                localListVar
+                    .prop('value')
+                    .map(Number)
+                    .reduce((a: number, b: number) => a + b),
+            ).toEqual(66);
+        });
+
+        test('global scalar var from stage available', () => {
+            // scalar variable in global scope
+            const globalScalarVar = variables.byId('1B!G;|;P6ALif|?9(Tum-glitch_Acceleration');
+            expect(globalScalarVar.prop('name')).toEqual('glitch_Acceleration');
+            expect(globalScalarVar.prop('value')).toEqual('50');
+            expect(globalScalarVar.global()).toBeTruthy();
+        });
+
+        test('global broadcast var from stage available', () => {
+            // broadcast variable in global scope
+            const globalBroadcastVar = spriteWithVars
+                .broadcasts()
+                .byId('broadcastMsgId-start glowing (accelerator)');
+            expect(globalBroadcastVar.prop('name')).toEqual('start glowing (accelerator)');
+            expect(globalBroadcastVar.prop('value')).toEqual('start glowing (accelerator)');
+            expect(globalBroadcastVar.global()).toBeTruthy();
+        });
+
+        test('global list var from stage available', () => {
+            const globalListVar = spriteWithVars.lists().byId('Pi3E!fcsKWLQ}5(ugkcS');
+            expect(globalListVar.prop('name')).toEqual('global-list');
+            expect(
+                globalListVar
+                    .prop('value')
+                    .map(Number)
+                    .reduce((a: number, b: number) => a + b),
+            ).toEqual(55);
+        });
     });
 });
 

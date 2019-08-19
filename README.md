@@ -351,16 +351,17 @@ An *Asset* is a singleton of *AssetCollection*.
 **toBuffer()**
 Return: *Promise* to the file buffer of this Asset
 
- ## CLI Proposal
-
- *Coming soon*
-
 ---
-
 ### Variable Collection
 A *Variable* collection represents a collection of local and global variables belonging to a sprite.
 
 ### Variable
+
+---
+
+ ## CLI Proposal
+
+ *Coming soon*
 
 ---
 
