@@ -44,3 +44,31 @@ export const getVariableMeta = (p: VariableProperties): VariableMeta => {
 export function setMetaIterable<T>(iterable: Iterable<T>, predicate: (item: T) => T): Iterable<T> {
     return makeIterable(iterable, (d): Iterator<T> => map(d, predicate));
 }
+
+export const setVariableMetaIterable = (
+    iter: Iterable<VariableProperties>,
+    meta: VariableMeta,
+): Iterator<VariableProperties> =>
+    map(
+        iter,
+        (props): VariableProperties => {
+            Object.assign(getVariableMeta(props), meta);
+            return props;
+        },
+    );
+
+/**
+ *
+ * @param deserialized iterable of VariableProperties
+ * @param sprite A Sprite object
+ */
+export function setVariableMetaSprite(
+    deserialized: Iterable<VariableProperties>,
+    sprite: SpriteProperties,
+): Iterable<VariableProperties> {
+    return makeIterable(
+        deserialized,
+        (d: Iterable<VariableProperties>): Iterator<VariableProperties> =>
+            setVariableMetaIterable(d, { sprite }),
+    );
+}
