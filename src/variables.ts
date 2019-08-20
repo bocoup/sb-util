@@ -21,7 +21,7 @@ export class Variable extends PropertiesWrapper<VariableProperties> {
 
 /** Class representing a variable collection */
 export class VariableCollection extends CollectionWrapper<VariableProperties, Variable> {
-    protected static PropClass = Variable;
+    protected static WrapperClass = Variable;
 
     /**
      * Find the variable by a given ID

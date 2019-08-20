@@ -33,7 +33,7 @@ export class PropertiesWrapper<T> {
  */
 export class CollectionWrapper<T, U> {
     // Assign to the type of the PropertiesWrapper that we create
-    protected static PropClass: new (T) => unknown = PropertiesWrapper;
+    protected static WrapperClass: new (T) => unknown = PropertiesWrapper;
 
     public constructor(props: Iterable<T>) {
         propsStorage.set(this, props);
@@ -50,8 +50,8 @@ export class CollectionWrapper<T, U> {
      * Iterate the collection mapping to a utility class for additional query.
      */
     public [Symbol.iterator](): Iterator<U> {
-        const { PropClass } = this.constructor as typeof CollectionWrapper;
-        return map(this.propsIterable(), (item: T): U => new PropClass(item) as U);
+        const { WrapperClass } = this.constructor as typeof CollectionWrapper;
+        return map(this.propsIterable(), (item: T): U => new WrapperClass(item) as U);
     }
 
     /**

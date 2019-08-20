@@ -151,7 +151,7 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
  * Multiple sprites in a collection.
  */
 export class SpriteCollection extends CollectionWrapper<SpriteProperties, Sprite> {
-    protected static PropClass = Sprite;
+    protected static WrapperClass = Sprite;
 
     /**
      * Query sprites

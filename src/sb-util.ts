@@ -4,16 +4,13 @@ import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset
 
 export { BlockShapes } from './block-shapes';
 import { getSpriteMeta } from './meta-data';
+
 import { SpriteCollection, Sprite } from './sprites';
 import { Block, BlockCollection } from './blocks';
 import { Variable, VariableCollection } from './variables';
+
+// Export the collections and properties wrappers
 export { Block, BlockCollection, SpriteCollection, Sprite, Variable, VariableCollection };
-
-/*
-sb-util CLASSES.
-
-The classes below make up the sb-util API.
-*/
 
 export class ScratchProject {
     /**
@@ -51,11 +48,6 @@ export class ScratchProject {
     }
 }
 
-/*
-LOADING FUNCTIONS.
-
-The global methods below create ScratchProject objects based on the input source.
-*/
 export const loadSb3 = async function(source: string): Promise<ScratchProject> {
     const projectJSON = await new Sb3Fetcher().parse(source);
     return new ScratchProject(projectJSON);

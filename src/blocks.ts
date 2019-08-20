@@ -59,7 +59,7 @@ export class Block extends PropertiesWrapper<BlockProperties> {
 }
 
 export class BlockCollection extends CollectionWrapper<BlockProperties, Block> {
-    protected static PropClass = Block;
+    protected static WrapperClass = Block;
 
     /**
      * Return the Block matching the provided id.
