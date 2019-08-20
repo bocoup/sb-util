@@ -24,17 +24,27 @@ export enum SpriteAttributes {
 }
 
 export class Sprite extends PropertiesWrapper<SpriteProperties> {
+    /**
+     * Is this sprite the stage?
+     */
     public isStage(): boolean {
         const { isStage } = this.props();
         return Boolean(isStage);
     }
 
+    /**
+     * Return position {x, y} of Sprite.
+     */
     public position(): SpritePosition {
         const x = this.prop('x');
         const y = this.prop('y');
         return { x, y };
     }
 
+    /**
+     * Get blocks from the sprite
+     * @param query optional query string to query the collection
+     */
     public blocks(query?: string): BlockCollection {
         const deserialized = makeIterable(this.prop('blocks'), deserializeBlocks);
         const tagOwnerIterator = setMetaIterable(
@@ -136,9 +146,16 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
     }
 }
 
+/**
+ * Multiple sprites in a collection.
+ */
 export class SpriteCollection extends CollectionWrapper<SpriteProperties, Sprite> {
     protected static PropClass = Sprite;
 
+    /**
+     * Query sprites
+     * @param selector Query Selector
+     */
     public query(selector: string): SpriteCollection {
         validateSpriteSelector(selector);
 
