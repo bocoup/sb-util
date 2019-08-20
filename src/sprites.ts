@@ -1,6 +1,7 @@
 import { PropertiesWrapper, CollectionWrapper } from './base';
 import { SpriteProperties, SpritePosition, BlockProperties, VariableProperties } from './abstracts';
-import { BlockCollection, VariableCollection } from './sb-util';
+import { BlockCollection } from './sb-util';
+import { VariableCollection } from './variables';
 import { makeIterable, chain, filterIterable, flatmapIterable } from './generators';
 import {
     deserializeBlocks,
