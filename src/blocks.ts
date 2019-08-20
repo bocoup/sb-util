@@ -79,7 +79,7 @@ export class BlockCollection extends CollectionWrapper<BlockProperties, Block> {
      * Filter the collection to only top level (first block in a stack) blocks.
      */
     public top(): BlockCollection {
-        return new BlockCollection(filterIterable(this.propsIterable(), ({ topLevel }): boolean => topLevel));
+        return new BlockCollection(filterIterable(this.props(), ({ topLevel }): boolean => topLevel));
     }
 
     /**
@@ -92,7 +92,7 @@ export class BlockCollection extends CollectionWrapper<BlockProperties, Block> {
             queryValues: { type, shape, opcode },
         }: BlockQueryProperties = parseBlockQuerySelector(selector);
 
-        const allBlocks = this.propsIterable();
+        const allBlocks = this.props();
 
         let filterFunction = (b: BlockProperties): boolean => b[attr] === opcode;
 

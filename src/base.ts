@@ -35,14 +35,14 @@ export class CollectionWrapper<T, U> {
     // Assign to the type of the PropertiesWrapper that we create
     protected static WrapperClass: new (T) => unknown = PropertiesWrapper;
 
-    public constructor(props: Iterable<T>) {
-        propsStorage.set(this, props);
+    public constructor(iterable: Iterable<T>) {
+        propsStorage.set(this, iterable);
     }
 
     /**
      * Return the raw iterable that returns raw properties instead of wrapped properties.
      */
-    public propsIterable(): Iterable<T> {
+    public props(): Iterable<T> {
         return propsStorage.get(this);
     }
 
@@ -51,7 +51,7 @@ export class CollectionWrapper<T, U> {
      */
     public [Symbol.iterator](): Iterator<U> {
         const { WrapperClass } = this.constructor as typeof CollectionWrapper;
-        return map(this.propsIterable(), (item: T): U => new WrapperClass(item) as U);
+        return map(this.props(), (item: T): U => new WrapperClass(item) as U);
     }
 
     /**

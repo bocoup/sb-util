@@ -106,7 +106,7 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
                 getSpriteMeta(this.props())
                     .project.stage()
                     .lists()
-                    .propsIterable(),
+                    .props(),
             );
         }
 
@@ -139,7 +139,7 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
                 getSpriteMeta(this.props())
                     .project.stage()
                     .variables()
-                    .propsIterable(),
+                    .props(),
             );
         }
 
@@ -194,7 +194,7 @@ export class SpriteCollection extends CollectionWrapper<SpriteProperties, Sprite
             filterFunction = (s: SpriteProperties): boolean => attr in s;
         }
 
-        return new SpriteCollection(filterIterable(this.propsIterable(), filterFunction));
+        return new SpriteCollection(filterIterable(this.props(), filterFunction));
     }
 
     /**
@@ -202,7 +202,7 @@ export class SpriteCollection extends CollectionWrapper<SpriteProperties, Sprite
      */
     public blocks(): BlockCollection {
         return new BlockCollection(
-            flatmapIterable(this, (sprite): Iterable<BlockProperties> => sprite.blocks().propsIterable()),
+            flatmapIterable(this, (sprite): Iterable<BlockProperties> => sprite.blocks().props()),
         );
     }
 }
