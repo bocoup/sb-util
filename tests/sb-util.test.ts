@@ -45,7 +45,12 @@ describe('ScratchProject class --------------------', () => {
         });
 
         test('props returns value for first sprite in SpriteCollection', () => {
-            expect(sp.sprites().prop('isStage')).toBeDefined();
+            expect(
+                sp
+                    .sprites()
+                    .first()
+                    .prop('isStage'),
+            ).toBeDefined();
         });
 
         describe('sprites()', () => {
@@ -84,9 +89,9 @@ describe('ScratchProject class --------------------', () => {
                 expect(stage.prop('doesNotExist')).toBeUndefined();
             });
 
-            test('to get prop when sprites are empty', () => {
+            test('to get first when sprites are empty', () => {
                 const emptySprites = sp.sprites('[layerOrder=200]');
-                expect(emptySprites.prop('isStage')).toBeNull();
+                expect(emptySprites.first()).toBeNull();
             });
 
             test('to query for sprites with an attribute that is numeric', () => {
@@ -102,13 +107,13 @@ describe('ScratchProject class --------------------', () => {
             test('to query sprites where value is a string with double quotes', () => {
                 const sprite = sp.sprites('[name="Sprite1"]');
                 expect(sprite).toBeInstanceOf(SpriteCollection);
-                expect(sprite.prop('name')).toEqual('Sprite1');
+                expect(sprite.first().prop('name')).toEqual('Sprite1');
             });
 
             test('to query sprites where value is a string with single quotes', () => {
                 const sprite = sp.sprites("[name='Sprite1']");
                 expect(sprite).toBeInstanceOf(SpriteCollection);
-                expect(sprite.prop('name')).toEqual('Sprite1');
+                expect(sprite.first().prop('name')).toEqual('Sprite1');
             });
         });
 
