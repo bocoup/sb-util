@@ -1,22 +1,14 @@
-import {
-    Queryable,
-    BlockProperties,
-    BlockQueryProperties,
-    SB3ProjectJSON,
-    VariableProperties,
-} from './abstracts';
+import { SB3ProjectJSON, VariableProperties } from './abstracts';
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 
-import { parseBlockQuerySelector } from './selector-parse';
-
-import { map, first, filterIterable } from './generators';
-import { BlockOpcodeToShape } from './block-shapes';
+import { map, first } from './generators';
 export { BlockShapes } from './block-shapes';
-import { getSpriteMeta, getBlockMeta, getVariableMeta } from './meta-data';
+import { getSpriteMeta, getVariableMeta } from './meta-data';
 import { SpriteCollection, Sprite } from './sprites';
+import { Block, BlockCollection } from './blocks';
 
-export { SpriteCollection, Sprite };
+export { Block, BlockCollection, SpriteCollection, Sprite };
 
 /*
 sb-util CLASSES.
@@ -60,121 +52,6 @@ export class ScratchProject {
 
     public blocks(): BlockCollection {
         return this.sprites().blocks();
-    }
-}
-
-export class BlockCollection implements Queryable {
-    public constructor(blocks: Iterable<BlockProperties>) {
-        storage.set(this, blocks);
-    }
-
-    public propsIterable(): Iterable<BlockProperties> {
-        return storage.get(this);
-    }
-
-    public top(): BlockCollection {
-        return new BlockCollection(filterIterable(this.propsIterable(), ({ topLevel }): boolean => topLevel));
-    }
-
-    public first(): Block {
-        return first(this);
-    }
-
-    public props(): BlockProperties {
-        // Remember that a Block is a BlockCollection of one element
-        return first(storage.get(this));
-    }
-
-    // todo: eventually this should be able to be written as return this.query(`[id="${id}"]`).first()
-    public byId(id: string): Block {
-        for (const block of this) {
-            if (block.prop('id') === id) {
-                return block;
-            }
-        }
-        return null;
-    }
-
-    public query(selector: string): BlockCollection {
-        const {
-            attr,
-            queryValues: { type, shape, opcode },
-        }: BlockQueryProperties = parseBlockQuerySelector(selector);
-
-        const allBlocks = this.propsIterable();
-
-        let filterFunction = (b: BlockProperties): boolean => b[attr] === opcode;
-
-        // Check that the query is asking for block type
-        if (type) filterFunction = (b: BlockProperties): boolean => b[attr].includes(type);
-
-        if (shape) {
-            if (type) {
-                filterFunction = (b: BlockProperties): boolean =>
-                    b[attr].includes(type) && BlockOpcodeToShape[b.opcode] === shape;
-            } else {
-                filterFunction = (b: BlockProperties): boolean => BlockOpcodeToShape[b.opcode] === shape;
-            }
-        }
-
-        const blocks: Iterable<BlockProperties> = filterIterable(allBlocks, filterFunction);
-
-        return new BlockCollection(blocks);
-    }
-
-    public [Symbol.iterator](): Iterator<Block> {
-        const blocks: Iterable<BlockProperties> = storage.get(this);
-        return map(blocks, (props: BlockProperties): Block => new Block(props));
-    }
-}
-
-export class Block extends BlockCollection {
-    public constructor(block: BlockProperties) {
-        super([block]);
-    }
-
-    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public prop(property: string): any {
-        const props = this.props();
-        if (!props) return null;
-        return props[property];
-    }
-
-    public sprite(): Sprite {
-        return new Sprite(getBlockMeta(this.props()).sprite);
-    }
-
-    public parent(): Block {
-        const parentId: string = this.prop('parent');
-        if (parentId) {
-            return this.sprite()
-                .blocks()
-                .byId(parentId);
-        }
-        return null;
-    }
-
-    public input(name: string): Block {
-        const { inputs } = this.props();
-        const blockId = inputs[name] && inputs[name].block;
-        if (blockId) {
-            return this.sprite()
-                .blocks()
-                .byId(blockId);
-        }
-        return null;
-    }
-
-    public shadow(name: string): Block {
-        const { inputs } = this.props();
-        const blockId = inputs[name] && inputs[name].shadow;
-        if (blockId) {
-            return this.sprite()
-                .blocks()
-                .byId(blockId);
-        }
-        return null;
     }
 }
 
