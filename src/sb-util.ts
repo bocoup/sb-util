@@ -1,7 +1,5 @@
 import {
     Queryable,
-    SpriteProperties,
-    SpritePosition,
     BlockProperties,
     BlockQueryProperties,
     SB3ProjectJSON,
@@ -10,37 +8,15 @@ import {
 
 import { Sb3Fetcher, ProjectJsonFetcher, ProjectByCloudIdFetcher } from './asset-fetcher';
 
-import {
-    validateSpriteSelector,
-    isSelectorAttrValue,
-    getAttributeAndValueInSelector,
-    attrValueContainsQuotes,
-    parseBlockQuerySelector,
-} from './selector-parse';
+import { parseBlockQuerySelector } from './selector-parse';
 
-import { map, makeIterable, first, chain, filterIterable, flatmapIterable } from './generators';
+import { map, first, filterIterable } from './generators';
 import { BlockOpcodeToShape } from './block-shapes';
 export { BlockShapes } from './block-shapes';
-import {
-    deserializeBlocks,
-    deserializeVariables,
-    deserializeBroadcastVariables,
-    deserializeListVariables,
-} from './sb3-serialize';
-import {
-    getSpriteMeta,
-    getBlockMeta,
-    getVariableMeta,
-    setMetaIterable,
-    setVariableMetaSprite,
-} from './meta-data';
+import { getSpriteMeta, getBlockMeta, getVariableMeta } from './meta-data';
+import { SpriteCollection, Sprite } from './sprites';
 
-enum SpriteAttributes {
-    BLOCKS = 'blocks',
-    BROADCASTS = 'broadcasts',
-    LISTS = 'lists',
-    VARIABLES = 'variables',
-}
+export { SpriteCollection, Sprite };
 
 /*
 sb-util CLASSES.
@@ -84,211 +60,6 @@ export class ScratchProject {
 
     public blocks(): BlockCollection {
         return this.sprites().blocks();
-    }
-}
-
-export class SpriteCollection implements Queryable {
-    public constructor(sprites: Iterable<SpriteProperties>) {
-        storage.set(this, sprites);
-    }
-
-    public first(): Sprite {
-        const props: SpriteProperties = first(storage.get(this));
-        return props ? new Sprite(props) : null;
-    }
-
-    public propsIterable(): Iterable<SpriteProperties> {
-        return storage.get(this);
-    }
-
-    public blocks(): BlockCollection {
-        return new BlockCollection(
-            flatmapIterable(this, (sp): Iterable<BlockProperties> => sp.blocks().propsIterable()),
-        );
-    }
-
-    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public prop(attribute: string): any {
-        const first = this.first();
-        if (!first) return null;
-        return first.prop(attribute);
-    }
-
-    /*
-		Currently, the query selector syntax only supports
-		attribute selector style in the form of [attr] and
-		[attr=value]
-	*/
-    public query(selector: string): SpriteCollection {
-        validateSpriteSelector(selector);
-
-        // string between brackets
-        const selectorBody = selector.slice(1, -1);
-
-        let filterFunction: (s: SpriteProperties) => boolean;
-        // the attribute being queried for might be string, number, or bool
-        let attrValue: string | number | boolean;
-
-        // case when selector string is in [attr=value] form
-        if (isSelectorAttrValue(selectorBody)) {
-            const [attr, valueString] = getAttributeAndValueInSelector(selectorBody);
-
-            attrValue = valueString;
-
-            // handle case when booleans are strings
-            if (valueString === 'true' || valueString === 'false') {
-                attrValue = Boolean(valueString);
-            }
-            // handle case when numbers are strings
-            else if (!isNaN(+valueString)) {
-                attrValue = +valueString;
-            }
-            // handle case when strings have quotes
-            else if (attrValueContainsQuotes(valueString)) {
-                attrValue = valueString.replace(/^[",'](.*)[",']$/, '$1');
-            }
-
-            filterFunction = (s: SpriteProperties): boolean => s[attr] === attrValue;
-        }
-        // case when selector string is in [attr] form
-        else {
-            const attr = selectorBody;
-            filterFunction = (s: SpriteProperties): boolean => attr in s;
-        }
-
-        return new SpriteCollection(filterIterable(this.propsIterable(), filterFunction));
-    }
-
-    public isStage(): boolean {
-        return this.prop('isStage');
-    }
-
-    public [Symbol.iterator](): Iterator<Sprite> {
-        return map(this.propsIterable(), (props: SpriteProperties): Sprite => new Sprite(props));
-    }
-}
-
-export class Sprite extends SpriteCollection {
-    public constructor(sprite: SpriteProperties) {
-        // Per documentation, Sprite is a singleton SpriteCollection
-        super([sprite]);
-    }
-
-    // DISABLING ESLINT: a prop can be a string, number, object, or boolean
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public prop(property: string): any {
-        return this.props()[property];
-    }
-
-    public props(): SpriteProperties {
-        return storage.get(this)[0];
-    }
-
-    public position(): SpritePosition {
-        const x = this.prop('x');
-        const y = this.prop('y');
-        return { x, y };
-    }
-
-    public blocks(query?: string): BlockCollection {
-        const deserialized = makeIterable(this.prop('blocks'), deserializeBlocks);
-        const tagOwnerIterator = setMetaIterable(
-            deserialized,
-            (b): BlockProperties => {
-                getBlockMeta(b).sprite = this.props();
-                return b;
-            },
-        );
-        const blocks = new BlockCollection(tagOwnerIterator);
-        if (query !== undefined) {
-            return blocks.query(query);
-        }
-        return blocks;
-    }
-
-    /**
-     * @return {VariableCollection}
-     *
-     * In the Scratch VM, broadcasts are variables, and
-     *  in the Scratch GUI are always global
-     */
-    public broadcasts(): VariableCollection {
-        const stage = getSpriteMeta(this.props()).project.stage();
-
-        const deserializedBroadcastVars: Iterable<VariableProperties> = makeIterable(
-            stage.prop(SpriteAttributes.BROADCASTS),
-            deserializeBroadcastVariables,
-        );
-
-        const broadcastVariables = setVariableMetaSprite(deserializedBroadcastVars, stage.props());
-
-        return new VariableCollection(broadcastVariables);
-    }
-
-    /**
-     * @return {VariableCollection}
-     *
-     * In the Scratch VM, lists are a variable type. They can
-     *  be local or global to a Sprite
-     */
-    public lists(): VariableCollection {
-        let listVariables: Iterable<VariableProperties>;
-
-        // Handle Local LIST vars
-        const deserializedLocalListVars: Iterable<VariableProperties> = makeIterable(
-            this.prop(SpriteAttributes.LISTS),
-            deserializeListVariables,
-        );
-
-        const localListVariableIterable = setVariableMetaSprite(deserializedLocalListVars, this.props());
-        listVariables = localListVariableIterable;
-
-        // Add global lists vars to local scope
-        if (!this.isStage()) {
-            listVariables = chain(
-                localListVariableIterable,
-                getSpriteMeta(this.props())
-                    .project.stage()
-                    .lists()
-                    .propsIterable(),
-            );
-        }
-
-        return new VariableCollection(listVariables);
-    }
-
-    /**
-     * @return {VariableCollection}. The variables available to a Sprite include the
-     *      variables attached to the sprite as well as variables in the
-     *      global scope, which are attached to the stage. Also included in variables
-     *      are broadcasts (which are always global) and lists, which can be global
-     *      or local.
-     */
-    public variables(): VariableCollection {
-        let scalarVariables: Iterable<VariableProperties>;
-
-        // Handle Local SCALAR vars
-        const deserializedLocalScalarVars = makeIterable(
-            this.prop(SpriteAttributes.VARIABLES),
-            deserializeVariables,
-        );
-        const localScalarVariableIterable = setVariableMetaSprite(deserializedLocalScalarVars, this.props());
-
-        scalarVariables = localScalarVariableIterable;
-
-        if (!this.isStage()) {
-            // Handle Global SCALAR vars
-            scalarVariables = chain(
-                localScalarVariableIterable,
-                getSpriteMeta(this.props())
-                    .project.stage()
-                    .variables()
-                    .propsIterable(),
-            );
-        }
-
-        return new VariableCollection(scalarVariables);
     }
 }
 
