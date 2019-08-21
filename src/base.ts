@@ -1,4 +1,4 @@
-import { map, first } from './generators';
+import { map, first, count, getIndex } from './generators';
 
 const propsStorage = new WeakMap();
 
@@ -59,5 +59,20 @@ export class CollectionWrapper<T, U> {
      */
     public first(): U {
         return first(this);
+    }
+
+    /**
+     * Return the length of the collection.
+     */
+    public count(): number {
+        return count(this.props());
+    }
+
+    /**
+     * Get the wrapped item from the collection at a specific index.
+     * @param n index of collection to retrieve
+     */
+    public index(n: number): U {
+        return getIndex(this, n);
     }
 }

@@ -59,6 +59,17 @@ describe('ScratchProject class --------------------', () => {
                 expect(sprites).toBeInstanceOf(SpriteCollection);
             });
 
+            test('to have correct count', async () => {
+                sprites = sp.sprites();
+                expect(sprites.count()).toEqual(2);
+            });
+
+            test('to be able to fetch from index', async () => {
+                sprites = sp.sprites();
+                expect(sprites.index(1).prop('name')).toEqual('Sprite1');
+                expect(sprites.index(2)).toEqual(null);
+            });
+
             test('to fail with empty string query string', () => {
                 expect(() => sp.sprites('')).toThrowError();
             });
@@ -340,8 +351,10 @@ describe('Block class -------------------------', () => {
     });
 
     test('can find top blocks', () => {
-        expect.assertions(10);
-        for (const block of blocks.top()) {
+        expect.assertions(11);
+        const top = blocks.top();
+        expect(top.count()).toEqual(10);
+        for (const block of top) {
             expect(block.prop('topLevel')).toBeTruthy();
         }
     });
