@@ -62,3 +62,36 @@ export function last<T>(iter: Iterable<T>): T {
     }
     return val;
 }
+
+export function getIndex<T>(iter: Iterable<T> | T[], index: number): T {
+    if (Array.isArray(iter)) {
+        return iter[index];
+    }
+
+    let counter = 0;
+    const runner = iter[Symbol.iterator]();
+    let done = false;
+    while (counter++ < index && !done) {
+        done = runner.next().done;
+    }
+    if (done) return null;
+    const { done: doneNow, value } = runner.next();
+    if (doneNow) return null;
+    return value;
+}
+
+/**
+ * Get count from iterable, using "length" property if it exists on the iterable.
+ * @param iterable Iterable or array to get length from
+ */
+export function count(iterable: Iterable<unknown> | unknown[]): number {
+    if ('length' in iterable) {
+        return (iterable as unknown[]).length;
+    }
+    let counter = 0;
+    let iter = iterable[Symbol.iterator]();
+    while (!iter.next().done) {
+        counter++;
+    }
+    return counter;
+}
