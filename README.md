@@ -1,11 +1,11 @@
-
 # sb-util
 
 ## Table of Contents
-- [sb-util Proposal (RFC)](https://github.com/bocoup/sb-util/blob/master/README.md#sb-util-proposal-rfc)
-  - [JavaScript API Proposal](https://github.com/bocoup/sb-util/blob/master/README.md#javascript-api-proposal)
-  - [CLI Proposal](https://github.com/bocoup/sb-util/blob/master/README.md#cli-proposal)
-- [Development](https://github.com/bocoup/sb-util/blob/master/README.md#development)
+
+-   [sb-util Proposal (RFC)](https://github.com/bocoup/sb-util/blob/master/README.md#sb-util-proposal-rfc)
+    -   [JavaScript API Proposal](https://github.com/bocoup/sb-util/blob/master/README.md#javascript-api-proposal)
+    -   [CLI Proposal](https://github.com/bocoup/sb-util/blob/master/README.md#cli-proposal)
+-   [Development](https://github.com/bocoup/sb-util/blob/master/README.md#development)
 
 ---
 
@@ -19,46 +19,46 @@ The resulting tool should be usable in test suites, scripts, and applications.
 
 ## Javascript API Proposal
 
-- [Loading a Scratch Project](https://github.com/bocoup/sb-util#javascript-api-proposal)
-- [ScratchProject](https://github.com/bocoup/sb-util#scratchproject)
-- [SpriteCollection](https://github.com/bocoup/sb-util#spritecollection)
-- [Sprite](https://github.com/bocoup/sb-util#sprite)
-- [BlockCollection](https://github.com/bocoup/sb-util#blockcollection)
-- [Block](https://github.com/bocoup/sb-util#block)
-- [AssetCollection](https://github.com/bocoup/sb-util#assetcollection)
-- [Asset](https://github.com/bocoup/sb-util#asset)
+-   [Loading a Scratch Project](https://github.com/bocoup/sb-util#javascript-api-proposal)
+-   [ScratchProject](https://github.com/bocoup/sb-util#scratchproject)
+-   [SpriteCollection](https://github.com/bocoup/sb-util#spritecollection)
+-   [Sprite](https://github.com/bocoup/sb-util#sprite)
+-   [BlockCollection](https://github.com/bocoup/sb-util#blockcollection)
+-   [Block](https://github.com/bocoup/sb-util#block)
+-   [AssetCollection](https://github.com/bocoup/sb-util#assetcollection)
+-   [Asset](https://github.com/bocoup/sb-util#asset)
 
-API methods that have been implmented are marked with *implemented*.
+API methods that have been implmented are marked with _implemented_.
 
+### **Loading a Scratch Project** - _implemented_
 
-### **Loading a Scratch Project** - *implemented*
 sb-util exposes loading functions to asynchronously instantiate a **ScratchProject**
- object. These loading functions handle file I/O and HTTP request handling, decoupling that process from the ScratchProject object itself.
+object. These loading functions handle file I/O and HTTP request handling, decoupling that process from the ScratchProject object itself.
 
- ---
+---
 
-**loadSb3(*sb3File*)**
+**loadSb3(_sb3File_)**
 
-Parameter(s): *sb3File*. String representing local file location of an *.sb3 file or a URI to an *.sb3 file   
-Return: *Promise*. This Promise object will resolve to a ScratchProject
+Parameter(s): _sb3File_. String representing local file location of an _.sb3 file or a URI to an _.sb3 file  
+Return: _Promise_. This Promise object will resolve to a ScratchProject
 
 ```
 const sp = await loadSb3('foo.sb3');
 ```
 
-**loadProjectJson(*projectJsonFile*)**
+**loadProjectJson(_projectJsonFile_)**
 
-Parameter(s): *projectJsonFile*. String representing local file location of an project.json file or a URI to an project.json file   
-Return: *Promise*. This Promise object will resolve to a ScratchProject
+Parameter(s): _projectJsonFile_. String representing local file location of an project.json file or a URI to an project.json file  
+Return: _Promise_. This Promise object will resolve to a ScratchProject
 
 ```
 const sp = await loadProjectJson('project.json');
 ```
 
-**loadCloudId(*cloudId*)**
+**loadCloudId(_cloudId_)**
 
-Parameter(s): *cloudId*. Number representing a Cloud ID in Scratch   
-Return: *Promise*. This Promise object will resolve to a ScratchProject  
+Parameter(s): _cloudId_. Number representing a Cloud ID in Scratch  
+Return: _Promise_. This Promise object will resolve to a ScratchProject
 
 ```
 const sp = await loadCloudId(123456);
@@ -68,8 +68,8 @@ const sp = await loadCloudId(123456);
 
 ### ScratchProject
 
-**ScratchProject(*projectJSON*)**  - *implemented*  
-A *ScratchProject* gets initialized by an object, represented by the project.json. The *assetFetcher* is an optional constructor argument that represents an object is responsible for retrieving asset buffers for an Asset object.
+**ScratchProject(_projectJSON_)** - _implemented_  
+A _ScratchProject_ gets initialized by an object, represented by the project.json. The _assetFetcher_ is an optional constructor argument that represents an object is responsible for retrieving asset buffers for an Asset object.
 
 ```
 const { ScratchProject } - require('sb-util');
@@ -81,68 +81,83 @@ const sp = new ScratchProject(projectJson);
 **Methods**
 
 **assets()**  
-Return: *AssetCollection* representing all the assets of a project
+Return: _AssetCollection_ representing all the assets of a project
+
 ```
 let assets = sp.assets()
 ```
 
-**blocks()**  -- *implemented*  
-Return: *BlockCollection* representing all the blocks in the project. This *BlockCollection* can be further filtered to get specific blocks
+**blocks()** -- _implemented_  
+Return: _BlockCollection_ representing all the blocks in the project. This _BlockCollection_ can be further filtered to get specific blocks
+
 ```
 let blocks = sp.blocks();
 ```
 
-**sprites(...args)**  - *implemented*  
-Return: *SpriteCollection* representing all sprites in the project. A selector syntax can be passed to this function to get sprites that meet the syntax criteria
+**sprites(...args)** - _implemented_  
+Return: _SpriteCollection_ representing all sprites in the project. A selector syntax can be passed to this function to get sprites that meet the syntax criteria
+
 ```
 let sprites = sp.sprites();
 
 let stage = sp.sprites('[isStage=true]').pop();
-let sprite1 = sp.sprites('[name="Cat"]').pop(); 
+let sprite1 = sp.sprites('[name="Cat"]').pop();
 ```
 
-**stage()**  - *implemented*  
-Return: *Sprite* a stage
+**stage()** - _implemented_  
+Return: _Sprite_ a stage
+
 ```
 let stage = sp.stage();
 ```
 
 **variables()**
-Return: a list of *Variable* objects in the project
+Return: a list of _Variable_ objects in the project
+
 ```
 let vars = sp.variables();
-``` 
+```
+
 ---
+
+### Collections
+
+There are multiple "Collection" classes that all share some collection methods, the shared methods are listed here.
+
+**@\_\_iterator()** - _implemented_
+Collection objects are meant to be iterated using the `for ... of` `[Symbol.iterator]` protocol. Items iterated in this way will be emited using the "Wrapper Class" for the collection (e.g. Block for BlockCollection)
+
+**props()** - _implemented_
+Return: the Iterable of the raw "properties" objects for the items in the collection.
+
+**count()** - _implemented_
+Return: Counts the items in the collection, similar to `.length` on an array but these collections aren't arrays.
+
+**first()** - _implemented_
+Return: the first item in the collection wrapped, null if no items in collection.
+
+**index(n)** - _implemented_
+Return: Similar to using `array[n]` on an array, this will get the wrapped item at the specified index in the collection, or null if out-of-bounds.
 
 ### SpriteCollection
 
-A *SpriteCollection* represents an iterable collection of objects that represent Sprites. Array methods such as *map()*, *filter()*, and *pop()* are available.
+A _SpriteCollection_ represents an iterable collection of objects that represent Sprites.
 
 **Methods**
 
-**first()** - *implemented*  
-Return: the first element in the SpriteCollection, null if the collection is empty
-
-**prop(attribute)** - *implemented*  
-Parameter: *attribute* string.
-Return: the value of the given attribute for the **first** element in the SpriteCollection, undefined if the prop does not exist, null if the SpriteCollection is empty
-
-Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
-
-
-**query(selector)** - *implemented*  
-Parameter(s): *selector* string in the CSS selector syntax style.
-Return: *SpriteCollection*
+**query(selector)** - _implemented_  
+Parameter(s): _selector_ string in the CSS selector syntax style.
+Return: _SpriteCollection_
 
 ```
 let stage = sp.sprites('[isStage=true]');
 let sprite1 = sp.sprites('[name="Cat"]');
 ```
 
-Possible selector syntax, in attribute selector style:  
+Possible selector syntax, in attribute selector style:
 
 | Sprite Attribute | Selector Syntax                                                  |
-| ---------------- |------------------------------------------------------------------|
+| ---------------- | ---------------------------------------------------------------- |
 | isStage          | [isStage={true or false}]                                        |
 | layerOrder       | [layerOrder={a number}]                                          |
 | draggable        | [draggable={true or false}]                                      |
@@ -152,40 +167,45 @@ Possible selector syntax, in attribute selector style:
 
 ### Sprite
 
-A *Sprite* is a singleton of *SpriteCollection*, with additional methods that are specific to a single Sprite. A Sprite can be a stage or an individual sprite.
+A _Sprite_ is a singleton of _SpriteCollection_, with additional methods that are specific to a single Sprite. A Sprite can be a stage or an individual sprite.
 
-**Methods**   
+**Methods**
 
-**prop(attribute)** - *implemented*  
-Parameter: *attribute* string.
-Return: *any* value for a given attribute
+**prop(attribute)** - _implemented_  
+Parameter: _attribute_ string.
+Return: _any_ value for a given attribute
+
 ```
 const currentCostume = sprite.prop('currentCostume');
 ```
 
-Attributes available to pass: *name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle*
+Attributes available to pass: _name, isStage, variables, lists, broadcasts, blocks, comments, currentCostume, costumes, sounds, volume, layerOrder, temp, videoTransparency, videoState, textToSpeechLanguage, visible, x, y, size, direction, draggable, rotationStyle_
 
-**blocks()** - *implemented*  
-Return: *BlockCollection*
+**blocks()** - _implemented_  
+Return: _BlockCollection_
+
 ```
 const sprite = sp.sprites('[name="Cat"]');
 const blocks = sprite.blocks();
 ```
 
 **assets()**  
-Return: *AssetCollection*
+Return: _AssetCollection_
+
 ```
 const assets = sprite.assets();
 ```
 
-**position()** - *implemented*  
+**position()** - _implemented_  
 Return: the (X, Y) cooredinates of a Sprite in Object notation
+
 ```
 const { x, y } = sprite.position();
 ```
 
-**broadcasts()** - *implemented*  
+**broadcasts()** - _implemented_  
 Return: a list of Objects representing a broadcast, which contains an id and a message
+
 ```
 const broadcasts = sprite.broadcasts();
 
@@ -193,8 +213,8 @@ const broadcasts = sprite.broadcasts();
 Object.entries(broadcasts).map(([key, value]) => ({ messageId: key, message: value }));
 ```
 
-**lists()** - *implemented*  
-Return: a list of Objects representing a list, which contains an id, name, and an  Array of values
+**lists()** - _implemented_  
+Return: a list of Objects representing a list, which contains an id, name, and an Array of values
 
 ```
 const lists = sprite.lists();
@@ -203,113 +223,54 @@ Object.entries(lists).map(([key, value]) => console.log({key, listName: value[0]
 ```
 
 ---
+
 ### BlockCollection
 
-A *BlockCollection* represents and iterable collection of objects that represent Blocks. Array methods such as *map()*, *filter()*, and *pop()* are available.
+A _BlockCollection_ represents and iterable collection of objects that represent Blocks.
 
 **Methods**
 
-**first()** - *implemented*  
-Return: the first element in the BlockCollection, null if the collection is empty
+**query(selector)** - _partially implemented_  
+Parameter(s): _selector_, a string with the convention similar to CSS selector syntax  
+Return: _BlockCollection_
 
-**query(selector)** - *partially implemented*  
-Parameter(s): *selector*, a string with the convention similar to CSS selector syntax  
-Return: *BlockCollection*
+This is a mapping of Block object attributes to selector syntax:
 
-This is a mapping of Block object attributes to selector syntax:  
+| Block Attribute                                                                                 | CSS-like Selector Syntax                                                                    | Status          |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | --------------- |
+| opcode ([Full set of opcodes](https://github.com/LLK/scratch-vm/tree/develop/src/blocks))       | Type selector. `blocks.query('event_whenflagclicked')` or `blocks.query('control_if_else')` | implemented     |
+| block type ([Full set of block types](https://en.scratch-wiki.info/wiki/Blocks#List_of_Blocks)) | Class selector. `blocks.query('.motion')` or `blocks.query('.sensing')`                     | implemented     |
+| block shape ([Full set of block shapes](https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes)) | Pseudo class selector. `blocks.query(':hat')` or `blocks.query(':reporter')`                | not implemented |
 
-| Block Attribute     | CSS-like Selector Syntax      | Status |
-| --------------------|-------------------------------|--------|
-| opcode ([Full set of opcodes](https://github.com/LLK/scratch-vm/tree/develop/src/blocks )) | Type selector. `blocks.query('event_whenflagclicked')` or `blocks.query('control_if_else')`| implemented | 
-| block type ([Full set of block types](https://en.scratch-wiki.info/wiki/Blocks#List_of_Blocks)) | Class selector. `blocks.query('.motion')` or `blocks.query('.sensing')` | implemented |
-| block shape ([Full set of block shapes](https://en.scratch-wiki.info/wiki/Blocks#Block_Shapes))| Pseudo class selector. `blocks.query(':hat')` or `blocks.query(':reporter')` | not implemented |
-
-The selector syntax can be combined for more fine-grained filtering.  
+The selector syntax can be combined for more fine-grained filtering.
 
 **Get all motion reporter blocks**
+
 ```
 const motionReporterBlocks = blocks.query('.motion :reporter');
 ```
 
-**renderToText()**  
-Return: a text representation of blocks that are connected. The output will be a consumable JSON format, which can be written to a file and also be converted to YAML
-
-```
-const sprite1Blocks = sp.sprites({name: 'Sprite1'}).blocks();
-const blockTextRepresentation = sprite1Blocks.renderToText()
-
-// Output
-{
-    "blockGroups" : [
-        // First group of blocks
-        {
-            "output": [
-                "event_whenflagclicked",
-                {
-                    "control_if_else" : {
-                        "if": {
-                            "condition" : {
-                                "sensing_keypressed": {
-                                    "sensing_keyoptions": "space"
-                                }
-                            }
-                        },
-                        "then": [
-                            {
-                                "data_changevariableby": {
-                                    "variable": "my variable",
-                                    "value": 10
-                                }
-                            },
-                            {
-                                "motion_gotoxy": {
-                                    "X": "my variable",
-                                    "Y": 10
-                                }
-                            }
-                        ],
-                        "else": [
-                            {
-                                "control_wait_until": {
-                                    "sensing_keypressed": {
-                                        "sensing_keyoptions": "space"
-                                    }
-                                }
-                            }
-                        ]
-                    }
-                }
-            ]
-        },
-        // Second group of blocks
-        {
-            "output": { ... }
-        }
-    ]
-}
-```
 ---
 
 ### Block
 
-A *Block* is a singleton of *BlockCollection*. It has additional methods, specific to the data held by an individual block.
+A _Block_ is a singleton of _BlockCollection_. It has additional methods, specific to the data held by an individual block.
 
 **Methods**
 
-**prop(attribute)** - *implemented*  
-Parameter: *attribute* string.
-Return: *any* value for a given attribute
+**prop(attribute)** - _implemented_  
+Parameter: _attribute_ string.
+Return: _any_ value for a given attribute
 
-Attributes available to pass: *opcode, next, parent, inputs, fields, shadow, topLevel*
-
+Attributes available to pass: _opcode, next, parent, inputs, fields, shadow, topLevel_
 
 **args(selector)**  
-This method is similar to *query*. *args* returns the inputs or fields (depending on the query string) of a block using one of the strings defined below. Certain query strings can return an input or a field.
+This method is similar to _query_. _args_ returns the inputs or fields (depending on the query string) of a block using one of the strings defined below. Certain query strings can return an input or a field.
 
-A sample of selector values for the *args* method is defined in this table: 
+A sample of selector values for the _args_ method is defined in this table:
 
-| Inputs                       | Fields                      | Both Input and Field   |
-|------------------------------|-----------------------------|------------------------|
+| Inputs                                                                                                                                | Fields                                          | Both Input and Field                        |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | ------------------------------------------- |
 | X, Y, DURATION, MESSAGE, SECS CONDITION, SUBSTACK, OPERAND, TIMES, CHANGE, FROM, VALUE, BROADCAST_INPUT, BACKDROP, VOLUME, NUM1, NUM2 | EFFECT, BROADCAST_OPTION, VARIABLE, STOP_OPTION | COSTUME, TOUCHINGOBJECTMENU, TO, SOUND_MENU |
 
 ```
@@ -321,70 +282,78 @@ const operand = block.args('OPERAND');
 **substacks()**  
 Returns the substacks for the block as an list of Objects representing a substack. If a block is not capable of having a substack, the list will be empty.
 
-
 ---
 
-### AssetCollection  
-An *AssetCollection* represents an interable collection of objects that represent Assets, which are static files included in an *.sb3 file or somwhere the user designates, used for costumes and sounds.
+### AssetCollection
+
+An _AssetCollection_ represents an interable collection of objects that represent Assets, which are static files included in an \*.sb3 file or somwhere the user designates, used for costumes and sounds.
 
 **Methods**
 
 **query(selector)**  
 Parameter(s): A string in the CSS selector style
-Return: *AssetCollection*
+Return: _AssetCollection_
 
 Possible selector syntax:
 
-| Asset Attribute | Selector Syntax |
-|-----------------|-----------------|
-| name            | Attribute selector. `assets.query('name="83a9787d4cb6f3b7632b4ddfebf74367.wav")`|
-| dataFormat      | Type Selector. `assets.query('wav')`|
+| Asset Attribute | Selector Syntax                                                                  |
+| --------------- | -------------------------------------------------------------------------------- |
+| name            | Attribute selector. `assets.query('name="83a9787d4cb6f3b7632b4ddfebf74367.wav")` |
+| dataFormat      | Type Selector. `assets.query('wav')`                                             |
 
 ---
 
 ### Asset
 
-An *Asset* is a singleton of *AssetCollection*.
+An _Asset_ is a singleton of _AssetCollection_.
 
 **Methods**
 
 **toBuffer()**
-Return: *Promise* to the file buffer of this Asset
+Return: _Promise_ to the file buffer of this Asset
 
 ---
+
 ### Variable Collection
-A *Variable* collection represents a collection of local and global variables belonging to a sprite.
+
+A _Variable_ collection represents a collection of local and global variables belonging to a sprite.
 
 ### Variable
 
 ---
 
- ## CLI Proposal
+## CLI Proposal
 
- *Coming soon*
+_Coming soon_
 
 ---
 
 ## Development
+
 sb-util is implemented in TypeScript and will be available as a JavaScript library on [npm](https://www.npmjs.com/package/sb-util) and as a CLI tool.
 
 ## Install Dependencies
+
 ```
 npm install
 ```
 
 ## Build
+
 ```
 npm run build
 ```
 
 ## Run Tests
+
 ```
 npm test
 ```
 
 ## Linting Code
+
 This project uses [https://prettier.io](Prettier) to format code and [https://eslint.org/](ESLint) for linting (catching errors). To format and lint, run
+
 ```
 npm run lint
 ```
