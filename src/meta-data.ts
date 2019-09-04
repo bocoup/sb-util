@@ -1,6 +1,8 @@
 import { SpriteProperties, BlockProperties, VariableProperties } from './abstracts';
-import { ScratchProject } from './sb-util';
+import { ScratchProject } from './ScratchProject';
 import { makeIterable, map } from './generators';
+
+export const propsStorage = new WeakMap();
 
 export interface SpriteMeta {
     project: ScratchProject;

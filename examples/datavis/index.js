@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const express = require('express');
 const app = express();
 const port = 3000;
@@ -13,18 +15,18 @@ app.get('/shapes', async (req, res) => {
     const blocks = sp.blocks();
 
     let shapeCounts = [];
-    for (let [key, shape] of Object.entries(BlockShapes)) {
+    for (let shape of Object.values(BlockShapes)) {
         const shapeBlocks = blocks.query(`:${shape}`);
         const totalShapeCount = Array.from(shapeBlocks.propsIterable()).length;
         const blocksCount = {};
         Array.from(shapeBlocks.propsIterable()).map(b => {
-            if(!(b.opcode in blocksCount)) {
+            if (!(b.opcode in blocksCount)) {
                 blocksCount[b.opcode] = 1;
             } else {
                 blocksCount[b.opcode] = blocksCount[b.opcode] + 1;
             }
-        })
-        shapeCounts.push({ name: shape, count: totalShapeCount, blocks: blocksCount});
+        });
+        shapeCounts.push({ name: shape, count: totalShapeCount, blocks: blocksCount });
     }
 
     res.send(shapeCounts);
@@ -32,4 +34,4 @@ app.get('/shapes', async (req, res) => {
 
 app.use('/datavis', express.static('public'));
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
