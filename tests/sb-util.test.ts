@@ -9,7 +9,7 @@ import {
     Sprite,
     BlockCollection,
     Block,
-} from '../src/sb-util';
+} from '../src';
 import process from 'process';
 import { BlockProperties } from '../src/abstracts';
 import { BlockOpcodeToShape } from '../src/block-shapes';

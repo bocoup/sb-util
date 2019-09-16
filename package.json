@@ -6,13 +6,14 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "start": "jest --watch",
     "jest": "jest",
-    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "prettier": "prettier \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "lint": "eslint --ext js,ts .",
+    "prettier": "prettier \"**/*.js\" \"**/*.ts\" \"**/*.json\"",
     "test": "npm run prettier -- --check && npm run lint && npm run jest",
     "prepublish": "npm run build"
   },
-  "main": "dist/sb-util.js",
+  "main": "dist/index.js",
   "keywords": [
     "scratch",
     "scratchblocks",

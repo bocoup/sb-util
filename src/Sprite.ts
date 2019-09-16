@@ -1,8 +1,8 @@
-import { PropertiesWrapper, CollectionWrapper } from './base';
+import { PropertiesWrapper } from './PropertiesWrapper';
 import { SpriteProperties, SpritePosition, BlockProperties, VariableProperties } from './abstracts';
-import { BlockCollection } from './sb-util';
-import { VariableCollection } from './variables';
-import { makeIterable, chain, filterIterable, flatmapIterable } from './generators';
+import { BlockCollection } from './BlockCollection';
+import { VariableCollection } from './VariableCollection';
+import { makeIterable, chain } from './generators';
 import {
     deserializeBlocks,
     deserializeVariables,
@@ -10,19 +10,7 @@ import {
     deserializeListVariables,
 } from './sb3-serialize';
 import { setMetaIterable, getBlockMeta, getSpriteMeta, setVariableMetaSprite } from './meta-data';
-import {
-    validateSpriteSelector,
-    isSelectorAttrValue,
-    getAttributeAndValueInSelector,
-    attrValueContainsQuotes,
-} from './selector-parse';
-
-export enum SpriteAttributes {
-    BLOCKS = 'blocks',
-    BROADCASTS = 'broadcasts',
-    LISTS = 'lists',
-    VARIABLES = 'variables',
-}
+import { SpriteAttributes } from './enum';
 
 export class Sprite extends PropertiesWrapper<SpriteProperties> {
     /**
@@ -32,7 +20,6 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
         const { isStage } = this.props();
         return Boolean(isStage);
     }
-
     /**
      * Return position {x, y} of Sprite.
      */
@@ -41,7 +28,6 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
         const y = this.prop('y');
         return { x, y };
     }
-
     /**
      * Get blocks from the sprite
      * @param query optional query string to query the collection
@@ -61,7 +47,6 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
         }
         return blocks;
     }
-
     /**
      * @return {VariableCollection}
      *
@@ -70,17 +55,13 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
      */
     public broadcasts(): VariableCollection {
         const stage = getSpriteMeta(this.props()).project.stage();
-
         const deserializedBroadcastVars: Iterable<VariableProperties> = makeIterable(
             stage.prop(SpriteAttributes.BROADCASTS),
             deserializeBroadcastVariables,
         );
-
         const broadcastVariables = setVariableMetaSprite(deserializedBroadcastVars, stage.props());
-
         return new VariableCollection(broadcastVariables);
     }
-
     /**
      * @return {VariableCollection}
      *
@@ -89,16 +70,13 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
      */
     public lists(): VariableCollection {
         let listVariables: Iterable<VariableProperties>;
-
         // Handle Local LIST vars
         const deserializedLocalListVars: Iterable<VariableProperties> = makeIterable(
             this.prop(SpriteAttributes.LISTS),
             deserializeListVariables,
         );
-
         const localListVariableIterable = setVariableMetaSprite(deserializedLocalListVars, this.props());
         listVariables = localListVariableIterable;
-
         // Add global lists vars to local scope
         if (!this.isStage()) {
             listVariables = chain(
@@ -109,10 +87,8 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
                     .props(),
             );
         }
-
         return new VariableCollection(listVariables);
     }
-
     /**
      * @return {VariableCollection}. The variables available to a Sprite include the
      *      variables attached to the sprite as well as variables in the
@@ -122,16 +98,13 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
      */
     public variables(): VariableCollection {
         let scalarVariables: Iterable<VariableProperties>;
-
         // Handle Local SCALAR vars
         const deserializedLocalScalarVars = makeIterable(
             this.prop(SpriteAttributes.VARIABLES),
             deserializeVariables,
         );
         const localScalarVariableIterable = setVariableMetaSprite(deserializedLocalScalarVars, this.props());
-
         scalarVariables = localScalarVariableIterable;
-
         if (!this.isStage()) {
             // Handle Global SCALAR vars
             scalarVariables = chain(
@@ -142,67 +115,6 @@ export class Sprite extends PropertiesWrapper<SpriteProperties> {
                     .props(),
             );
         }
-
         return new VariableCollection(scalarVariables);
-    }
-}
-
-/**
- * Multiple sprites in a collection.
- */
-export class SpriteCollection extends CollectionWrapper<SpriteProperties, Sprite> {
-    protected static WrapperClass = Sprite;
-
-    /**
-     * Query sprites
-     * @param selector Query Selector
-     */
-    public query(selector: string): SpriteCollection {
-        validateSpriteSelector(selector);
-
-        // string between brackets
-        const selectorBody = selector.slice(1, -1);
-
-        let filterFunction: (s: SpriteProperties) => boolean;
-        // the attribute being queried for might be string, number, or bool
-        let attrValue: string | number | boolean;
-
-        // case when selector string is in [attr=value] form
-        if (isSelectorAttrValue(selectorBody)) {
-            const [attr, valueString] = getAttributeAndValueInSelector(selectorBody);
-
-            attrValue = valueString;
-
-            // handle case when booleans are strings
-            if (valueString === 'true' || valueString === 'false') {
-                attrValue = Boolean(valueString);
-            }
-            // handle case when numbers are strings
-            else if (!isNaN(+valueString)) {
-                attrValue = +valueString;
-            }
-            // handle case when strings have quotes
-            else if (attrValueContainsQuotes(valueString)) {
-                attrValue = valueString.replace(/^[",'](.*)[",']$/, '$1');
-            }
-
-            filterFunction = (s: SpriteProperties): boolean => s[attr] === attrValue;
-        }
-        // case when selector string is in [attr] form
-        else {
-            const attr = selectorBody;
-            filterFunction = (s: SpriteProperties): boolean => attr in s;
-        }
-
-        return new SpriteCollection(filterIterable(this.props(), filterFunction));
-    }
-
-    /**
-     * Return the blocks for all sprites in collection.
-     */
-    public blocks(): BlockCollection {
-        return new BlockCollection(
-            flatmapIterable(this, (sprite): Iterable<BlockProperties> => sprite.blocks().props()),
-        );
     }
 }
